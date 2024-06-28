@@ -50,6 +50,7 @@ const AddAccount = () => {
         returnSecureToken: true,
       });
       autCtx.login(res.data.idToken);
+      localStorage.setItem("user-mail", userMail);
       if (res.status === 200 && isLogIn) {
         message = "Welcome Back";
         setTimeout(() => {

@@ -6,8 +6,8 @@ const CardComponent = (props) => {
   return (
     <div className="fixed top-[0%] bg-black bg-opacity-70 w-[100vw] h-[100vh] px-14 z-10">
       <p
-        className="text-white text-2xl flex items-center justify-center pt-10 bg-black p-2 rounded-lg cursor-pointer"
-        onClick={() => navigate("/home")}
+        className="text-white text-3xl flex items-center justify-center pt-10 p-2 rounded-lg cursor-pointer font-bold "
+        onClick={() => navigate(-1)}
       >
         X
       </p>

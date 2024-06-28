@@ -149,7 +149,7 @@ const ChangePassword = () => {
           </button>
           <button
             className="mt-4 ms-4 bg-red-700 text-white rounded-2xl py-3 px-6"
-            onClick={() => navigate("/")}
+            onClick={() => navigate(-1)}
           >
             Cancel
           </button>
