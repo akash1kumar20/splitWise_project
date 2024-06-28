@@ -52,6 +52,9 @@ const AddAccount = () => {
       autCtx.login(res.data.idToken);
       if (res.status === 200 && isLogIn) {
         message = "Welcome Back";
+        setTimeout(() => {
+          navigate("/home");
+        }, 2000);
       }
       if (res.status === 200 && !isLogIn) {
         message = "Account Created Successully!";
