@@ -26,7 +26,7 @@ export const AuthContextProvider = (props) => {
   };
 
   const passwordTypeHandler = () => {
-    setForgetPassword(true);
+    setForgetPassword((forgetPassword) => !forgetPassword);
   };
 
   const contextValue = {

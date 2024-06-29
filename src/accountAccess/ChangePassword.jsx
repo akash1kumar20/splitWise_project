@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import AuthContext from "../../store/auth-context";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import axios from "axios";
@@ -7,15 +7,19 @@ import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 
 const ChangePassword = () => {
+  const navigate = useNavigate();
   const autCtx = useContext(AuthContext);
-  const forgetPassword = autCtx.forgetPassword;
+  let forgetPassword = autCtx.forgetPassword;
   const [passowrd, setPassword] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState(false);
   const mailRef = useRef();
   const passwordRef = useRef();
   const confirmPasswordRef = useRef();
   const token = autCtx.token;
-  const navigate = useNavigate();
+  let isUserLogged = localStorage.getItem("split-token");
+  if (!isUserLogged) {
+    forgetPassword = true;
+  }
 
   async function submitFormHandler(event) {
     event.preventDefault();

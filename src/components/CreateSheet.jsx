@@ -30,6 +30,7 @@ const CreateSheet = () => {
         `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${invitationCode}.json`,
         sheetDetails
       );
+
       let sheetRes = await axios.post(
         `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${changeEmail}/sheets.json`,
         sheetDetails

@@ -10,6 +10,7 @@ import CreateSheet from "./components/CreateSheet.jsx";
 import Sheets from "./components/Sheets.jsx";
 import FindSheet from "./components/FindSheet.jsx";
 import SingleSheet from "./components/SingleSheet.jsx";
+import WrongURL from "./ExtraComponents.jsx/WrongURL.jsx";
 
 const router = createBrowserRouter([
   { path: "/", element: <App /> },
@@ -38,6 +39,7 @@ const router = createBrowserRouter([
     ],
   },
   { path: "/home/sheets/:sheetName", element: <SingleSheet /> },
+  { path: "/*", element: <WrongURL /> },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(

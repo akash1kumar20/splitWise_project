@@ -8,7 +8,7 @@ const FindSheet = () => {
         <input
           type="text"
           required
-          placeholder="Enter 5 digit code here"
+          placeholder="Enter invitation code here"
           className="py-2 ps-2 bg-slate-500 text-white focus:outline-none placeholder:text-white w-full rounded-md border border-slate-700"
         />
         <button className="px-6 py-3 bg-blue-800 text-white rounded-xl mt-3">

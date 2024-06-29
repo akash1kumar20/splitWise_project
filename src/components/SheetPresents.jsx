@@ -8,6 +8,11 @@ import Footer from "../ExtraComponents.jsx/Footer";
 const AddSheet = () => {
   const [sheetPresent, setSheetPresent] = useState(false);
   const [sheetData, setSheetData] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+  }, []);
 
   useEffect(() => {
     const userMail = localStorage.getItem("user-mail");
@@ -22,6 +27,7 @@ const AddSheet = () => {
         let res = await axios.get(
           `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${changeEmail}/sheets.json`
         );
+        setLoading(false);
         if (res.status === 200) {
           setSheetPresent(true);
         }
@@ -37,6 +43,10 @@ const AddSheet = () => {
     fetchData();
   });
   const navigate = useNavigate();
+  const openSpecificSheetHandler = (sheet) => {
+    localStorage.setItem("invitationCode", sheet.inviationCode);
+    navigate(`/home/sheets/${sheet.code}`);
+  };
   return (
     <>
       <div className="bg-gray-900 text-white h-[100vh] w-[100vw]">
@@ -44,39 +54,46 @@ const AddSheet = () => {
           It sounds extraordinary but it's a fact that balance sheets can make
           fascinating reading.
         </h1>
-        <div className="grid grid-cols-2 md:grid-cols-4 py-16 md:mx-32 gap-y-6">
-          {sheetPresent &&
-            sheetData.map((sheet) => (
-              <div className="flex flex-col items-center gap-3 " key={sheet.id}>
-                <p
-                  className="text-xl p-6 rounded-full bg-gray-600 border-2 border-gray-500 shadow-xl cursor-pointer"
-                  onClick={() => navigate(`/home/sheets/${sheet.code}`)}
+        {loading && <p className="text-center mt-10">Loading...</p>}
+        {!loading && (
+          <div className="grid grid-cols-2 md:grid-cols-4 py-16 md:mx-32 gap-y-6">
+            {sheetPresent &&
+              sheetData.map((sheet) => (
+                <div
+                  className="flex flex-col items-center gap-3 "
+                  key={sheet.id}
                 >
-                  {sheet.sheetName}
-                </p>
-                <span className="text-sm text-gray-200">Your Sheet</span>
-              </div>
-            ))}
-          <div className="flex flex-col items-center gap-3">
-            <p
-              className="text-2xl p-6 rounded-full bg-gray-600 border-2 border-gray-500 shadow-xl cursor-pointer"
-              onClick={() => navigate("/home/sheets/addSheet")}
-            >
-              <IoMdAdd />
-            </p>
-            <span className="text-sm text-gray-200">Add Sheet</span>
+                  <p
+                    className="text-xl p-6 rounded-full bg-gray-600 border-2 border-gray-500 shadow-xl cursor-pointer"
+                    onClick={() => openSpecificSheetHandler(sheet)}
+                  >
+                    {sheet.sheetName}
+                  </p>
+                  <span className="text-sm text-gray-200">Your Sheet</span>
+                </div>
+              ))}
+            <div className="flex flex-col items-center gap-3">
+              <p
+                className="text-2xl p-6 rounded-full bg-gray-600 border-2 border-gray-500 shadow-xl cursor-pointer"
+                onClick={() => navigate("/home/sheets/addSheet")}
+              >
+                <IoMdAdd />
+              </p>
+              <span className="text-sm text-gray-200">Add Sheet</span>
+            </div>
+            <div className="flex flex-col items-center gap-3">
+              <p
+                className="text-xl p-6 rounded-full bg-gray-600 border-2 border-gray-500 shadow-xl cursor-pointer"
+                onClick={() => navigate("/home/sheets/findSheet")}
+              >
+                <FaSearch />
+              </p>
+              <span className="text-sm text-gray-200">Find Sheet</span>
+            </div>
           </div>
-          <div className="flex flex-col items-center gap-3">
-            <p
-              className="text-xl p-6 rounded-full bg-gray-600 border-2 border-gray-500 shadow-xl cursor-pointer"
-              onClick={() => navigate("/home/sheets/findSheet")}
-            >
-              <FaSearch />
-            </p>
-            <span className="text-sm text-gray-200">Find Sheet</span>
-          </div>
-        </div>
+        )}
       </div>
+
       <Footer />
     </>
   );
