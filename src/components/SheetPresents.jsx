@@ -4,24 +4,21 @@ import { FaSearch } from "react-icons/fa";
 import { IoMdAdd } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import Footer from "../ExtraComponents.jsx/Footer";
+import { useDispatch, useSelector } from "react-redux";
+import { expenseSheetActions } from "../../store";
 
 const AddSheet = () => {
   const [sheetPresent, setSheetPresent] = useState(false);
   const [sheetData, setSheetData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const changeEmail = useSelector((state) => state.expenseSheet.convertedMail);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     setLoading(true);
   }, []);
 
   useEffect(() => {
-    const userMail = localStorage.getItem("user-mail");
-    let changeEmail;
-    if (userMail === null) {
-      changeEmail = 0;
-    } else {
-      changeEmail = userMail.replace("@", "").replace(".", "");
-    }
     const fetchData = async () => {
       try {
         let res = await axios.get(
@@ -44,7 +41,13 @@ const AddSheet = () => {
   });
   const navigate = useNavigate();
   const openSpecificSheetHandler = (sheet) => {
-    localStorage.setItem("invitationCode", sheet.inviationCode);
+    dispatch(
+      expenseSheetActions.setCodes({
+        sheetCode: sheet.code,
+        inviteCode: sheet.inviationCode,
+      })
+    );
+
     navigate(`/home/sheets/${sheet.code}`);
   };
   return (

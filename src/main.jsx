@@ -11,6 +11,8 @@ import Sheets from "./components/Sheets.jsx";
 import FindSheet from "./components/FindSheet.jsx";
 import SingleSheet from "./components/SingleSheet.jsx";
 import WrongURL from "./ExtraComponents.jsx/WrongURL.jsx";
+import { Provider } from "react-redux";
+import store from "../store/index.js";
 
 const router = createBrowserRouter([
   { path: "/", element: <App /> },
@@ -43,9 +45,11 @@ const router = createBrowserRouter([
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <AuthContextProvider>
-    <React.StrictMode>
-      <RouterProvider router={router} />
-    </React.StrictMode>
-  </AuthContextProvider>
+  <Provider store={store}>
+    <AuthContextProvider>
+      <React.StrictMode>
+        <RouterProvider router={router} />
+      </React.StrictMode>
+    </AuthContextProvider>
+  </Provider>
 );

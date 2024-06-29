@@ -6,15 +6,16 @@ import { useNavigate, useParams } from "react-router-dom";
 import SheetDetailsCard from "../Card/SheetDetailsCard";
 import axios from "axios";
 import CreateExpense from "../Expenses/CreateExpense";
+import { useSelector } from "react-redux";
 
 const SingleSheet = () => {
   const navigate = useNavigate();
   const [sheets, setSheets] = useState([]);
   const [time, setTime] = useState(new Date());
   const [greetings, setGreetings] = useState("");
+  const token = useSelector((state) => state.expenseSheet.token);
 
   useEffect(() => {
-    const token = localStorage.getItem("split-token");
     if (!token) {
       navigate("/");
     }
@@ -37,12 +38,15 @@ const SingleSheet = () => {
     return clearInterval(timer);
   }, []);
   const param = useParams();
-  const userMail = localStorage.getItem("user-mail");
+  const userMail = useSelector((state) => state.expenseSheet.userMail);
+  const inviteCode = useSelector((state) => state.expenseSheet.inviteCode);
 
   useEffect(() => {
     let sheetName = param.sheetName;
-    let inviteCode = localStorage.getItem("invitationCode");
-    let toCallSheet = inviteCode.includes(sheetName);
+    let toCallSheet;
+    if (inviteCode !== null) {
+      toCallSheet = inviteCode.includes(sheetName);
+    }
 
     if (toCallSheet) {
       const fetchData = async () => {

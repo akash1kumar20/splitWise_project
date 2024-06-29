@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import AuthContext from "../../store/auth-context";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import axios from "axios";
@@ -16,8 +16,7 @@ const ChangePassword = () => {
   const passwordRef = useRef();
   const confirmPasswordRef = useRef();
   const token = autCtx.token;
-  let isUserLogged = localStorage.getItem("split-token");
-  if (!isUserLogged) {
+  if (!token) {
     forgetPassword = true;
   }
 

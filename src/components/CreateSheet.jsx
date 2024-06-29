@@ -4,20 +4,16 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const CreateSheet = () => {
   const sheetNameRef = useRef();
   const navigate = useNavigate();
+  const userMail = useSelector((state) => state.expenseSheet.userMail);
+  const changeEmail = useSelector((state) => state.expenseSheet.convertedMail);
   async function formSubmitHandler(event) {
     event.preventDefault();
     const sheetCode = Math.random().toString(36).substring(2, 7).toUpperCase();
-    const userMail = localStorage.getItem("user-mail");
-    let changeEmail;
-    if (userMail === null) {
-      changeEmail = 0;
-    } else {
-      changeEmail = userMail.replace("@", "").replace(".", "");
-    }
     const invitationCode = changeEmail + sheetCode;
     const sheetDetails = {
       code: sheetCode,

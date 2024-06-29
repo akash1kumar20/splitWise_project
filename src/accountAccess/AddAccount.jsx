@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import AuthContext from "../../store/auth-context";
+import { useDispatch } from "react-redux";
+import { expenseSheetActions } from "../../store";
 
 const AddAccount = () => {
   const [isLogIn, setIsLogIn] = useState(true);
@@ -15,6 +17,7 @@ const AddAccount = () => {
   const confirmPasswordRef = useRef();
   const navigate = useNavigate();
   const autCtx = useContext(AuthContext);
+  const dispatch = useDispatch();
 
   async function formSubmitHandler(event) {
     event.preventDefault();
@@ -50,7 +53,9 @@ const AddAccount = () => {
         returnSecureToken: true,
       });
       autCtx.login(res.data.idToken);
-      localStorage.setItem("user-mail", userMail);
+      dispatch(expenseSheetActions.setUserMail(userMail));
+      dispatch(expenseSheetActions.setToken(res.data.idToken));
+      dispatch(expenseSheetActions.setChangedMail(userMail));
       if (res.status === 200 && isLogIn) {
         message = "Welcome Back";
         setTimeout(() => {

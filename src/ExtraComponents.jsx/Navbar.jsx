@@ -2,22 +2,18 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import { IoIosAddCircle } from "react-icons/io";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 const Navbar = ({ openProfile }) => {
   const [sheetData, setSheetData] = useState([]);
   const navigate = useNavigate();
-  const userMail = localStorage.getItem("user-mail");
+  const userMail =
+    useSelector((state) => state.expenseSheet.userMail) || "User";
   const userabbreviation = userMail.substring(0, 2).toUpperCase();
+  const changeEmail = useSelector((state) => state.expenseSheet.convertedMail);
 
   useEffect(() => {
-    const userMail = localStorage.getItem("user-mail");
-    let changeEmail;
-    if (userMail === null) {
-      changeEmail = 0;
-    } else {
-      changeEmail = userMail.replace("@", "").replace(".", "");
-    }
     const fetchData = async () => {
       try {
         let res = await axios.get(

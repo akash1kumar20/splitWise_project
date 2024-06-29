@@ -3,9 +3,10 @@ import { useNavigate } from "react-router-dom";
 import AuthContext from "../../store/auth-context";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useSelector } from "react-redux";
 
 const Profile = () => {
-  const userMail = localStorage.getItem("user-mail");
+  const userMail = useSelector((state) => state.expenseSheet.userMail);
   const navigate = useNavigate();
   const autCtx = useContext(AuthContext);
   const logoutHandler = () => {

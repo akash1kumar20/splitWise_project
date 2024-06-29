@@ -1,7 +1,8 @@
 import React from "react";
+import { useSelector } from "react-redux";
 
 const CreateExpense = () => {
-  const userMail = localStorage.getItem("user-mail");
+  const userMail = useSelector((state) => state.expenseSheet.userMail);
 
   return (
     <form>
