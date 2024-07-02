@@ -24,8 +24,10 @@ const Profile = () => {
   return (
     <>
       <ToastContainer />
-      <div className=" bg-slate-900 w-fit flex flex-col right-0 fixed text-white me-2 px-5 mt-1 rounded-lg py-10 border-2 border-slate-400">
-        <span className="text-center font-bold text-xl">{userMail}</span>
+      <div className=" bg-slate-900 w-fit  flex flex-col right-0 fixed text-white me-2 px-5 mt-1 rounded-lg py-10 border-2 border-slate-400">
+        <span className="text-center font-bold underline text-sm">
+          {userMail}
+        </span>
         <button
           className="bg-slate-500 py-2 px-4 rounded-xl mb-2 mt-5 text-white hover:bg-slate-300 hover:text-black"
           onClick={() => navigate("/changePassword")}

@@ -7,6 +7,7 @@ const sheeetInitialState = {
   inviteCode: localStorage.getItem("inviteCode") || null,
   sheetCode: localStorage.getItem("sheetCode") || null,
   toEdit: [],
+  sheetFoundData: [],
 };
 
 const expenseSheetSlice = createSlice({
@@ -37,6 +38,10 @@ const expenseSheetSlice = createSlice({
     },
     setExpenseToEdit(state, action) {
       state.toEdit = state.toEdit.push(action.payload);
+    },
+
+    setSheetFoundData(state, action) {
+      state.sheetFoundData = action.payload;
     },
   },
 });

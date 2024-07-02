@@ -13,6 +13,7 @@ import SingleSheet from "./components/SingleSheet.jsx";
 import WrongURL from "./ExtraComponents.jsx/WrongURL.jsx";
 import { Provider } from "react-redux";
 import store from "../store/index.js";
+import FoundSheet from "./components/FoundSheet.jsx";
 
 const router = createBrowserRouter([
   { path: "/", element: <App /> },
@@ -35,6 +36,10 @@ const router = createBrowserRouter([
           {
             path: "/home/sheets/findSheet",
             element: <FindSheet />,
+          },
+          {
+            path: "/home/sheets/foundSheet",
+            element: <FoundSheet />,
           },
         ],
       },

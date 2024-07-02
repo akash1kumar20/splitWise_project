@@ -1,35 +1,13 @@
-import axios from "axios";
-import { useEffect, useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import { IoIosAddCircle } from "react-icons/io";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 const Navbar = ({ openProfile }) => {
-  const [sheetData, setSheetData] = useState([]);
   const navigate = useNavigate();
   const userMail =
     useSelector((state) => state.expenseSheet.userMail) || "User";
   const userabbreviation = userMail.substring(0, 2).toUpperCase();
-  const changeEmail = useSelector((state) => state.expenseSheet.convertedMail);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        let res = await axios.get(
-          `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${changeEmail}/sheets.json`
-        );
-        const sheetArray = [];
-        for (let key in res.data) {
-          sheetArray.push({ ...res.data[key], id: key });
-        }
-        setSheetData(sheetArray);
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    fetchData();
-  });
 
   const openProfileHandler = () => {
     openProfile();
@@ -37,16 +15,12 @@ const Navbar = ({ openProfile }) => {
 
   return (
     <div className="bg-slate-700 text-white h-16 flex justify-between md:px-10 px-2 items-center">
-      <select className="bg-black px-4 py-3 rounded-3xl " name="sheet">
-        <option defaultValue hidden>
-          Your Sheet
-        </option>
-        {sheetData.map((sheet) => (
-          <option value={sheet.sheetName} name="sheet" key={sheet.id}>
-            {sheet.sheetName}
-          </option>
-        ))}
-      </select>
+      <div
+        className="bg-black px-4 py-3 rounded-3xl cursor-pointer"
+        onClick={() => navigate("/home")}
+      >
+        Home
+      </div>
       <div
         onClick={() => navigate("/home/sheets/findSheet")}
         className="flex items-center gap-x-2 bg-black px-4 py-3 rounded-3xl cursor-pointer"

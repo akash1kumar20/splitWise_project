@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Navbar from "../ExtraComponents.jsx/Navbar";
 import Footer from "../ExtraComponents.jsx/Footer";
 import Profile from "../ExtraComponents.jsx/Profile";
@@ -7,35 +7,35 @@ import SheetDetailsCard from "../Card/SheetDetailsCard";
 import axios from "axios";
 import CreateExpense from "../Expenses/CreateExpense";
 import { useSelector } from "react-redux";
+import Users from "../ExtraComponents.jsx/Users";
 
 const SingleSheet = () => {
+  const token = useSelector((state) => state.expenseSheet.token);
   const navigate = useNavigate();
   const [sheets, setSheets] = useState([]);
   const [time, setTime] = useState(new Date());
   const [greetings, setGreetings] = useState("");
-  const token = useSelector((state) => state.expenseSheet.token);
+  const [users, setUsers] = useState([]);
+  const [addUser, setAddUser] = useState(true);
+
+  const timer = setInterval(() => {
+    setTime(new Date());
+  }, 1000);
 
   useEffect(() => {
     if (!token) {
       navigate("/");
     }
     let currentTime = time.getHours();
-
-    if (currentTime > 6 && currentTime < 12) {
+    if (currentTime >= 6 && currentTime < 12) {
       setGreetings(" Good Morning! Have a good day.");
-    } else if (currentTime > 12 && currentTime < 17) {
+    } else if (currentTime >= 12 && currentTime < 17) {
       setGreetings("Good Afternoon!");
-    } else if (currentTime > 17 && currentTime < 24) {
+    } else if (currentTime >= 17 && currentTime < 24) {
       setGreetings("Hey! Good Evening");
     } else {
       setGreetings("Good Night! Take some rest");
     }
-
-    const timer = setInterval(() => {
-      setTime(new Date());
-    }, 1000);
-
-    return clearInterval(timer);
   }, []);
   const param = useParams();
   const userMail = useSelector((state) => state.expenseSheet.userMail);
@@ -47,7 +47,6 @@ const SingleSheet = () => {
     if (inviteCode !== null) {
       toCallSheet = inviteCode.includes(sheetName);
     }
-
     if (toCallSheet) {
       const fetchData = async () => {
         try {
@@ -73,13 +72,30 @@ const SingleSheet = () => {
   const profileChangeHandler = () => {
     setOpenProfile((openProfile) => !openProfile);
   };
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      let urlKey = "usersList" + inviteCode;
+      try {
+        let userRes = await axios.get(
+          `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${urlKey}.json`
+        );
+        let userResArr = [];
+        for (let key in userRes.data) {
+          userResArr.push({ ...userRes.data[key], id: key });
+        }
+        setUsers(userResArr);
+      } catch (err) {}
+    };
+    fetchUserData();
+  }, [users]);
   return (
     <div>
       <Navbar openProfile={profileChangeHandler} />
       {openProfile && <Profile />}
       <div className="md:flex">
         <SheetDetailsCard>
-          <div className="flex justify-between md:pe-20 pe-2  ">
+          <div className="flex lg:flex-row flex-col gap-y-2 justify-between md:pe-20 pe-2  ">
             {sheets.map((sheet) => (
               <div key={sheet.id}>
                 <p className="text-sm md:text-lg">
@@ -103,7 +119,7 @@ const SingleSheet = () => {
                 </p>
               </div>
             ))}
-            <div>
+            <div className="flex lg:flex-col flex-row gap-x-3">
               <p className="text-sm md:text-lg">{time.toDateString()}</p>
               <p className="text-sm md:text-lg">{time.toLocaleTimeString()}</p>
               <p className="text-sm md:text-lg">{greetings}</p>
@@ -111,7 +127,27 @@ const SingleSheet = () => {
           </div>
         </SheetDetailsCard>
         <SheetDetailsCard>
-          <CreateExpense />
+          {addUser && <Users />}
+          {users.length > 0 && addUser && (
+            <p
+              className="text-blue-400 font-bold cursor-pointer mt-2"
+              onClick={() => setAddUser(false)}
+            >
+              Add Expense
+            </p>
+          )}
+          {!addUser && <CreateExpense users={users} />}
+          {users.length === 0 && (
+            <p className="mt-2">Please atleast add one user name to continue</p>
+          )}
+          {!addUser && (
+            <p
+              className="text-blue-400 font-bold cursor-pointer mt-2"
+              onClick={() => setAddUser(true)}
+            >
+              Add users
+            </p>
+          )}
         </SheetDetailsCard>
       </div>
       <Footer />
