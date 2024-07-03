@@ -1,15 +1,13 @@
 import { Outlet, useNavigate } from "react-router-dom";
 import SheetPresents from "./SheetPresents";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import AuthContext from "../../store/auth-context";
-import Profile from "../ExtraComponents.jsx/Profile";
+import Profile from "../ExtraComponents/Profile";
 import { FaUser } from "react-icons/fa";
 
 const Home = () => {
-  const autCtx = useContext(AuthContext);
   const navigate = useNavigate();
   const token = useSelector((state) => state.expenseSheet.token);
   const [openProfile, setOpenProfile] = useState(false);

@@ -10,7 +10,7 @@ import CreateSheet from "./components/CreateSheet.jsx";
 import Sheets from "./components/Sheets.jsx";
 import FindSheet from "./components/FindSheet.jsx";
 import SingleSheet from "./components/SingleSheet.jsx";
-import WrongURL from "./ExtraComponents.jsx/WrongURL.jsx";
+import WrongURL from "./ExtraComponents/WrongURL.jsx";
 import { Provider } from "react-redux";
 import store from "../store/index.js";
 import FoundSheet from "./components/FoundSheet.jsx";

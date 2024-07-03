@@ -1,45 +1,21 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
 import { FaSearch, FaTrash } from "react-icons/fa";
 import { IoMdAdd } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
-import Footer from "../ExtraComponents.jsx/Footer";
+import Footer from "../ExtraComponents/Footer";
 import { useDispatch, useSelector } from "react-redux";
 import { expenseSheetActions } from "../../store";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import useFetchDataHook from "../customHooks/useFetchDataHook";
+import Loading from "../ExtraComponents/Loading";
 
 const AddSheet = () => {
-  const [sheetPresent, setSheetPresent] = useState(false);
-  const [sheetData, setSheetData] = useState([]);
-  const [loading, setLoading] = useState(false);
   const changeEmail = useSelector((state) => state.expenseSheet.convertedMail);
   const dispatch = useDispatch();
-  const useMail = useSelector((state) => state.expenseSheet.userMail);
+  const userMail = useSelector((state) => state.expenseSheet.userMail);
+  const [comingData, isLoading] = useFetchDataHook(
+    `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${changeEmail}/sheets.json`
+  );
 
-  useEffect(() => {
-    setLoading(true);
-  }, []);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        let res = await axios.get(
-          `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${changeEmail}/sheets.json`
-        );
-        setLoading(false);
-        if (res.status === 200) {
-          setSheetPresent(true);
-        }
-        const sheetArray = [];
-        for (let key in res.data) {
-          sheetArray.push({ ...res.data[key], id: key });
-        }
-        setSheetData(sheetArray);
-      } catch (err) {}
-    };
-    fetchData();
-  });
   const navigate = useNavigate();
   const openSpecificSheetHandler = (sheet) => {
     dispatch(
@@ -48,7 +24,6 @@ const AddSheet = () => {
         inviteCode: sheet.inviationCode,
       })
     );
-
     navigate(`/home/sheets/${sheet.code}`);
   };
 
@@ -63,48 +38,36 @@ const AddSheet = () => {
           `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${sheet.inviationCode}.json`
         );
       }
-      if (delQuery1.status === 200 && delQuery2.status === 200) {
-        toast.error("Sheet Deleted", {
-          theme: "dark",
-          position: "top-right",
-          autoClose: 1000,
-        });
-      }
     } catch (error) {}
   };
   return (
     <>
       <div className="bg-gray-900 text-white h-[100vh] w-[100vw]">
-        <ToastContainer />
         <h1 className="md:text-3xl text-xl pt-10 text-center font-serif underline">
           It sounds extraordinary but it's a fact that balance sheets can make
           fascinating reading.
         </h1>
-        {loading && <p className="text-center mt-10">Loading...</p>}
-        {!loading && (
+        {isLoading && <Loading />}
+        {!isLoading && (
           <div className="grid grid-cols-2 md:grid-cols-4 py-8 md:mx-32 gap-y-6 ">
-            {sheetPresent &&
-              sheetData.map((sheet) => (
-                <div
-                  className="flex flex-col items-center gap-3 static"
-                  key={sheet.id}
+            {comingData.map((sheet) => (
+              <div
+                className="flex flex-col items-center gap-3 static"
+                key={sheet.id}
+              >
+                <FaTrash
+                  className="relative top-[20px] left-6 text-red-500 hover:text-red-700 cursor-pointer hover:scale-150"
+                  onClick={() => deleteSheetHandler(sheet)}
+                />
+                <p
+                  className="text-xl p-6 rounded-full bg-gray-600 border-2 border-gray-500 shadow-xl cursor-pointer"
+                  onClick={() => openSpecificSheetHandler(sheet)}
                 >
-                  <FaTrash
-                    className="relative top-[20px] left-6 text-red-500 hover:text-red-700 cursor-pointer hover:scale-150"
-                    onClick={() => deleteSheetHandler(sheet)}
-                  />
-
-                  <p
-                    className="text-xl p-6 rounded-full bg-gray-600 border-2 border-gray-500 shadow-xl cursor-pointer"
-                    onClick={() => openSpecificSheetHandler(sheet)}
-                  >
-                    {sheet.sheetName.substring(0, 2)}...
-                  </p>
-                  <span className="text-sm text-gray-200">
-                    {sheet.sheetName}
-                  </span>
-                </div>
-              ))}
+                  {sheet.sheetName.substring(0, 2)}...
+                </p>
+                <span className="text-sm text-gray-200">{sheet.sheetName}</span>
+              </div>
+            ))}
             <div className="flex flex-col items-center gap-3 mt-9">
               <p
                 className="text-2xl p-6 rounded-full bg-gray-600 border-2 border-gray-500 shadow-xl cursor-pointer"
@@ -126,7 +89,6 @@ const AddSheet = () => {
           </div>
         )}
       </div>
-
       <Footer />
     </>
   );
