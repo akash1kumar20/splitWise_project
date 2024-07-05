@@ -24,7 +24,7 @@ const SingleSheet = () => {
     if (!token) {
       navigate("/");
     } else {
-      navigate(`/home/sheets/:${sheetCode}/displayExpense`);
+      navigate(`/home/sheets/${sheetCode}/displayExpense`);
     }
   }, []);
 

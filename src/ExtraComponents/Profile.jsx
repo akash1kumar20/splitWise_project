@@ -18,7 +18,7 @@ const Profile = () => {
     });
     setTimeout(() => {
       navigate("/");
-    }, 1200);
+    }, 800);
   };
 
   return (

@@ -71,7 +71,7 @@ const UpdateExpense = () => {
   return (
     <>
       <ToastContainer />
-      <div className="min-h-[100vh] bg-black text-white bg-opacity-70 ">
+      <div className="min-h-[100vh] bg-slate-600  text-white ">
         {dataToEdit.map((toEdit) => (
           <form
             onSubmit={(event) => updateExpenseHandler(event, toEdit.id)}

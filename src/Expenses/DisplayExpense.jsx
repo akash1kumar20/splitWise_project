@@ -7,6 +7,8 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { expenseSheetActions } from "../../store";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import LeftBar from "../ExtraComponents/LeftBar";
 
 const DisplayExpense = () => {
   const sheetCode = useSelector((state) => state.expenseSheet.sheetCode);
@@ -16,6 +18,13 @@ const DisplayExpense = () => {
   let length = comingData.length > 0;
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const token = useSelector((state) => state.expenseSheet.token);
+
+  useEffect(() => {
+    if (!token) {
+      navigate("/");
+    }
+  }, []);
 
   async function deleteExpenseHandler(id) {
     try {
@@ -44,7 +53,7 @@ const DisplayExpense = () => {
   return (
     <>
       <ToastContainer />
-      <div className="min-h-[100vh] bg-slate-600  pt-4">
+      <div className="min-h-[100vh] bg-slate-600  pt-4 z-0">
         {!length && !isLoading && (
           <p className=" text-white text-center font-bold text-3xl ">
             No expense to show
@@ -155,6 +164,7 @@ const DisplayExpense = () => {
           </div>
         )}
       </div>
+      <LeftBar />
     </>
   );
 };

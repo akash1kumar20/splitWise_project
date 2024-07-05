@@ -65,11 +65,11 @@ const router = createBrowserRouter([
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <AuthContextProvider>
-    <Provider store={store}>
+  <Provider store={store}>
+    <AuthContextProvider>
       <React.StrictMode>
         <RouterProvider router={router} />
       </React.StrictMode>
-    </Provider>
-  </AuthContextProvider>
+    </AuthContextProvider>
+  </Provider>
 );
