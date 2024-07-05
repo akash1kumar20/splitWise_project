@@ -37,9 +37,8 @@ const expenseSheetSlice = createSlice({
       localStorage.setItem("sheetCode", action.payload.sheetCode);
     },
     setExpenseToEdit(state, action) {
-      state.toEdit = state.toEdit.push(action.payload);
+      state.toEdit = action.payload;
     },
-
     setSheetFoundData(state, action) {
       state.sheetFoundData = action.payload;
     },

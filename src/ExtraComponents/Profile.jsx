@@ -14,11 +14,11 @@ const Profile = () => {
     toast.error("Logout Successfully!", {
       position: "top-right",
       theme: "dark",
-      autoClose: 2000,
+      autoClose: 1000,
     });
     setTimeout(() => {
       navigate("/");
-    }, 2000);
+    }, 1200);
   };
 
   return (

@@ -14,6 +14,8 @@ import WrongURL from "./ExtraComponents/WrongURL.jsx";
 import { Provider } from "react-redux";
 import store from "../store/index.js";
 import FoundSheet from "./components/FoundSheet.jsx";
+import UpdateExpense from "./Expenses/UpdateExpense.jsx";
+import DisplayExpense from "./Expenses/DisplayExpense.jsx";
 
 const router = createBrowserRouter([
   { path: "/", element: <App /> },
@@ -45,16 +47,29 @@ const router = createBrowserRouter([
       },
     ],
   },
-  { path: "/home/sheets/:sheetName", element: <SingleSheet /> },
+  {
+    path: "/home/sheets/:sheetName",
+    element: <SingleSheet />,
+    children: [
+      {
+        path: "/home/sheets/:sheetName/displayExpense",
+        element: <DisplayExpense />,
+      },
+      {
+        path: "/home/sheets/:sheetName/updateExpense",
+        element: <UpdateExpense />,
+      },
+    ],
+  },
   { path: "/*", element: <WrongURL /> },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <Provider store={store}>
-    <AuthContextProvider>
+  <AuthContextProvider>
+    <Provider store={store}>
       <React.StrictMode>
         <RouterProvider router={router} />
       </React.StrictMode>
-    </AuthContextProvider>
-  </Provider>
+    </Provider>
+  </AuthContextProvider>
 );

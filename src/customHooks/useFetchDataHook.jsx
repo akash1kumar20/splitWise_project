@@ -24,7 +24,7 @@ const useFetchDataHook = (url) => {
       } catch (err) {}
     };
     fetchData();
-    setInterval(fetchData, 2000);
+    setInterval(fetchData, 500);
   }, [url]);
   return [comingData, isLoading, status];
 };

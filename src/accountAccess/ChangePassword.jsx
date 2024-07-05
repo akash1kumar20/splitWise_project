@@ -46,7 +46,7 @@ const ChangePassword = () => {
             navigate("/");
           }, 2000);
         }
-      } catch (error) {
+      } catch (err) {
         toast.error("Please Try again", {
           theme: "colored",
           position: "top-right",
@@ -83,7 +83,7 @@ const ChangePassword = () => {
             navigate("/");
           }, 2000);
         }
-      } catch (error) {}
+      } catch (err) {}
       toast.error("Please Try again", {
         theme: "colored",
         position: "top-right",

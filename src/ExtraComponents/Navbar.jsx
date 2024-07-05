@@ -14,7 +14,7 @@ const Navbar = ({ openProfile }) => {
   };
 
   return (
-    <div className="bg-slate-700 text-white h-16 flex justify-between md:px-10 px-2 items-center">
+    <div className="bg-slate-700 text-white h-16  flex justify-between md:px-10 px-2 items-center">
       <div
         className="bg-black px-4 py-3 rounded-3xl cursor-pointer"
         onClick={() => navigate("/home")}

@@ -7,6 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 import AuthContext from "../../store/auth-context";
 import { useDispatch } from "react-redux";
 import { expenseSheetActions } from "../../store";
+import Footer from "../ExtraComponents/Footer";
 
 const AddAccount = () => {
   const [isLogIn, setIsLogIn] = useState(true);
@@ -189,6 +190,7 @@ const AddAccount = () => {
           )}
         </form>
       </div>
+      <Footer />
     </>
   );
 };

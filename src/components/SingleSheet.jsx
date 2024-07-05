@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Navbar from "../ExtraComponents/Navbar";
 import Footer from "../ExtraComponents/Footer";
 import Profile from "../ExtraComponents/Profile";
-import { useNavigate, useParams } from "react-router-dom";
+import { Outlet, useNavigate, useParams } from "react-router-dom";
 import SheetDetailsCard from "../Card/SheetDetailsCard";
 import axios from "axios";
 import CreateExpense from "../Expenses/CreateExpense";
@@ -15,6 +15,7 @@ import useGreetingsHook from "../customHooks/useGreetingsHook";
 const SingleSheet = () => {
   const token = useSelector((state) => state.expenseSheet.token);
   const navigate = useNavigate();
+  const sheetCode = useSelector((state) => state.expenseSheet.sheetCode);
   const [sheets, setSheets] = useState([]);
   const [addUser, setAddUser] = useState(false);
   const [greetings, time] = useGreetingsHook();
@@ -22,8 +23,11 @@ const SingleSheet = () => {
   useEffect(() => {
     if (!token) {
       navigate("/");
+    } else {
+      navigate(`/home/sheets/:${sheetCode}/displayExpense`);
     }
   }, []);
+
   const param = useParams();
   const userMail = useSelector((state) => state.expenseSheet.userMail);
   const inviteCode = useSelector((state) => state.expenseSheet.inviteCode);
@@ -56,6 +60,7 @@ const SingleSheet = () => {
   }, []);
 
   const [openProfile, setOpenProfile] = useState(false);
+
   const profileChangeHandler = () => {
     setOpenProfile((openProfile) => !openProfile);
   };
@@ -68,11 +73,11 @@ const SingleSheet = () => {
     <div>
       <Navbar openProfile={profileChangeHandler} />
       {openProfile && <Profile />}
-      <div className="md:flex">
+      <div className="md:flex  ">
         <SheetDetailsCard>
           {isLoading && <Loading />}
           {!isLoading && (
-            <div className="flex lg:flex-row flex-col gap-y-2 justify-between md:pe-20 pe-2  ">
+            <div className="flex lg:flex-row flex-col gap-y-2 justify-between ">
               {sheets.map((sheet) => (
                 <div key={sheet.id}>
                   <p className="text-sm md:text-lg">
@@ -96,12 +101,12 @@ const SingleSheet = () => {
                   </p>
                 </div>
               ))}
-              <div className="flex lg:flex-col flex-row gap-x-3">
+              <div className="flex lg:flex-col flex-row gap-x-3 text-end">
                 <p className="text-sm md:text-lg">{time.toDateString()}</p>
                 <p className="text-sm md:text-lg">
                   {time.toLocaleTimeString()}
                 </p>
-                <p className="text-sm md:text-lg">{greetings}</p>
+                <p className="text-sm md:text-lg leading-snug">{greetings}</p>
               </div>
             </div>
           )}
@@ -134,6 +139,7 @@ const SingleSheet = () => {
           )}
         </SheetDetailsCard>
       </div>
+      <Outlet />
       <Footer />
     </div>
   );
