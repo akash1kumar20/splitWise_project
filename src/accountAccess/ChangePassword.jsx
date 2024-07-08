@@ -108,6 +108,7 @@ const ChangePassword = () => {
                 You will recieve a mail, to reset the passowrd.
               </span>
               <input
+                name="mail"
                 type="mail"
                 required
                 ref={mailRef}
@@ -120,6 +121,7 @@ const ChangePassword = () => {
             <div>
               <div className="flex justify-between items-center md:w-[60%] w-[90%] bg-white text-black mx-auto rounded-lg px-2">
                 <input
+                  name="password"
                   type={passowrd ? "type" : "password"}
                   required
                   placeholder="Enter New Password"
@@ -130,6 +132,7 @@ const ChangePassword = () => {
               </div>
               <div className="flex justify-between items-center md:w-[60%] w-[90%] bg-white text-black mx-auto rounded-lg px-2 mt-4">
                 <input
+                  name="confirmPassword"
                   type={confirmPassword ? "text" : "password"}
                   required
                   placeholder="Confirm Password"

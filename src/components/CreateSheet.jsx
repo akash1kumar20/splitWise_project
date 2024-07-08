@@ -57,6 +57,7 @@ const CreateSheet = () => {
         <h2 className="text-xl font-semibold">Create Your Own Sheet</h2>
         <form className="mt-4" onSubmit={(event) => formSubmitHandler(event)}>
           <input
+            name="sheetName"
             type="text"
             required
             ref={sheetNameRef}

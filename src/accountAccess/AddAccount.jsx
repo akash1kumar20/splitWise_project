@@ -96,6 +96,7 @@ const AddAccount = () => {
               Email
             </label>
             <input
+              name="mail"
               type="mail"
               ref={mailRef}
               required
@@ -109,6 +110,7 @@ const AddAccount = () => {
             </label>
             <div className="flex justify-between bg-slate-400 text-black items-center pe-3 rounded-xl">
               <input
+                name="password"
                 type={viewPassword ? "type" : "password"}
                 required
                 ref={passwordRef}
@@ -144,6 +146,7 @@ const AddAccount = () => {
               </label>
               <div className="flex justify-between bg-slate-400 text-black items-center pe-3 rounded-xl">
                 <input
+                  name="confirmPassword"
                   type={viewConfirmPassword ? "type" : "password"}
                   required
                   ref={confirmPasswordRef}

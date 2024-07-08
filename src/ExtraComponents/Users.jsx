@@ -39,6 +39,7 @@ const Users = () => {
     <>
       <ToastContainer />
       <input
+        name="user"
         type="text"
         required
         ref={nameRef}

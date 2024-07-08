@@ -50,16 +50,10 @@ const router = createBrowserRouter([
   {
     path: "/home/sheets/:sheetName",
     element: <SingleSheet />,
-    children: [
-      {
-        path: "/home/sheets/:sheetName/displayExpense",
-        element: <DisplayExpense />,
-      },
-      {
-        path: "/home/sheets/:sheetName/updateExpense",
-        element: <UpdateExpense />,
-      },
-    ],
+  },
+  {
+    path: "/home/sheets/:sheetName/updateExpense",
+    element: <UpdateExpense />,
   },
   { path: "/*", element: <WrongURL /> },
 ]);

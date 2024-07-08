@@ -8,7 +8,6 @@ import "react-toastify/dist/ReactToastify.css";
 import { expenseSheetActions } from "../../store";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import LeftBar from "../ExtraComponents/LeftBar";
 
 const DisplayExpense = () => {
   const sheetCode = useSelector((state) => state.expenseSheet.sheetCode);
@@ -47,7 +46,7 @@ const DisplayExpense = () => {
 
   function updateExpenseHandler(data) {
     dispatch(expenseSheetActions.setExpenseToEdit([data]));
-    navigate(`/home/sheets/:${sheetCode}/updateExpense`);
+    navigate(`/home/sheets/${sheetCode}/updateExpense`);
   }
 
   return (
@@ -164,7 +163,6 @@ const DisplayExpense = () => {
           </div>
         )}
       </div>
-      <LeftBar />
     </>
   );
 };

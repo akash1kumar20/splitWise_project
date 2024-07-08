@@ -56,8 +56,8 @@ const UpdateExpense = () => {
           position: "top-center",
         });
         setTimeout(() => {
-          navigate(`/home/sheets/:${sheetCode}/displayExpense`);
-        }, 1000);
+          navigate(`/home/sheets/${sheetCode}`);
+        }, 1100);
       }
     } catch (err) {
       toast.error("Try Again", {
@@ -175,7 +175,7 @@ const UpdateExpense = () => {
                   <option name="payBy" value="Cash" defaultValue>
                     Cash
                   </option>
-                  <option name="payBy" valye="Upi">
+                  <option name="payBy" value="Upi">
                     Upi
                   </option>
                   <option name="payBy" value="Card">

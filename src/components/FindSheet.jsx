@@ -36,6 +36,7 @@ const FindSheet = () => {
       <h2 className="text-xl font-semibold">Find Sheet</h2>
       <form className="mt-4" onSubmit={(event) => findSheetHandler(event)}>
         <input
+          name="sheetName"
           type="text"
           required
           ref={codeRef}

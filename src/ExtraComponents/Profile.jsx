@@ -24,7 +24,7 @@ const Profile = () => {
   return (
     <>
       <ToastContainer />
-      <div className=" bg-slate-900 w-fit  flex flex-col right-0 fixed text-white me-2 px-5 mt-1 rounded-lg py-10 border-2 border-slate-400 z-50">
+      <div className=" bg-slate-900 w-fit  flex flex-col right-2 fixed text-white  px-5 mt-1 rounded-lg py-10 border-2 border-slate-400 z-50">
         <span className="text-center font-bold underline text-sm">
           {userMail}
         </span>
