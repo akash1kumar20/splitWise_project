@@ -4,12 +4,16 @@ import { RiBillLine } from "react-icons/ri";
 import { FaFilter } from "react-icons/fa";
 import { TiUserDelete } from "react-icons/ti";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const LeftBar = () => {
   const [showCalculator, setShowCalculator] = useState(false);
   const [showBill, setShowBill] = useState(false);
   const [showFilter, setShowFilter] = useState(false);
   const [showDeleteUser, setShowDeleteUser] = useState(false);
+  const navigate = useNavigate();
+  const sheetCode = useSelector((state) => state.expenseSheet.sheetCode);
 
   return (
     <div className="bg-transparent text-white w-10 fixed top-0 z-50 right-0 h-full flex flex-col gap-3 items-center ">
@@ -44,7 +48,10 @@ const LeftBar = () => {
             onMouseOver={() => setShowDeleteUser(true)}
             onMouseOut={() => setShowDeleteUser(false)}
           >
-            <TiUserDelete className="text-2xl" />
+            <TiUserDelete
+              className="text-2xl"
+              onClick={() => navigate(`/home/sheets/${sheetCode}/deleteUser`)}
+            />
             {showDeleteUser && <span className="text-sm">Delete User</span>}
           </p>
         </Cylinder>
