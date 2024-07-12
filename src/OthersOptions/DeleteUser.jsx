@@ -50,7 +50,7 @@ const DeleteUser = () => {
       <OthersComponentCard>
         {isLoading && <Loading />}
         {comingData.length === 0 && !isLoading && <p>No User To Delete</p>}
-        <h2 className="text-2xl font-semibold">Users:</h2>
+        {!isLoading && <h2 className="text-2xl font-semibold">Users:</h2>}
         {comingData.map((data) => (
           <div key={data.id}>
             <p className="text-xl flex gap-5 items-center justify-between ">

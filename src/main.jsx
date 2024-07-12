@@ -17,6 +17,7 @@ import FoundSheet from "./components/FoundSheet.jsx";
 import UpdateExpense from "./Expenses/UpdateExpense.jsx";
 import DisplayExpense from "./Expenses/DisplayExpense.jsx";
 import DeleteUser from "./OthersOptions/DeleteUser.jsx";
+import FilterData from "./OthersOptions/FilterData.jsx";
 
 const router = createBrowserRouter([
   { path: "/", element: <App /> },
@@ -59,6 +60,10 @@ const router = createBrowserRouter([
   {
     path: "/home/sheets/:sheetName/deleteUser",
     element: <DeleteUser />,
+  },
+  {
+    path: "/home/sheets/:sheetName/filterData",
+    element: <FilterData />,
   },
   { path: "/*", element: <WrongURL /> },
 ]);

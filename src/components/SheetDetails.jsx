@@ -79,7 +79,7 @@ const SheetDetails = () => {
                     Sheet Name: {sheet.sheetName}
                   </p>
                   {userMail !== sheet.userMail ? (
-                    <p className="text-sm md:text-lg">
+                    <p className="text-[14px] md:text-lg">
                       Admin: <span>{sheet.userMail}</span>
                     </p>
                   ) : (

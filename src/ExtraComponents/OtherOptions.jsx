@@ -40,7 +40,10 @@ const LeftBar = () => {
             onMouseOver={() => setShowFilter(true)}
             onMouseOut={() => setShowFilter(false)}
           >
-            <FaFilter className="text-2xl" />
+            <FaFilter
+              className="text-2xl"
+              onClick={() => navigate(`/home/sheets/${sheetCode}/filterData`)}
+            />
             {showFilter && <span className="text-sm">Filter Data</span>}
           </p>
           <p
