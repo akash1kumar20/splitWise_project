@@ -1,13 +1,14 @@
 import { useDispatch, useSelector } from "react-redux";
 import useFetchDataHook from "../customHooks/useFetchDataHook";
 import Loading from "./../ExtraComponents/Loading";
-import { FaPenAlt, FaTrash } from "react-icons/fa";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { expenseSheetActions } from "../../store";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
+import ForLargerScreen from "./ForLargerScreen";
+import ForSmallerScreen from "./ForSmallerScreen";
 
 const DisplayExpense = () => {
   const sheetCode = useSelector((state) => state.expenseSheet.sheetCode);
@@ -61,105 +62,16 @@ const DisplayExpense = () => {
         {isLoading && <Loading />}
         {length && (
           <div>
-            {comingData.map((data, i) => (
-              <div
-                className="lg:hidden grid grid-cols-2 text-white gap-x-1 text-lg font-semibold px-4 border-2 mb-1 mx-2 md:mx-6"
-                key={data.id}
-              >
-                <p>S.No: {i + 1}</p>
-                <p className="flex justify-between items-center">
-                  <span className="ms-1">Date: {data.date}</span>
-                  <span className="flex gap-x-2">
-                    <FaPenAlt
-                      className="text-yellow-400 text-lg cursor-pointer  hover:scale-x-125"
-                      onClick={() => updateExpenseHandler(data)}
-                    />
-                    <FaTrash
-                      className="text-red-500 text-lg cursor-pointer hover:scale-x-125"
-                      onClick={() => deleteExpenseHandler(data.id)}
-                    />
-                  </span>
-                </p>
-
-                <p>Category: {data.category}</p>
-                {data.subCategory.length > 0 && (
-                  <p>
-                    Note:
-                    <span className="text-md ms-1">{data.subCategory}</span>
-                  </p>
-                )}
-                {data.subCategory.length === 0 && (
-                  <p>
-                    Note:
-                    <span className="text-md ms-1">___</span>
-                  </p>
-                )}
-                <p>
-                  Amount: {data.amount}
-                  <span className="text-sm font-extrabold ms-1">
-                    ( {data.payBy} )
-                  </span>
-                </p>
-                <p>Spend By: {data.user}</p>
-              </div>
-            ))}
-
-            <div className="hidden text-2xl text-white lg:flex flex-row justify-between mx-6 border-2 p-4 font-bold">
-              <table>
-                <thead>
-                  <tr>
-                    <th className="tableElementSide">S.No</th>
-                    <th className="tableHeading">Date</th>
-                    <th className="tableElementMain">Category</th>
-                    <th className="tableElementMain">Note</th>
-                    <th className="tableHeading">Amount</th>
-                    <th className="tableHeading">Spend By</th>
-                    <th className="tableElementSide">Actions</th>
-                  </tr>
-                </thead>
-              </table>
-            </div>
-            {comingData.map((data, i) => (
-              <div
-                className="hidden text-2xl text-white lg:flex flex-row justify-between mx-6 border-2 p-4"
-                key={data.id}
-              >
-                <table>
-                  <tbody>
-                    <tr>
-                      <td className="tableElementSide">{i + 1}</td>
-                      <td className="tableHeading">{data.date}</td>
-                      <td className="tableElementMain">{data.category}</td>
-                      {data.subCategory.length > 0 && (
-                        <td className="tableElementMain">{data.subCategory}</td>
-                      )}
-                      {data.subCategory.length === 0 && (
-                        <td className="tableElementMain">___</td>
-                      )}
-                      <td className="tableHeading">
-                        {data.amount}
-                        <p className="text-sm font-extrabold">
-                          By - {data.payBy}
-                        </p>
-                      </td>
-                      <td className="tableHeading ">{data.user}</td>
-                      <td className="tableElementSide">
-                        <span className="flex gap-x-6">
-                          <FaPenAlt
-                            className="text-yellow-400 text-lg cursor-pointer  hover:scale-x-125"
-                            onClick={() => updateExpenseHandler(data)}
-                          />
-                          <FaTrash
-                            className="text-red-500 text-lg cursor-pointer hover:scale-x-125"
-                            onClick={() => deleteExpenseHandler(data.id)}
-                          />
-                        </span>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            ))}
+            <ForSmallerScreen
+              comingData={comingData}
+              updateHandler={updateExpenseHandler}
+              deleteHandler={deleteExpenseHandler}
+            />
+            <ForLargerScreen
+              comingData={comingData}
+              updateHandler={updateExpenseHandler}
+              deleteHandler={deleteExpenseHandler}
+            />
           </div>
         )}
       </div>
