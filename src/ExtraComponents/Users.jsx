@@ -12,17 +12,15 @@ const Users = () => {
     const users = {
       userName: nameRef.current.value,
     };
-    let urlKey = "usersList" + invitationCode;
-
     try {
       let res = await axios.post(
-        `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${urlKey}.json`,
+        `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${invitationCode}/usersList.json`,
         users
       );
       if (res.status === 200) {
-        toast.success(`${nameRef.current.value} added`, {
+        toast.success(`user added`, {
           position: "top-right",
-          autoClose: 2000,
+          autoClose: 1000,
           theme: "colored",
         });
       }

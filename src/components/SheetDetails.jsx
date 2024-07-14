@@ -1,10 +1,11 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import Loading from "../ExtraComponents/Loading";
 import useGreetingsHook from "../customHooks/useGreetingsHook";
 import { IoIosArrowDropdown, IoIosArrowDropup } from "react-icons/io";
+import SheetDetailsCard from "../Card/SheetDetailsCard";
 
 const SheetDetails = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -37,7 +38,7 @@ const SheetDetails = () => {
       const fetchData = async () => {
         try {
           let res = await axios.get(
-            `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${inviteCode}.json`
+            `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${inviteCode}/sheetDetails.json`
           );
           let sheetArr = [];
           if (res.status === 200) {
@@ -55,7 +56,7 @@ const SheetDetails = () => {
     }
   }, []);
   return (
-    <>
+    <SheetDetailsCard>
       {isLoading && <Loading />}
       {!isLoading && (
         <div className="flex lg:flex-row flex-col gap-y-2 justify-between ">
@@ -105,7 +106,7 @@ const SheetDetails = () => {
           </div>
         </div>
       )}
-    </>
+    </SheetDetailsCard>
   );
 };
 

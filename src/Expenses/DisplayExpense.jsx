@@ -11,15 +11,14 @@ import ForLargerScreen from "./ForLargerScreen";
 import ForSmallerScreen from "./ForSmallerScreen";
 
 const DisplayExpense = () => {
-  const sheetCode = useSelector((state) => state.expenseSheet.sheetCode);
-  let urlKey = "expenseSheet" + sheetCode;
-  let url = `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${urlKey}`;
+  const inviteCode = useSelector((state) => state.expenseSheet.inviteCode);
+  let url = `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${inviteCode}/expenseSheet`;
   const [comingData, isLoading] = useFetchDataHook(`${url}.json`);
   let length = comingData.length > 0;
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const token = useSelector((state) => state.expenseSheet.token);
-
+  const sheetCode = useSelector((state) => state.expenseSheet.sheetCode);
   useEffect(() => {
     if (!token) {
       navigate("/");

@@ -18,6 +18,7 @@ import UpdateExpense from "./Expenses/UpdateExpense.jsx";
 import DisplayExpense from "./Expenses/DisplayExpense.jsx";
 import DeleteUser from "./OthersOptions/DeleteUser.jsx";
 import FilterData from "./OthersOptions/FilterData.jsx";
+import GeneratedBill from "./OthersOptions/GeneratedBill.jsx";
 
 const router = createBrowserRouter([
   { path: "/", element: <App /> },
@@ -64,6 +65,10 @@ const router = createBrowserRouter([
   {
     path: "/home/sheets/:sheetName/filterData",
     element: <FilterData />,
+  },
+  {
+    path: "/home/sheets/:sheetName/generateBill",
+    element: <GeneratedBill />,
   },
   { path: "/*", element: <WrongURL /> },
 ]);

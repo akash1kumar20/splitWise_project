@@ -3,7 +3,6 @@ import Navbar from "../ExtraComponents/Navbar";
 import Footer from "../ExtraComponents/Footer";
 import Profile from "../ExtraComponents/Profile";
 import { useNavigate } from "react-router-dom";
-import SheetDetailsCard from "../Card/SheetDetailsCard";
 import { useSelector } from "react-redux";
 import OtherOptions from "../ExtraComponents/OtherOptions";
 import DisplayExpense from "../Expenses/DisplayExpense";
@@ -37,12 +36,8 @@ const SingleSheet = () => {
       {openProfile && <Profile />}
       {showCylinder && <OtherOptions />}
       <div className="md:flex  ">
-        <SheetDetailsCard>
-          <SheetDetails />
-        </SheetDetailsCard>
-        <SheetDetailsCard>
-          <CreateExpenseParent />
-        </SheetDetailsCard>
+        <SheetDetails />
+        <CreateExpenseParent />
       </div>
       <DisplayExpense />
       <Footer opeCylinder={showCylinderHandler} isOpen={showCylinder} />

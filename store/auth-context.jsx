@@ -22,7 +22,7 @@ export const AuthContextProvider = (props) => {
   };
   const logoutHandler = () => {
     setToken(null);
-    localStorage.removeItem("split-token");
+    localStorage.clear();
     setTimeout(() => {
       location.reload();
     }, 1500);

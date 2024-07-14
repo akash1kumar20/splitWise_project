@@ -4,17 +4,16 @@ import useFetchDataHook from "../customHooks/useFetchDataHook";
 import CreateExpense from "../Expenses/CreateExpense";
 import { useState } from "react";
 import { useSelector } from "react-redux";
+import SheetDetailsCard from "../Card/SheetDetailsCard";
 
 const CreateExpenseParent = () => {
   const inviteCode = useSelector((state) => state.expenseSheet.inviteCode);
   const [addUser, setAddUser] = useState(false);
-
-  let urlKey = "usersList" + inviteCode;
   const [comingData, isLoading] = useFetchDataHook(
-    `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${urlKey}.json`
+    `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${inviteCode}/usersList.json`
   );
   return (
-    <>
+    <SheetDetailsCard>
       {!isLoading && (
         <div>
           {addUser && <Users />}
@@ -45,7 +44,7 @@ const CreateExpenseParent = () => {
         </div>
       )}
       {isLoading && <Loading />}
-    </>
+    </SheetDetailsCard>
   );
 };
 

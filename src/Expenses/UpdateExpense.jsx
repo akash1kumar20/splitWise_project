@@ -26,10 +26,8 @@ const UpdateExpense = () => {
   }, []);
 
   let inviteCode = useSelector((state) => state.expenseSheet.inviteCode);
-  let urlKey = "usersList" + inviteCode;
-  const [comingData] = useFetchDataHook(
-    `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${urlKey}.json`
-  );
+  let urlKey = `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${inviteCode}`;
+  const [comingData] = useFetchDataHook(`${urlKey}/usersList.json`);
 
   const updateExpenseHandler = async (event, id) => {
     event.preventDefault();
@@ -42,10 +40,10 @@ const UpdateExpense = () => {
       user: event.target.user.value,
       payBy: event.target.payBy.value,
     };
-    let updateUrlKey = "expenseSheet" + sheetCode;
+
     try {
       let res = await axios.put(
-        `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${updateUrlKey}/${id}.json`,
+        `${urlKey}/expenseSheet/${id}.json`,
         expenseAdded
       );
 

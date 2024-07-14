@@ -15,7 +15,7 @@ const CreateExpense = ({ users }) => {
   const amountRef = useRef();
   const userRef = useRef();
   const payBy = useRef();
-  const sheetCode = useSelector((state) => state.expenseSheet.sheetCode);
+  const inviteCode = useSelector((state) => state.expenseSheet.inviteCode);
   useEffect(() => {
     setUserList(users);
   });
@@ -30,12 +30,13 @@ const CreateExpense = ({ users }) => {
       user: userRef.current.value,
       payBy: payBy.current.value,
     };
-    let urlKey = "expenseSheet" + sheetCode;
+
     try {
       let res = await axios.post(
-        `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${urlKey}.json`,
+        `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${inviteCode}/expenseSheet.json`,
         expenseAdded
       );
+
       if (res.status === 200) {
         toast.success("Expense Added!", {
           position: "top-center",

@@ -32,7 +32,10 @@ const LeftBar = () => {
             onMouseOver={() => setShowBill(true)}
             onMouseOut={() => setShowBill(false)}
           >
-            <RiBillLine className="text-2xl" />
+            <RiBillLine
+              className="text-2xl"
+              onClick={() => navigate(`/home/sheets/${sheetCode}/generateBill`)}
+            />
             {showBill && <span className="text-sm">Generate Bill</span>}
           </p>
           <p

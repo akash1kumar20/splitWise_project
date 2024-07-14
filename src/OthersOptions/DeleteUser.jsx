@@ -18,16 +18,12 @@ const DeleteUser = () => {
     }
   }, []);
   const code = useSelector((state) => state.expenseSheet.inviteCode);
-  let urlKey = "usersList" + code;
-  const [comingData, isLoading] = useFetchDataHook(
-    `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${urlKey}.json`
-  );
+  const urlKey = `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${code}/usersList`;
+  const [comingData, isLoading] = useFetchDataHook(`${urlKey}.json`);
 
   const deleteUserHandler = async (id) => {
     try {
-      let res = await axios.delete(
-        `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${urlKey}/${id}.json`
-      );
+      let res = await axios.delete(`${urlKey}/${id}.json`);
       if (res.status === 200) {
         toast.info("User Deleted!", {
           theme: "dark",

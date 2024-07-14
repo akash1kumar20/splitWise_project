@@ -6,7 +6,7 @@
     @apply text-xl w-[150px] text-center;
   }
   .tableElementSide {
-    @apply text-xl  w-[50px] text-center;
+    @apply text-xl  w-[60px] text-center;
   }
   .tableElementMain {
     @apply text-xl  w-[350px] text-center;

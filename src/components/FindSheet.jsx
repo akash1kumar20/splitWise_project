@@ -14,7 +14,7 @@ const FindSheet = () => {
     let invitationCode = codeRef.current.value;
     try {
       let res = await axios.get(
-        `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${invitationCode}.json`
+        `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${invitationCode}/sheetDetails.json`
       );
       if (res.data === null) {
         return alert("No Sheet found");
@@ -41,7 +41,7 @@ const FindSheet = () => {
           required
           ref={codeRef}
           placeholder="Enter invitation code here"
-          className="py-2 ps-2 bg-slate-500 text-white focus:outline-none placeholder:text-white w-full rounded-md border border-slate-700"
+          className="py-2 ps-2 bg-slate-500 text-white focus:outline-none placeholder:text-white  rounded-md border border-slate-700 w-[100%]"
         />
         <button className="px-6 py-3 bg-blue-800 text-white rounded-xl mt-3">
           Find
