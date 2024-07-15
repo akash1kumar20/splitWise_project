@@ -3,7 +3,7 @@ import CardComponent from "../Card/CardComponent";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { expenseSheetActions } from "../../store";
+import { expenseSheetActions } from "../../store/expenseSheetSlice";
 
 const FindSheet = () => {
   const codeRef = useRef();

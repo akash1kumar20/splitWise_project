@@ -10,14 +10,14 @@ const ForLargerScreen = ({ comingData, updateHandler, deleteHandler }) => {
   };
   return (
     <>
-      <div className="hidden text-2xl text-white lg:flex flex-row justify-between mx-6 border-2 p-4 font-bold">
+      <div className="hidden text-2xl  lg:flex flex-row justify-between mx-6 border-2 p-4 font-bold">
         <TableHead />
         <span className="tableElementSide">Actions</span>
       </div>
       {comingData.map((data, i) => (
         <table
           key={data.id}
-          className="hidden text-2xl text-white lg:flex flex-row justify-between mx-6 border-2 p-4"
+          className="hidden text-2xl  lg:flex flex-row justify-between mx-6 border-2 p-4"
         >
           <tbody>
             <tr>

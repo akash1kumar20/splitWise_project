@@ -4,7 +4,7 @@ import Loading from "./../ExtraComponents/Loading";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { expenseSheetActions } from "../../store";
+import { expenseSheetActions } from "../../store/expenseSheetSlice";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import ForLargerScreen from "./ForLargerScreen";
@@ -19,6 +19,8 @@ const DisplayExpense = () => {
   const navigate = useNavigate();
   const token = useSelector((state) => state.expenseSheet.token);
   const sheetCode = useSelector((state) => state.expenseSheet.sheetCode);
+  const theme = useSelector((state) => state.theme.theme);
+
   useEffect(() => {
     if (!token) {
       navigate("/");
@@ -52,7 +54,13 @@ const DisplayExpense = () => {
   return (
     <>
       <ToastContainer />
-      <div className="min-h-[100vh] bg-slate-600  pt-4 z-0">
+      <div
+        className={
+          theme
+            ? "min-h-[100vh] bg-white text-slate-600  pt-4 z-0"
+            : "min-h-[100vh] bg-slate-600 text-white pt-4 z-0"
+        }
+      >
         {!length && !isLoading && (
           <p className=" text-white text-center font-bold text-3xl ">
             No expense to show

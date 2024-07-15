@@ -4,12 +4,13 @@ import { IoMdAdd } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import Footer from "../ExtraComponents/Footer";
 import { useDispatch, useSelector } from "react-redux";
-import { expenseSheetActions } from "../../store";
+import { expenseSheetActions } from "../../store/expenseSheetSlice";
 import useFetchDataHook from "../customHooks/useFetchDataHook";
 import Loading from "../ExtraComponents/Loading";
 
 const AddSheet = () => {
   const changeEmail = useSelector((state) => state.expenseSheet.convertedMail);
+  const theme = useSelector((state) => state.theme.theme);
   const dispatch = useDispatch();
   const userMail = useSelector((state) => state.expenseSheet.userMail);
   const [comingData, isLoading] = useFetchDataHook(
@@ -42,7 +43,13 @@ const AddSheet = () => {
   };
   return (
     <>
-      <div className="bg-gray-900 text-white h-[100vh] w-[100vw]">
+      <div
+        className={
+          theme
+            ? "text-gray-900 bg-white h-[100vh] w-[100vw]"
+            : "bg-gray-900 text-white h-[100vh] w-[100vw]"
+        }
+      >
         <h1 className="md:text-3xl text-xl pt-10 text-center font-serif underline">
           It sounds extraordinary but it's a fact that balance sheets can make
           fascinating reading.
@@ -65,7 +72,7 @@ const AddSheet = () => {
                 >
                   {sheet.sheetName.substring(0, 2)}...
                 </p>
-                <span className="text-sm text-gray-200">{sheet.sheetName}</span>
+                <span className="text-sm ">{sheet.sheetName}</span>
               </div>
             ))}
             <div className="flex flex-col items-center gap-3 mt-9">
@@ -75,7 +82,7 @@ const AddSheet = () => {
               >
                 <IoMdAdd />
               </p>
-              <span className="text-sm text-gray-200">Add Sheet</span>
+              <span className="text-sm ">Add Sheet</span>
             </div>
             <div className="flex flex-col items-center gap-3 mt-9">
               <p
@@ -84,7 +91,7 @@ const AddSheet = () => {
               >
                 <FaSearch />
               </p>
-              <span className="text-sm text-gray-200">Find Sheet</span>
+              <span className="text-sm ">Find Sheet</span>
             </div>
           </div>
         )}

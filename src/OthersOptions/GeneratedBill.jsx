@@ -109,7 +109,7 @@ const GeneratedBill = () => {
               Landscape Mode Only.
             </p>
           </div>
-          <div className=" bg-slate-500 h-[100vh] text-white p-6" ref={details}>
+          <div className="bg-slate-500 text-white p-6" ref={details}>
             <div className="hidden md:block">
               <TableHead />
               <TableBody comingData={comingData} />
@@ -179,17 +179,18 @@ const GeneratedBill = () => {
                 ]
               </div>
             )}
+            <p className="flex justify-center gap-4 text-sm mt-3 items-center">
+              <span className="min-h-6 min-w-6 rounded-full  flex items-center">
+                <FaCircle className="text-green-900" />{" "}
+                <span className=" ms-1">Amount To Recieve</span>
+              </span>
+              <span className="min-h-6 min-w-6 rounded-full  flex items-center">
+                <FaCircle className="text-red-900" />{" "}
+                <span className=" ms-1">Amount To Give</span>
+              </span>
+            </p>
           </div>
-          <p className="flex justify-center gap-4 text-sm mt-3 items-center">
-            <span className="min-h-6 min-w-6 rounded-full text-green-900 flex items-center">
-              <FaCircle />{" "}
-              <span className="text-white ms-1">Amount To Recieve</span>
-            </span>
-            <span className="min-h-6 min-w-6 rounded-full text-red-900 flex items-center">
-              <FaCircle />{" "}
-              <span className="text-white ms-1">Amount To Give</span>
-            </span>
-          </p>
+
           <div className="flex gap-2 my-5 justify-center items-center">
             <button
               className="text-xl bg-gradient-to-br from-green-400 via-green-700 to-green-950 px-4 py-2 text-white font-semibold rounded-xl shadow-xl drop-shadow-xl shadow-green-700"

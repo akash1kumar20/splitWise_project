@@ -6,7 +6,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import AuthContext from "../../store/auth-context";
 import { useDispatch } from "react-redux";
-import { expenseSheetActions } from "../../store";
+import { expenseSheetActions } from "../../store/expenseSheetSlice";
 import Footer from "../ExtraComponents/Footer";
 
 const AddAccount = () => {

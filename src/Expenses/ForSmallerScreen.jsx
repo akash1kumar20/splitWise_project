@@ -11,7 +11,7 @@ const ForSmallerScreen = ({ comingData, updateHandler, deleteHandler }) => {
     <>
       {comingData.map((data, i) => (
         <div
-          className="lg:hidden grid grid-cols-2 text-white gap-x-1 text-lg font-semibold px-4 border-2 mb-1 mx-2 md:mx-6"
+          className="lg:hidden grid grid-cols-2  gap-x-1 text-lg font-semibold px-4 border-2 mb-1 mx-2 md:mx-6"
           key={data.id}
         >
           <p>S.No: {i + 1}</p>
