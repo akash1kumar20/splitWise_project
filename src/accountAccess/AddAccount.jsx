@@ -5,20 +5,23 @@ import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import AuthContext from "../../store/auth-context";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { expenseSheetActions } from "../../store/expenseSheetSlice";
 import Footer from "../ExtraComponents/Footer";
+import PasswordValidation from "./PasswordValidation";
 
 const AddAccount = () => {
   const [isLogIn, setIsLogIn] = useState(true);
   const [viewPassword, setViewPassword] = useState(false);
   const [viewConfirmPassword, setViewConfirmPassword] = useState(false);
   const mailRef = useRef();
-  const passwordRef = useRef();
+  const [password, setPassword] = useState(" ");
   const confirmPasswordRef = useRef();
   const navigate = useNavigate();
   const autCtx = useContext(AuthContext);
   const dispatch = useDispatch();
+  const [checkPassword, setCheckPassword] = useState(false);
+  const submitPassword = useSelector((state) => state.password.submitPassword);
 
   async function formSubmitHandler(event) {
     event.preventDefault();
@@ -28,25 +31,32 @@ const AddAccount = () => {
     let url;
     if (isLogIn) {
       userMail = mailRef.current.value;
-      userPassword = passwordRef.current.value;
+      userPassword = password;
       url =
         "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyBOfzoct-rKO3JwaHNCGoh2qfHdGly_IdI";
     } else {
-      userMail = mailRef.current.value;
-      userPassword = passwordRef.current.value;
-      confirmPassword = confirmPasswordRef.current.value;
-      if (confirmPassword !== userPassword) {
-        return toast.warning("Please type passwords carefully", {
-          position: "top-center",
+      if (!submitPassword) {
+        return toast.warning("Please match the password condition", {
           theme: "colored",
-          autoClose: 2000,
+          autoClose: 1000,
+          position: "top-center",
         });
+      } else {
+        userMail = mailRef.current.value;
+        userPassword = password;
+        confirmPassword = confirmPasswordRef.current.value;
+        if (confirmPassword !== userPassword) {
+          return toast.warning("Please type passwords carefully", {
+            position: "top-center",
+            theme: "colored",
+            autoClose: 2000,
+          });
+        }
       }
       url =
         "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyBOfzoct-rKO3JwaHNCGoh2qfHdGly_IdI";
     }
     let message;
-    passwordRef.current.value = "";
     try {
       let res = await axios.post(url, {
         email: userMail,
@@ -65,7 +75,9 @@ const AddAccount = () => {
       }
       if (res.status === 200 && !isLogIn) {
         message = "Account Created Successully!";
-        setIsLogIn(true);
+        setTimeout(() => {
+          location.reload();
+        }, 2000);
       }
       toast.success(message, {
         theme: "colored",
@@ -113,7 +125,8 @@ const AddAccount = () => {
                 name="password"
                 type={viewPassword ? "type" : "password"}
                 required
-                ref={passwordRef}
+                onChange={(e) => setPassword(e.target.value)}
+                onFocus={() => setCheckPassword(true)}
                 placeholder="Write here..."
                 className="  bg-slate-400 rounded-xl focus:outline-none text-black ps-3 py-2 placeholder:text-black w-[95%]"
               />
@@ -130,6 +143,9 @@ const AddAccount = () => {
                 />
               )}
             </div>
+            {!isLogIn && checkPassword && (
+              <PasswordValidation password={password} />
+            )}
             {isLogIn && (
               <span
                 className=" text-sm my-2 cursor-pointer"
@@ -175,6 +191,7 @@ const AddAccount = () => {
           >
             {isLogIn ? "Login" : "Sign-in"}
           </button>
+
           {isLogIn && (
             <p
               className="mt-2 text-sm font-bold cursor-pointer"

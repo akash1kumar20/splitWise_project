@@ -5,6 +5,8 @@ import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
+import PasswordValidation from "./PasswordValidation";
+import { useSelector } from "react-redux";
 
 const ChangePassword = () => {
   const navigate = useNavigate();
@@ -12,9 +14,10 @@ const ChangePassword = () => {
   let forgetPassword = autCtx.forgetPassword;
   const [passowrd, setPassword] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState(false);
+  const [enteredPassword, setEnteredPassword] = useState(" ");
   const mailRef = useRef();
-  const passwordRef = useRef();
   const confirmPasswordRef = useRef();
+  const submitPassword = useSelector((state) => state.password.submitPassword);
   const token = autCtx.token;
   if (!token) {
     forgetPassword = true;
@@ -54,15 +57,24 @@ const ChangePassword = () => {
         });
       }
     } else {
-      password = passwordRef.current.value;
-      confirmPassword = confirmPasswordRef.current.value;
-      if (passowrd !== confirmPassword) {
-        toast.warning("Type Password correctly", {
+      if (!submitPassword) {
+        return toast.warning("Please match the password condition", {
           theme: "colored",
+          autoClose: 1000,
           position: "top-center",
-          autoClose: 2000,
         });
+      } else {
+        password = enteredPassword;
+        confirmPassword = confirmPasswordRef.current.value;
+        if (passowrd !== confirmPassword) {
+          toast.warning("Type Password correctly", {
+            theme: "colored",
+            position: "top-center",
+            autoClose: 2000,
+          });
+        }
       }
+
       try {
         let res = await axios.post(
           "https://identitytoolkit.googleapis.com/v1/accounts:update?key=AIzaSyBOfzoct-rKO3JwaHNCGoh2qfHdGly_IdI",
@@ -126,10 +138,12 @@ const ChangePassword = () => {
                   required
                   placeholder="Enter New Password"
                   className=" placeholder:text-black py-2 rounded-lg w-[95%] placeholder:text-lg focus:outline-none"
+                  onChange={(e) => setEnteredPassword(e.target.value)}
                 />
                 {!passowrd && <FiEye onClick={() => setPassword(true)} />}
                 {passowrd && <FiEyeOff onClick={() => setPassword(false)} />}
               </div>
+              <PasswordValidation password={enteredPassword} />
               <div className="flex justify-between items-center md:w-[60%] w-[90%] bg-white text-black mx-auto rounded-lg px-2 mt-4">
                 <input
                   name="confirmPassword"
