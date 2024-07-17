@@ -53,20 +53,18 @@ const PasswordValidation = ({ password }) => {
     if (password.length > 0) {
       verifyPasswordHandler(password);
     }
-    dispatchToggle();
   }, [password]);
-  function dispatchToggle() {
-    if (
-      validLength &&
-      validLowerCase &&
-      validNumber &&
-      validSpecialChar &&
-      validUpperCase
-    ) {
-      dispatch(passwordSliceAction.submitPasswordToggle(true));
-    } else {
-      dispatch(passwordSliceAction.submitPasswordToggle(false));
-    }
+
+  if (
+    validLength &&
+    validLowerCase &&
+    validNumber &&
+    validSpecialChar &&
+    validUpperCase
+  ) {
+    dispatch(passwordSliceAction.submitPasswordToggle(true));
+  } else {
+    dispatch(passwordSliceAction.submitPasswordToggle(false));
   }
 
   return (

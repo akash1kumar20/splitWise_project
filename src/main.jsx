@@ -1,50 +1,74 @@
-import React from "react";
+import React, { lazy, Suspense } from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
 import "./index.css";
 import { AuthContextProvider } from "../store/auth-context.jsx";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
-import ChangePassword from "./accountAccess/ChangePassword.jsx";
-import Home from "./components/Home.jsx";
-import CreateSheet from "./components/CreateSheet.jsx";
-import Sheets from "./components/Sheets.jsx";
-import FindSheet from "./components/FindSheet.jsx";
-import SingleSheet from "./components/SingleSheet.jsx";
-import WrongURL from "./ExtraComponents/WrongURL.jsx";
 import { Provider } from "react-redux";
 import store from "../store/index.js";
-import FoundSheet from "./components/FoundSheet.jsx";
-import UpdateExpense from "./Expenses/UpdateExpense.jsx";
-import DisplayExpense from "./Expenses/DisplayExpense.jsx";
-import DeleteUser from "./OthersOptions/DeleteUser.jsx";
-import FilterData from "./OthersOptions/FilterData.jsx";
-import GeneratedBill from "./OthersOptions/GeneratedBill.jsx";
-
+const Home = lazy(() => import("./components/Home.jsx"));
+const CreateSheet = lazy(() => import("./components/CreateSheet.jsx"));
+const Sheets = lazy(() => import("./components/Sheets.jsx"));
+const FindSheet = lazy(() => import("./components/FindSheet.jsx"));
+const SingleSheet = lazy(() => import("./components/SingleSheet.jsx"));
+const WrongURL = lazy(() => import("./ExtraComponents/WrongURL.jsx"));
+const FoundSheet = lazy(() => import("./components/FoundSheet.jsx"));
+const UpdateExpense = lazy(() => import("./Expenses/UpdateExpense.jsx"));
+const DeleteUser = lazy(() => import("./OthersOptions/DeleteUser.jsx"));
+const FilterData = lazy(() => import("./OthersOptions/FilterData.jsx"));
+const GeneratedBill = lazy(() => import("./OthersOptions/GeneratedBill.jsx"));
+const ChangePassword = lazy(() => import("./accountAccess/ChangePassword.jsx"));
+import Loading from "./ExtraComponents/Loading.jsx";
 const router = createBrowserRouter([
   { path: "/", element: <App /> },
   {
     path: "/changePassword",
-    element: <ChangePassword />,
+    element: (
+      <Suspense fallback={<Loading />}>
+        <ChangePassword />
+      </Suspense>
+    ),
   },
   {
     path: "/home",
-    element: <Home />,
+    element: (
+      <Suspense fallback={<Loading />}>
+        <Home />
+      </Suspense>
+    ),
     children: [
       {
         path: "/home/sheets",
-        element: <Sheets />,
+        element: (
+          <Suspense fallback={<Loading />}>
+            <Sheets />
+          </Suspense>
+        ),
+
         children: [
           {
             path: "/home/sheets/addSheet",
-            element: <CreateSheet />,
+            element: (
+              <Suspense fallback={<Loading />}>
+                <CreateSheet />
+              </Suspense>
+            ),
           },
           {
             path: "/home/sheets/findSheet",
-            element: <FindSheet />,
+            element: (
+              <Suspense fallback={<Loading />}>
+                <FindSheet />
+              </Suspense>
+            ),
           },
           {
             path: "/home/sheets/foundSheet",
-            element: <FoundSheet />,
+            element: (
+              <Suspense fallback={<Loading />}>
+                <FoundSheet />
+              </Suspense>
+            ),
           },
         ],
       },
@@ -52,25 +76,52 @@ const router = createBrowserRouter([
   },
   {
     path: "/home/sheets/:sheetName",
-    element: <SingleSheet />,
+    element: (
+      <Suspense fallback={<Loading />}>
+        <SingleSheet />
+      </Suspense>
+    ),
   },
   {
     path: "/home/sheets/:sheetName/updateExpense",
-    element: <UpdateExpense />,
+    element: (
+      <Suspense fallback={<Loading />}>
+        <UpdateExpense />
+      </Suspense>
+    ),
   },
   {
     path: "/home/sheets/:sheetName/deleteUser",
-    element: <DeleteUser />,
+    element: (
+      <Suspense fallback={<Loading />}>
+        <DeleteUser />
+      </Suspense>
+    ),
   },
   {
     path: "/home/sheets/:sheetName/filterData",
-    element: <FilterData />,
+    element: (
+      <Suspense fallback={<Loading />}>
+        <FilterData />
+      </Suspense>
+    ),
   },
   {
     path: "/home/sheets/:sheetName/generateBill",
-    element: <GeneratedBill />,
+    element: (
+      <Suspense fallback={<Loading />}>
+        <GeneratedBill />
+      </Suspense>
+    ),
   },
-  { path: "/*", element: <WrongURL /> },
+  {
+    path: "/*",
+    element: (
+      <Suspense fallback={<Loading />}>
+        <WrongURL />
+      </Suspense>
+    ),
+  },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
