@@ -24,7 +24,12 @@ const LeftBar = () => {
             onMouseOver={() => setShowCalculator(true)}
             onMouseOut={() => setShowCalculator(false)}
           >
-            <ImCalculator className="text-2xl" />
+            <a
+              href="https://whimsical-melba-dcb48d.netlify.app/"
+              target="blank"
+            >
+              <ImCalculator className="text-2xl" />
+            </a>
             {showCalculator && <span className="text-sm">Calculator</span>}
           </p>
           <p
