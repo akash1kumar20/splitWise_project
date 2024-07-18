@@ -40,7 +40,7 @@ const SingleSheet = () => {
         <CreateExpenseParent />
       </div>
       <DisplayExpense />
-      <Footer opeCylinder={showCylinderHandler} isOpen={showCylinder} />
+      <Footer openCylinder={showCylinderHandler} isOpen={showCylinder} />
     </div>
   );
 };
