@@ -6,7 +6,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { expenseSheetActions } from "../../store/expenseSheetSlice";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import ForLargerScreen from "./ForLargerScreen";
 import ForSmallerScreen from "./ForSmallerScreen";
 
@@ -26,7 +26,6 @@ const DisplayExpense = () => {
       navigate("/");
     }
   }, []);
-
   async function deleteExpenseHandler(id) {
     try {
       let res = await axios.delete(`${url}/${id}.json`);

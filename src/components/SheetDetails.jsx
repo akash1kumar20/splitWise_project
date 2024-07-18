@@ -99,7 +99,7 @@ const SheetDetails = () => {
               )}
             </div>
           ))}
-          <div className="flex lg:flex-col flex-row gap-x-3 text-end">
+          <div className="flex lg:flex-col flex-row md:gap-x-3 gap-x-[6px] text-end">
             <p className="text-sm md:text-lg">{time.toDateString()}</p>
             <p className="text-sm md:text-lg">{time.toLocaleTimeString()}</p>
             <p className="text-sm md:text-lg leading-snug">{greetings}</p>
