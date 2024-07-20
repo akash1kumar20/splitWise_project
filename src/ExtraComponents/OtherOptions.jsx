@@ -1,17 +1,18 @@
 import { ImCalculator } from "react-icons/im";
 import Cylinder from "./Cylinder";
-import { RiBillLine } from "react-icons/ri";
 import { FaFilter } from "react-icons/fa";
 import { TiUserDelete } from "react-icons/ti";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { FaMoneyBill1Wave, FaSheetPlastic } from "react-icons/fa6";
 
 const LeftBar = () => {
   const [showCalculator, setShowCalculator] = useState(false);
   const [showBill, setShowBill] = useState(false);
   const [showFilter, setShowFilter] = useState(false);
   const [showDeleteUser, setShowDeleteUser] = useState(false);
+  const [showPreviousBill, setShowPreviousBill] = useState(false);
   const navigate = useNavigate();
   const sheetCode = useSelector((state) => state.expenseSheet.sheetCode);
 
@@ -32,16 +33,28 @@ const LeftBar = () => {
             </a>
             {showCalculator && <span className="text-sm">Calculator</span>}
           </p>
+
           <p
             className="flex flex-col items-center cursor-pointer"
             onMouseOver={() => setShowBill(true)}
             onMouseOut={() => setShowBill(false)}
           >
-            <RiBillLine
+            <FaMoneyBill1Wave
               className="text-2xl"
               onClick={() => navigate(`/home/sheets/${sheetCode}/generateBill`)}
             />
             {showBill && <span className="text-sm">Generate Bill</span>}
+          </p>
+          <p
+            className="flex flex-col items-center cursor-pointer"
+            onMouseOver={() => setShowPreviousBill(true)}
+            onMouseOut={() => setShowPreviousBill(false)}
+          >
+            <FaSheetPlastic
+              className="text-2xl"
+              onClick={() => navigate(`/home/sheets/${sheetCode}/previousBill`)}
+            />
+            {showPreviousBill && <span className="text-sm">Previous Bill</span>}
           </p>
           <p
             className="flex flex-col items-center cursor-pointer"

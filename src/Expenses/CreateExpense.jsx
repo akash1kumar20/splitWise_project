@@ -72,7 +72,9 @@ const CreateExpense = ({ users }) => {
               placeholder="Choose Category"
               required
             >
-              <option hidden>Category</option>
+              <option hidden defaultValue value="">
+                Category
+              </option>
               <option value="Food & Drinks" name="expenseCategory">
                 Food & Drinks
               </option>
@@ -106,7 +108,9 @@ const CreateExpense = ({ users }) => {
               ref={userRef}
               required
             >
-              <option hidden>Spend By</option>
+              <option hidden defaultValue value="">
+                Spend By
+              </option>
               {userList.map((userData) => (
                 <option
                   name="expenseAdder"

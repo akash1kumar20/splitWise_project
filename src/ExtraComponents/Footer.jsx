@@ -3,9 +3,20 @@ import { FaRegCopyright } from "react-icons/fa";
 import { RiArrowLeftWideFill } from "react-icons/ri";
 import { SiFontbase } from "react-icons/si";
 import { useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
 
 const Footer = ({ openCylinder, isOpen }) => {
+  const param = JSON.stringify(useParams());
+  const [viewExploreBtn, setViewExploreBtn] = useState(false);
   const sheetCode = useSelector((state) => state.expenseSheet.sheetCode);
+  useEffect(() => {
+    let booleanValue = param.includes(sheetCode);
+    if (!booleanValue) {
+      setViewExploreBtn(false);
+    } else {
+      setViewExploreBtn(true);
+    }
+  }, [param]);
   const [showText, setShowText] = useState(false);
   const [showTop, setShowTop] = useState(false);
   const [showTopBtn, setShowTopBtn] = useState(false);
@@ -57,40 +68,44 @@ const Footer = ({ openCylinder, isOpen }) => {
               </div>
             </>
           )}
-          <div
-            className="px-4 py-[10px] md:flex hidden gap-2 text-white bg-black rounded-full font-semibold cursor-pointer "
-            onMouseOver={() => setShowText(true)}
-            onMouseOut={() => setShowText(false)}
-            onClick={openCylinderHandler}
-          >
-            {showText && !isOpen && (
-              <span className="text-white font-bold  ">Explore More</span>
-            )}
-            <p>
-              {isOpen && (
-                <RiArrowLeftWideFill className="text-[26px] -rotate-90" />
+          {viewExploreBtn && (
+            <div
+              className="px-4 py-[10px] md:flex hidden gap-2 text-white bg-black rounded-full font-semibold cursor-pointer "
+              onMouseOver={() => setShowText(true)}
+              onMouseOut={() => setShowText(false)}
+              onClick={openCylinderHandler}
+            >
+              {showText && !isOpen && (
+                <span className="text-white font-bold  ">Explore More</span>
               )}
+              <p>
+                {isOpen && (
+                  <RiArrowLeftWideFill className="text-[26px] -rotate-90" />
+                )}
+                {!isOpen && (
+                  <RiArrowLeftWideFill className="text-[26px] rotate-90" />
+                )}
+              </p>
+            </div>
+          )}
+          {viewExploreBtn && (
+            <div
+              className="px-4 py-[10px] flex flex-col justify-center items-center md:hidden gap-1 text-white bg-black rounded-full font-semibold cursor-pointer "
+              onClick={openCylinderHandler}
+            >
+              <p>
+                {isOpen && (
+                  <RiArrowLeftWideFill className="text-[26px] -rotate-90" />
+                )}
+                {!isOpen && (
+                  <RiArrowLeftWideFill className="text-[26px] rotate-90" />
+                )}
+              </p>
               {!isOpen && (
-                <RiArrowLeftWideFill className="text-[26px] rotate-90" />
+                <span className="text-white font-bold text-xs">Explore</span>
               )}
-            </p>
-          </div>
-          <div
-            className="px-4 py-[10px] flex flex-col justify-center items-center md:hidden gap-1 text-white bg-black rounded-full font-semibold cursor-pointer "
-            onClick={openCylinderHandler}
-          >
-            <p>
-              {isOpen && (
-                <RiArrowLeftWideFill className="text-[26px] -rotate-90" />
-              )}
-              {!isOpen && (
-                <RiArrowLeftWideFill className="text-[26px] rotate-90" />
-              )}
-            </p>
-            {!isOpen && (
-              <span className="text-white font-bold text-xs">Explore</span>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       )}
       <div className="flex items-center justify-center bg-black bg-opacity-20 text-slate-500 text-md ">

@@ -20,6 +20,7 @@ const DisplayExpense = () => {
   const token = useSelector((state) => state.expenseSheet.token);
   const sheetCode = useSelector((state) => state.expenseSheet.sheetCode);
   const theme = useSelector((state) => state.theme.theme);
+  const [previousBilllength, setPreviousBilllength] = useState(0);
 
   useEffect(() => {
     if (!token) {
@@ -50,6 +51,25 @@ const DisplayExpense = () => {
     navigate(`/home/sheets/${sheetCode}/updateExpense`);
   }
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        let res = await axios.get(
+          `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${inviteCode}/previousBills.json`
+        );
+        let resArr = [];
+        for (let key in res.data) {
+          resArr.push({ ...res.data[key] });
+        }
+        setPreviousBilllength(resArr.length);
+      } catch (err) {
+        alert("No data found");
+      }
+    };
+
+    fetchData();
+  }, []);
+
   return (
     <>
       <ToastContainer />
@@ -65,9 +85,20 @@ const DisplayExpense = () => {
             No expense to show
           </p>
         )}
+        {previousBilllength > 0 && !length && (
+          <p className="mt-2 text-lg text-center">
+            Check out the
+            <span
+              className="text-blue-500 cursor-pointer ms-2"
+              onClick={() => navigate(`/home/sheets/${sheetCode}/previousBill`)}
+            >
+              Previous Bills
+            </span>
+          </p>
+        )}
         {isLoading && <Loading />}
         {length && (
-          <div>
+          <div className="pb-20">
             <ForSmallerScreen
               comingData={comingData}
               updateHandler={updateExpenseHandler}

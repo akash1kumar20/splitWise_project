@@ -26,6 +26,7 @@ const GeneratedBill = () => {
   const [comingData, isLoading] = useFetchDataHook(
     `${urlKey}/expenseSheet.json`
   );
+  const userMail = useSelector((state) => state.expenseSheet.userMail);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -74,14 +75,33 @@ const GeneratedBill = () => {
   });
 
   const afterPDFPrint = async () => {
+    let previousBillData = {
+      totalAmount: totalAmount,
+      generatedBy: userMail,
+      totalUsers: users.length,
+      data: data,
+    };
+    let status = false;
     try {
-      let res = await axios.delete(`${urlKey}/expenseSheet.json`);
+      let res = await axios.post(
+        `${urlKey}/previousBills.json`,
+        previousBillData
+      );
       if (res.status === 200) {
-        navigate(`/home/sheets/${sheetCode}`);
+        status = true;
       }
     } catch (err) {
-      console.log(err);
       alert("please try again");
+    }
+    if (status) {
+      try {
+        let res = await axios.delete(`${urlKey}/expenseSheet.json`);
+        if (res.status === 200) {
+          navigate(`/home/sheets/${sheetCode}`);
+        }
+      } catch (err) {
+        alert("please try again");
+      }
     }
   };
 
@@ -126,7 +146,7 @@ const GeneratedBill = () => {
                 Per Head Contribution is ₹{" "}
                 <span>
                   {totalAmount} / {users.length} (users) is ₹{" "}
-                  {totalAmount / users.length || 0}
+                  {(totalAmount / users.length).toFixed(2) || 0}
                 </span>
               </p>
             </div>
@@ -149,11 +169,15 @@ const GeneratedBill = () => {
                       <td className="md:px-6">
                         {totalAmount / users.length > item.amount ? (
                           <span className="text-red-900 font-semibold">
-                            {totalAmount / users.length - item.amount}
+                            {(totalAmount / users.length - item.amount).toFixed(
+                              2
+                            )}
                           </span>
                         ) : (
                           <span className="text-green-900 font-semibold">
-                            {(totalAmount / users.length - item.amount) * -1}
+                            {(totalAmount / users.length - item.amount).toFixed(
+                              2
+                            ) * -1}
                           </span>
                         )}
                       </td>
@@ -166,7 +190,7 @@ const GeneratedBill = () => {
               <p className="text-center mt-3 font-semibold">
                 Others users amount is zero and balance is ₹{" "}
                 <span className="text-red-900 font-semibold">
-                  {totalAmount / users.length}
+                  {(totalAmount / users.length).toFixed(2)}
                 </span>
               </p>
             )}

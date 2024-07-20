@@ -101,7 +101,9 @@ const AddAccount = () => {
     <>
       <ToastContainer />
       <div className="mx-auto md:w-[50%] border-2 shadow-2xl drop-shadow-2xl text-center py-16">
-        <h1 className="text-3xl font-semibold">Please Login to continue</h1>
+        <h1 className="text-3xl font-semibold">
+          {isLogIn ? "Please Login to continue" : "Create Account"}
+        </h1>
         <form>
           <div className="flex flex-col static w-[80%] mx-auto mt-6">
             <label className="text-black text-lg font-semibold relative top-2 ml-[7px] px-[3px] bg-[#e8e8e8] w-fit">

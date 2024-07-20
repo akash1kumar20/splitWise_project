@@ -1,14 +1,13 @@
 import axios from "axios";
 import { useRef } from "react";
 import { useSelector } from "react-redux";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 const Users = () => {
   const nameRef = useRef();
   const invitationCode = useSelector((state) => state.expenseSheet.inviteCode);
 
-  const addUsersList = async () => {
+  const addUsersList = async (e) => {
+    e.preventDefault();
     const users = {
       userName: nameRef.current.value,
     };
@@ -18,24 +17,17 @@ const Users = () => {
         users
       );
       if (res.status === 200) {
-        toast.success(`user added`, {
-          position: "top-right",
-          autoClose: 1000,
-          theme: "colored",
-        });
+        nameRef.current.value = `${nameRef.current.value} added`;
       }
     } catch (error) {
-      toast.error("Please try again", {
-        position: "top-right",
-        autoClose: 2000,
-        theme: "dark",
-      });
+      nameRef.current.value = "Please try again";
     }
-    nameRef.current.value = "";
+    setTimeout(() => {
+      nameRef.current.value = "";
+    }, 1000);
   };
   return (
     <>
-      <ToastContainer />
       <input
         name="user"
         type="text"
@@ -46,7 +38,7 @@ const Users = () => {
       />
       <button
         className="bg-purple-600 text-white ms-2 py-2 px-6 rounded-2xl font-bold"
-        onClick={() => addUsersList()}
+        onClick={(e) => addUsersList(e)}
       >
         Add
       </button>

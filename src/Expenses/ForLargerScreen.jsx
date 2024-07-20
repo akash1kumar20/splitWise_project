@@ -12,7 +12,6 @@ const ForLargerScreen = ({ comingData, updateHandler, deleteHandler }) => {
     <>
       <div className="hidden text-2xl  lg:flex flex-row justify-between mx-6 border-2 p-4 font-bold">
         <TableHead />
-        <span className="tableElementSide">Actions</span>
       </div>
       {comingData.map((data, i) => (
         <table
@@ -24,19 +23,16 @@ const ForLargerScreen = ({ comingData, updateHandler, deleteHandler }) => {
               <td className="tableElementSide">{i + 1}</td>
               <td className="tableHeading">{data.date}</td>
               <td className="tableElementMain">{data.category}</td>
-              {data.subCategory.length > 0 && (
-                <td className="tableElementMain">{data.subCategory}</td>
-              )}
-              {data.subCategory.length === 0 && (
-                <td className="tableElementMain">___</td>
-              )}
+              <td className="tableElementMain">
+                {data.subCategory.length > 0 ? data.subCategory : "__"}
+              </td>
               <td className="tableHeading">
                 {data.amount}
                 <p className="text-sm font-extrabold">By - {data.payBy}</p>
               </td>
               <td className="tableHeading ">{data.user}</td>
-              <td className="tableElementSide">
-                <span className="flex gap-x-6">
+              <td className="tableElementSide ">
+                <span className="flex gap-x-6 ms-10">
                   <FaPenAlt
                     className="text-yellow-400 text-lg cursor-pointer  hover:scale-x-125"
                     onClick={() => updateExpenseHandler(data)}

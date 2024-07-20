@@ -18,7 +18,9 @@ const DeleteUser = lazy(() => import("./OthersOptions/DeleteUser.jsx"));
 const FilterData = lazy(() => import("./OthersOptions/FilterData.jsx"));
 const GeneratedBill = lazy(() => import("./OthersOptions/GeneratedBill.jsx"));
 const ChangePassword = lazy(() => import("./accountAccess/ChangePassword.jsx"));
+const PreviousBill = lazy(() => import("./OthersOptions/PreviousBill.jsx"));
 import Loading from "./ExtraComponents/Loading.jsx";
+
 const router = createBrowserRouter([
   { path: "/", element: <App /> },
   {
@@ -111,6 +113,14 @@ const router = createBrowserRouter([
     element: (
       <Suspense fallback={<Loading />}>
         <GeneratedBill />
+      </Suspense>
+    ),
+  },
+  {
+    path: "/home/sheets/:sheetName/previousBill",
+    element: (
+      <Suspense fallback={<Loading />}>
+        <PreviousBill />
       </Suspense>
     ),
   },
