@@ -1,12 +1,12 @@
 const SinglePreviousBill = ({ data }) => {
   return (
-    <div className="border p-2 md:ms-10">
+    <div className="border  p-2">
       {data.map((item) => (
         <div className="text-[16px] " key={item.id}>
-          {item.user} contributed ₹{item.amount} in the previous bill.
+          {item.user} contributed ₹{item.amount} .
         </div>
       ))}
-      <p className="text-[16px]">No Other Contribution by any other user</p>
+      <p className="text-[16px]">No Other Contribution by any other user.</p>
     </div>
   );
 };

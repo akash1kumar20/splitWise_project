@@ -81,7 +81,7 @@ const DisplayExpense = () => {
         }
       >
         {!length && !isLoading && (
-          <p className=" text-white text-center font-bold text-3xl ">
+          <p className="  text-center font-bold text-3xl ">
             No expense to show
           </p>
         )}
