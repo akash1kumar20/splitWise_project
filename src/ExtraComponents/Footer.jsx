@@ -51,32 +51,32 @@ const Footer = ({ openCylinder, isOpen }) => {
           {showTopBtn && (
             <>
               <div
-                className="hidden px-4 py-[10px] text-white bg-black rounded-full md:flex gap-2 font-semibold cursor-pointer"
+                className=" px-4 py-[10px] text-white bg-black rounded-full flex gap-2 font-semibold cursor-pointer"
                 onMouseOver={() => setShowTop(true)}
                 onMouseOut={() => setShowTop(false)}
               >
                 <a href="#top">
                   <SiFontbase className="text-[26px]" />
                 </a>
-                {showTop && <span className="text-white font-bold  ">Top</span>}
-              </div>
-              <div className="md:hidden px-4 py-[10px] text-white bg-black rounded-full flex gap-1 flex-col font-semibold cursor-pointer">
-                <a href="#top">
-                  <SiFontbase className="text-[26px]" />
-                </a>
-                <span className="text-white font-bold  text-xs">Top</span>
+                {showTop && (
+                  <span className="text-white font-bold hidden md:block ">
+                    Top
+                  </span>
+                )}
               </div>
             </>
           )}
           {viewExploreBtn && (
             <div
-              className="px-4 py-[10px] md:flex hidden gap-2 text-white bg-black rounded-full font-semibold cursor-pointer "
+              className="px-4 py-[10px] flex gap-2 text-white bg-black rounded-full font-semibold cursor-pointer "
               onMouseOver={() => setShowText(true)}
               onMouseOut={() => setShowText(false)}
               onClick={openCylinderHandler}
             >
               {showText && !isOpen && (
-                <span className="text-white font-bold  ">Explore More</span>
+                <span className="text-white font-bold  hidden md:block">
+                  Explore More
+                </span>
               )}
               <p>
                 {isOpen && (
@@ -86,24 +86,6 @@ const Footer = ({ openCylinder, isOpen }) => {
                   <RiArrowLeftWideFill className="text-[26px] rotate-90" />
                 )}
               </p>
-            </div>
-          )}
-          {viewExploreBtn && (
-            <div
-              className="px-4 py-[10px] flex flex-col justify-center items-center md:hidden gap-1 text-white bg-black rounded-full font-semibold cursor-pointer "
-              onClick={openCylinderHandler}
-            >
-              <p>
-                {isOpen && (
-                  <RiArrowLeftWideFill className="text-[26px] -rotate-90" />
-                )}
-                {!isOpen && (
-                  <RiArrowLeftWideFill className="text-[26px] rotate-90" />
-                )}
-              </p>
-              {!isOpen && (
-                <span className="text-white font-bold text-xs">Explore</span>
-              )}
             </div>
           )}
         </div>

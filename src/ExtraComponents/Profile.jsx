@@ -5,13 +5,16 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useDispatch, useSelector } from "react-redux";
 import { themeSliceActions } from "../../store/themeSlice";
+import DemoVideo from "./DemoVideo";
 
 const Profile = () => {
   const userMail = useSelector((state) => state.expenseSheet.userMail);
   const [themeHanlder, setThemeHandler] = useState(false);
+  const [openDemo, setOpenDemo] = useState(false);
   const navigate = useNavigate();
   const autCtx = useContext(AuthContext);
   const dispatch = useDispatch();
+
   const logoutHandler = () => {
     autCtx.logout();
     toast.error("Logout Successfully!", {
@@ -24,10 +27,14 @@ const Profile = () => {
     }, 800);
   };
 
+  const demoVideoHandler = () => {
+    setOpenDemo((openDemo) => !openDemo);
+  };
+
   return (
     <>
       <ToastContainer />
-      <div className=" bg-slate-900 w-fit  flex flex-col right-2 fixed text-white  px-5 mt-1 rounded-lg py-10 border-2 border-slate-400 z-50">
+      <div className=" bg-slate-900 w-fit  flex flex-col right-2 fixed text-white  px-5 mt-1 rounded-lg py-10 border-2 border-slate-400 z-40">
         <span className="text-center font-bold underline text-sm">
           {userMail}
         </span>
@@ -66,12 +73,19 @@ const Profile = () => {
           </p>
         )}
         <button
+          className="bg-green-500 py-2 px-4 rounded-xl my-2 text-white hover:bg-green-300 hover:text-black"
+          onClick={demoVideoHandler}
+        >
+          Tutorial
+        </button>
+        <button
           className="bg-red-500 py-2 px-4 rounded-xl my-2 text-white hover:bg-red-300 hover:text-black"
           onClick={logoutHandler}
         >
           Logout
         </button>
       </div>
+      {openDemo && <DemoVideo demoVideo={demoVideoHandler} />}
     </>
   );
 };

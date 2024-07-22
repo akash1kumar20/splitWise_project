@@ -9,6 +9,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { expenseSheetActions } from "../../store/expenseSheetSlice";
 import Footer from "../ExtraComponents/Footer";
 import PasswordValidation from "./PasswordValidation";
+import DemoVideo from "../ExtraComponents/DemoVideo";
+import { FaCirclePlay } from "react-icons/fa6";
 
 const AddAccount = () => {
   const [isLogIn, setIsLogIn] = useState(true);
@@ -21,6 +23,7 @@ const AddAccount = () => {
   const autCtx = useContext(AuthContext);
   const dispatch = useDispatch();
   const [checkPassword, setCheckPassword] = useState(false);
+  const [openDemo, setOpenDemo] = useState(false);
   const submitPassword = useSelector((state) => state.password.submitPassword);
 
   async function formSubmitHandler(event) {
@@ -97,10 +100,14 @@ const AddAccount = () => {
     autCtx.changePasswordHandler();
     navigate("/changePassword");
   };
+
+  const demoVideoHandler = () => {
+    setOpenDemo((openDemo) => !openDemo);
+  };
   return (
     <>
       <ToastContainer />
-      <div className="mx-auto md:w-[50%] border-2 shadow-2xl drop-shadow-2xl text-center py-16">
+      <div className="mx-auto md:w-[50%] border-2 shadow-2xl drop-shadow-2xl text-center py-6">
         <h1 className="text-3xl font-semibold">
           {isLogIn ? "Please Login to continue" : "Create Account"}
         </h1>
@@ -212,6 +219,14 @@ const AddAccount = () => {
           )}
         </form>
       </div>
+      <div className="mt-2 flex gap-2 items-center justify-center">
+        <FaCirclePlay
+          className="text-3xl cursor-pointer"
+          onClick={demoVideoHandler}
+        />
+        <p>How it works?</p>
+      </div>
+      {openDemo && <DemoVideo demoVideo={demoVideoHandler} />}
       <Footer />
     </>
   );

@@ -90,7 +90,7 @@ const SheetDetails = () => {
                   )}
                   {userMail !== sheet.userMail && <p>You: {userMail}</p>}
                   <p className="text-sm md:text-lg">
-                    Inivitaion Code:
+                    Invitation Code:
                     <span className="text-md font-semibold underline ps-2">
                       {sheet.inviationCode}
                     </span>
