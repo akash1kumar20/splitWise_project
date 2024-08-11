@@ -7,16 +7,23 @@ const TableBody = ({ comingData }) => {
             <tr>
               <td className="tableElementSide">{i + 1}</td>
               <td className="tableHeading">{data.date}</td>
-              <td className="tableElementMain">{data.category}</td>
-              {data.subCategory.length > 0 && (
-                <td className="tableElementMain">{data.subCategory}</td>
-              )}
-              {data.subCategory.length === 0 && (
-                <td className="tableElementMain">___</td>
-              )}
+              <td className="tableElementMain">
+                {data.category}
+                {data.relatedAmount && (
+                  <p className="text-sm">(Related Amount)</p>
+                )}
+              </td>
+              <td className="tableElementMain">{data.subCategory}</td>
               <td className="tableHeading">
-                {data.amount}
-                <p className="text-sm font-extrabold">By - {data.payBy}</p>
+                {!data.relatedAmount ? data.amount : data.relatedAmtVal}
+                {data.relatedAmount && (
+                  <p className="text-sm font-extrabold">
+                    R/L - {data.relatedTo}
+                  </p>
+                )}
+                {!data.relatedAmount && (
+                  <p className="text-sm font-extrabold">P/M - {data.payBy}</p>
+                )}
               </td>
               <td className="tableHeading ">{data.user}</td>
             </tr>

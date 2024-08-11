@@ -39,6 +39,9 @@ const UpdateExpense = () => {
       subCategory: event.target.subCategory.value,
       user: event.target.user.value,
       payBy: event.target.payBy.value,
+      relatedAmtVal: 0,
+      relatedAmount: false,
+      relatedTo: event.target.user.value,
     };
 
     try {

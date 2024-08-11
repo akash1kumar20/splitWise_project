@@ -15,20 +15,24 @@ const ForLargerScreen = ({ comingData, updateHandler, deleteHandler }) => {
       </div>
       {comingData.map((data, i) => (
         <table
-          key={data.id}
           className="hidden text-2xl  lg:flex flex-row justify-between mx-6 border-2 p-4"
+          key={data.id}
         >
           <tbody>
             <tr>
               <td className="tableElementSide">{i + 1}</td>
               <td className="tableHeading">{data.date}</td>
               <td className="tableElementMain">{data.category}</td>
-              <td className="tableElementMain">
-                {data.subCategory.length > 0 ? data.subCategory : "__"}
-              </td>
+              <td className="tableElementMain">{data.subCategory}</td>
               <td className="tableHeading">
-                {data.amount}
-                <p className="text-sm font-extrabold">By - {data.payBy}</p>
+                {!data.relatedAmount ? data.amount : data.relatedAmtVal}
+                {!data.relatedAmount ? (
+                  <p className="text-sm font-extrabold">P/M - {data.payBy}</p>
+                ) : (
+                  <p className="text-sm font-extrabold">
+                    R/L - {data.relatedTo}
+                  </p>
+                )}
               </td>
               <td className="tableHeading ">{data.user}</td>
               <td className="tableElementSide ">

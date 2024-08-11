@@ -19,6 +19,10 @@ const FilterData = lazy(() => import("./OthersOptions/FilterData.jsx"));
 const GeneratedBill = lazy(() => import("./OthersOptions/GeneratedBill.jsx"));
 const ChangePassword = lazy(() => import("./accountAccess/ChangePassword.jsx"));
 const PreviousBill = lazy(() => import("./OthersOptions/PreviousBill.jsx"));
+const OtherExpense = lazy(() => import("./components/OtherExpense.jsx"));
+const OtherExpenseUpdate = lazy(() =>
+  import("./components/OtherExpenseUpdate.jsx")
+);
 import Loading from "./ExtraComponents/Loading.jsx";
 
 const router = createBrowserRouter([
@@ -89,6 +93,22 @@ const router = createBrowserRouter([
     element: (
       <Suspense fallback={<Loading />}>
         <UpdateExpense />
+      </Suspense>
+    ),
+  },
+  {
+    path: "/home/sheets/:sheetName/otherExpenseUpdate",
+    element: (
+      <Suspense fallback={<Loading />}>
+        <OtherExpenseUpdate />
+      </Suspense>
+    ),
+  },
+  {
+    path: "/home/sheets/:sheetName/otherExpense",
+    element: (
+      <Suspense fallback={<Loading />}>
+        <OtherExpense />
       </Suspense>
     ),
   },

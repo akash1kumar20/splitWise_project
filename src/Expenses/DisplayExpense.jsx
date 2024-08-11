@@ -47,8 +47,13 @@ const DisplayExpense = () => {
   }
 
   function updateExpenseHandler(data) {
-    dispatch(expenseSheetActions.setExpenseToEdit([data]));
-    navigate(`/home/sheets/${sheetCode}/updateExpense`);
+    if (data.relatedAmount) {
+      navigate(`/home/sheets/${sheetCode}/otherExpenseUpdate`);
+      dispatch(expenseSheetActions.setExpenseToEdit([data]));
+    } else if (!data.relatedAmount) {
+      navigate(`/home/sheets/${sheetCode}/updateExpense`);
+      dispatch(expenseSheetActions.setExpenseToEdit([data]));
+    }
   }
 
   useEffect(() => {

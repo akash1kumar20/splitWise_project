@@ -24,11 +24,14 @@ const CreateExpense = ({ users }) => {
     let date = new Date().toLocaleDateString();
     const expenseAdded = {
       date: date,
-      subCategory: subCategoryRef.current.value,
+      subCategory: subCategoryRef.current.value || "NA",
       category: categoryRef.current.value,
       amount: amountRef.current.value,
+      relatedAmtVal: 0,
       user: userRef.current.value,
       payBy: payBy.current.value,
+      relatedAmount: false,
+      relatedTo: userRef.current.value,
     };
 
     try {

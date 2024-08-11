@@ -5,6 +5,7 @@ import CreateExpense from "../Expenses/CreateExpense";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import SheetDetailsCard from "../Card/SheetDetailsCard";
+import { useNavigate } from "react-router-dom";
 
 const CreateExpenseParent = () => {
   const inviteCode = useSelector((state) => state.expenseSheet.inviteCode);
@@ -12,6 +13,8 @@ const CreateExpenseParent = () => {
   const [comingData, isLoading] = useFetchDataHook(
     `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${inviteCode}/usersList.json`
   );
+  const navigate = useNavigate();
+  const sheetCode = useSelector((state) => state.expenseSheet.sheetCode);
   return (
     <SheetDetailsCard>
       {!isLoading && (
@@ -34,12 +37,24 @@ const CreateExpenseParent = () => {
             </p>
           )}
           {!addUser && (
-            <p
-              className="text-blue-400 font-bold cursor-pointer mt-2 w-fit"
-              onClick={() => setAddUser(true)}
-            >
-              Add users
-            </p>
+            <div className="flex gap-x-3">
+              <p
+                className="text-blue-400 font-bold cursor-pointer mt-2 w-fit"
+                onClick={() => setAddUser(true)}
+              >
+                Add users
+              </p>
+              {comingData.length > 1 && (
+                <p
+                  className="text-blue-400 font-bold cursor-pointer mt-2 w-fit"
+                  onClick={() =>
+                    navigate(`/home/sheets/${sheetCode}/otherExpense`)
+                  }
+                >
+                  Other Expense
+                </p>
+              )}
+            </div>
           )}
         </div>
       )}

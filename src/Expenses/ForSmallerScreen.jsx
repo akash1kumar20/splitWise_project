@@ -34,17 +34,19 @@ const ForSmallerScreen = ({ comingData, updateHandler, deleteHandler }) => {
           </p>
           <p>
             Note:
-            <span className="text-md ms-1">
-              {data.subCategory.length > 0 ? data.subCategory : "___"}
-            </span>
+            <span className="text-md ms-1">{data.subCategory}</span>
           </p>
           <p>
-            Amount: {data.amount}
+            Amount: {!data.relatedAmount ? data.amount : data.relatedAmtVal}
             <span className="text-sm font-extrabold ms-1">
               ( {data.payBy} )
             </span>
           </p>
-          <p>Spend By: {data.user}</p>
+          {!data.relatedAmount ? (
+            <p>Spend By: {data.user}</p>
+          ) : (
+            <p>Related To: {data.relatedTo}</p>
+          )}
         </div>
       ))}
     </>

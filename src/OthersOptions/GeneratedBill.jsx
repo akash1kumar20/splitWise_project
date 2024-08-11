@@ -3,11 +3,11 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import useFetchDataHook from "../customHooks/useFetchDataHook";
 import Loading from "../ExtraComponents/Loading";
-import { FaCircle } from "react-icons/fa";
 import { useReactToPrint } from "react-to-print";
 import TableHead from "../ExtraComponents/TableHead";
 import TableBody from "../ExtraComponents/TableBody";
 import axios from "axios";
+import GeneratedBillDetails from "./GeneratedBillDetails";
 
 const GeneratedBill = () => {
   const token = useSelector((state) => state.expenseSheet.token);
@@ -27,6 +27,7 @@ const GeneratedBill = () => {
     `${urlKey}/expenseSheet.json`
   );
   const userMail = useSelector((state) => state.expenseSheet.userMail);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -47,8 +48,14 @@ const GeneratedBill = () => {
     startingDate = dataArray[0];
     endingDate = dataArray[dataArray.length - 1];
   }
-  let amountArray = comingData.map((item) => item.amount);
+
+  let relatedDataArr = comingData.map((item) => item.relatedAmtVal);
+  let relatedMoneyTtl = 0;
+  for (let i = 0; i < relatedDataArr.length; i++) {
+    relatedMoneyTtl = relatedMoneyTtl + Number(relatedDataArr[i]);
+  }
   let totalAmount = 0;
+  let amountArray = comingData.map((item) => item.amount);
   for (let i = 0; i < amountArray.length; i++) {
     totalAmount = totalAmount + Number(amountArray[i]);
   }
@@ -56,11 +63,20 @@ const GeneratedBill = () => {
   useEffect(() => {
     const dataObj = comingData.reduce((acc, data) => {
       const amount = parseFloat(data.amount);
+      let relatedAmtVal = parseFloat(data.relatedAmtVal) || 0;
       if (acc[data.user]) {
-        acc[data.user].amount += amount;
+        acc[data.user].amount = acc[data.user].amount + amount + relatedAmtVal;
         //if same type of value is coming
+        if (users.length > 1) {
+          acc[data.relatedTo].relatedAmtVal += relatedAmtVal;
+          relatedAmtVal = amount - relatedAmtVal;
+        } else {
+          acc[data.relatedTo].relatedAmtVal = 0;
+          //because we don't need relatedAmtVal if only single user is present
+        }
+        // console.log(acc[data.user].amount, acc[data.relatedTo].relatedAmtVal);
       } else {
-        acc[data.user] = { ...data, amount };
+        acc[data.user] = { ...data, amount, relatedAmtVal };
         //adding for the first time.
       }
       return acc;
@@ -140,13 +156,15 @@ const GeneratedBill = () => {
             </div>
             <div className="flex flex-col justify-center items-center gap-2 mb-1 mt-3">
               <h2 className="text-xl font-semibold ">
-                Total Expense : ₹ {totalAmount}
+                Total Expense : ₹ {totalAmount + relatedMoneyTtl}
               </h2>
+
               <p className="font-bold text-lg ">
-                Per Head Contribution is ₹{" "}
+                Per Head Contribution without (R/L amount - {relatedMoneyTtl})
+                is ₹{" "}
                 <span>
-                  {totalAmount} / {users.length} (users) is ₹{" "}
-                  {(totalAmount / users.length).toFixed(2) || 0}
+                  {totalAmount} / {users.length} (users) = ₹{" "}
+                  {(totalAmount / users.length).toFixed(2) * 1 || 0}
                 </span>
               </p>
             </div>
@@ -167,17 +185,22 @@ const GeneratedBill = () => {
                       </td>
                       <td className="md:px-6">{item.amount}</td>
                       <td className="md:px-6">
-                        {totalAmount / users.length > item.amount ? (
+                        {totalAmount / users.length >
+                        item.amount - item.relatedAmtVal ? (
                           <span className="text-red-900 font-semibold">
-                            {(totalAmount / users.length - item.amount).toFixed(
-                              2
-                            )}
+                            {(
+                              totalAmount / users.length -
+                              item.amount +
+                              item.relatedAmtVal
+                            ).toFixed(2) * 1}
                           </span>
                         ) : (
                           <span className="text-green-900 font-semibold">
-                            {(totalAmount / users.length - item.amount).toFixed(
-                              2
-                            ) * -1}
+                            {(
+                              totalAmount / users.length -
+                              item.amount +
+                              item.relatedAmtVal
+                            ).toFixed(2) * -1}
                           </span>
                         )}
                       </td>
@@ -190,7 +213,10 @@ const GeneratedBill = () => {
               <p className="text-center mt-3 font-semibold">
                 Others users amount is zero and balance is ₹{" "}
                 <span className="text-red-900 font-semibold">
-                  {(totalAmount / users.length).toFixed(2)}
+                  {(
+                    (totalAmount + relatedMoneyTtl + relatedMoneyTtl) /
+                    users.length
+                  ).toFixed(2) * 1}
                 </span>
               </p>
             )}
@@ -203,18 +229,8 @@ const GeneratedBill = () => {
                 ]
               </div>
             )}
-            <p className="flex justify-center gap-4 text-sm mt-3 items-center">
-              <span className="min-h-6 min-w-6 rounded-full  flex items-center">
-                <FaCircle className="text-green-900" />{" "}
-                <span className=" ms-1">Amount To Recieve</span>
-              </span>
-              <span className="min-h-6 min-w-6 rounded-full  flex items-center">
-                <FaCircle className="text-red-900" />{" "}
-                <span className=" ms-1">Amount To Give</span>
-              </span>
-            </p>
+            <GeneratedBillDetails />
           </div>
-
           <div className="flex gap-2 my-5 justify-center items-center">
             <button
               className="text-xl bg-gradient-to-br from-green-400 via-green-700 to-green-950 px-4 py-2 text-white font-semibold rounded-xl shadow-xl drop-shadow-xl shadow-green-700"
@@ -229,7 +245,6 @@ const GeneratedBill = () => {
               Add More
             </button>
           </div>
-
           <p className="text-md font-bold">
             Please download the pdf, if you want to go through your expenses in
             future. Otherwise it will be lost forever when you click on the new
