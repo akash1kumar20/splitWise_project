@@ -8,11 +8,16 @@ import TableHead from "../ExtraComponents/TableHead";
 import TableBody from "../ExtraComponents/TableBody";
 import axios from "axios";
 import GeneratedBillDetails from "./GeneratedBillDetails";
+import HowCalculate from "../ExtraComponents/HowCalculate";
 
 const GeneratedBill = () => {
   const token = useSelector((state) => state.expenseSheet.token);
-  const [data, setData] = useState([]);
+  const [result, setResult] = useState([]);
   const [users, setUsers] = useState([]);
+  const [balanceCal, setBalanceCal] = useState(false);
+  const balanceCalHandler = () => {
+    setBalanceCal((balanceCal) => !balanceCal);
+  };
   const navigate = useNavigate();
   const details = useRef();
   useEffect(() => {
@@ -61,27 +66,54 @@ const GeneratedBill = () => {
   }
 
   useEffect(() => {
-    const dataObj = comingData.reduce((acc, data) => {
-      const amount = parseFloat(data.amount);
-      let relatedAmtVal = parseFloat(data.relatedAmtVal) || 0;
-      if (acc[data.user]) {
-        acc[data.user].amount = acc[data.user].amount + amount + relatedAmtVal;
-        //if same type of value is coming
-        if (users.length > 1) {
-          acc[data.relatedTo].relatedAmtVal += relatedAmtVal;
-          relatedAmtVal = amount - relatedAmtVal;
-        } else {
-          acc[data.relatedTo].relatedAmtVal = 0;
-          //because we don't need relatedAmtVal if only single user is present
+    const calculateFinalAmounts = (data) => {
+      // Accumulate user data and relatedTo amounts
+      const userMap = data.reduce((acc, item) => {
+        const user = item.user;
+        const relatedTo = item.relatedTo;
+
+        const amount = parseFloat(item.amount) || 0;
+        const relatedAmtVal = parseFloat(item.relatedAmtVal) || 0;
+
+        // Initialize the user entry if it doesn't exist
+        if (!acc[user]) {
+          acc[user] = { amount: 0, relatedAmtVal: 0, relatedToAmtVal: 0 };
         }
-        // console.log(acc[data.user].amount, acc[data.relatedTo].relatedAmtVal);
-      } else {
-        acc[data.user] = { ...data, amount, relatedAmtVal };
-        //adding for the first time.
-      }
-      return acc;
-    }, {});
-    setData(Object.values(dataObj));
+
+        acc[user].amount += amount;
+        acc[user].relatedAmtVal += relatedAmtVal;
+
+        // Initialize the relatedTo entry if it doesn't exist
+        if (!acc[relatedTo]) {
+          acc[relatedTo] = { amount: 0, relatedAmtVal: 0, relatedToAmtVal: 0 };
+        }
+
+        // Correctly accumulate relatedAmtVal into relatedTo's relatedToAmtVal
+        acc[relatedTo].relatedToAmtVal += relatedAmtVal;
+        return acc;
+      }, {});
+
+      // Calculate the final amounts for each user
+      const finalResults = Object.keys(userMap).map((user) => {
+        const userAmount = userMap[user].amount;
+        const userRelatedAmtVal = userMap[user].relatedAmtVal;
+        const relatedToAmtVal = userMap[user].relatedToAmtVal;
+
+        const finalAmount = userAmount + userRelatedAmtVal - relatedToAmtVal;
+        return {
+          user,
+          finalAmount,
+          userAmount,
+          userRelatedAmtVal,
+          relatedToAmtVal,
+        };
+      });
+
+      return finalResults;
+    };
+
+    const finalResults = calculateFinalAmounts(comingData);
+    setResult(finalResults);
   }, [comingData]);
 
   const newBillHandler = useReactToPrint({
@@ -93,9 +125,10 @@ const GeneratedBill = () => {
   const afterPDFPrint = async () => {
     let previousBillData = {
       totalAmount: totalAmount,
+      relatedMoneyTtl: relatedMoneyTtl,
       generatedBy: userMail,
       totalUsers: users.length,
-      data: data,
+      data: result,
     };
     let status = false;
     try {
@@ -145,7 +178,7 @@ const GeneratedBill = () => {
               Landscape Mode Only.
             </p>
           </div>
-          <div className="bg-slate-500 text-white p-6" ref={details}>
+          <div className="bg-slate-500 text-white pt-6 pb-3" ref={details}>
             <div className="hidden md:block">
               <TableHead />
               <TableBody comingData={comingData} />
@@ -158,15 +191,29 @@ const GeneratedBill = () => {
               <h2 className="text-xl font-semibold ">
                 Total Expense : ₹ {totalAmount + relatedMoneyTtl}
               </h2>
-
-              <p className="font-bold text-lg ">
-                Per Head Contribution without (R/L amount - {relatedMoneyTtl})
-                is ₹{" "}
-                <span>
-                  {totalAmount} / {users.length} (users) = ₹{" "}
-                  {(totalAmount / users.length).toFixed(2) * 1 || 0}
-                </span>
-              </p>
+              {relatedMoneyTtl > 0 && users.length > 1 && (
+                <h2 className="text-xl font-semibold ">
+                  R/L amount - ₹ {relatedMoneyTtl}
+                </h2>
+              )}
+              {relatedMoneyTtl > 0 && (
+                <h2 className="text-xl font-semibold ">
+                  Without R/L amount - ₹ {totalAmount}
+                </h2>
+              )}
+              {totalAmount > 0 && (
+                <p className="font-bold text-lg ">
+                  Per Head Contribution{" "}
+                  {relatedMoneyTtl > 0 && users.length > 1 && (
+                    <span>without (R/L amount)</span>
+                  )}{" "}
+                  is ₹{" "}
+                  <span>
+                    {totalAmount} / {users.length} (users) = ₹{" "}
+                    {(totalAmount / users.length).toFixed(2) * 1 || 0}
+                  </span>
+                </p>
+              )}
             </div>
             <div className=" flex justify-center mt-1 w-[100%]">
               <table>
@@ -177,50 +224,69 @@ const GeneratedBill = () => {
                     <th className="px-6">Balance</th>
                   </tr>
                 </thead>
-                {data.map((item) => (
-                  <tbody key={item.id}>
+                {result.map((item) => (
+                  <tbody key={item.user}>
                     <tr className="md:text-xl">
                       <td className="md:px-6">
                         <p>{item.user}</p>
                       </td>
-                      <td className="md:px-6">{item.amount}</td>
                       <td className="md:px-6">
-                        {totalAmount / users.length >
-                        item.amount - item.relatedAmtVal ? (
-                          <span className="text-red-900 font-semibold">
-                            {(
-                              totalAmount / users.length -
-                              item.amount +
-                              item.relatedAmtVal
-                            ).toFixed(2) * 1}
-                          </span>
-                        ) : (
-                          <span className="text-green-900 font-semibold">
-                            {(
-                              totalAmount / users.length -
-                              item.amount +
-                              item.relatedAmtVal
-                            ).toFixed(2) * -1}
-                          </span>
-                        )}
+                        {item.userAmount + item.userRelatedAmtVal}
                       </td>
+                      {totalAmount > 0 && (
+                        <td className="md:px-6">
+                          {totalAmount / users.length + item.relatedToAmtVal >
+                          item.finalAmount ? (
+                            <span className="text-red-900 font-semibold">
+                              {(
+                                totalAmount / users.length +
+                                -item.finalAmount
+                              ).toFixed(2) * 1}
+                            </span>
+                          ) : (
+                            <span className="text-green-900 font-semibold">
+                              {(
+                                totalAmount / users.length +
+                                -item.finalAmount
+                              ).toFixed(2) * -1}
+                            </span>
+                          )}
+                        </td>
+                      )}
+                      {totalAmount === 0 && (
+                        <td className="md:px-6">
+                          {relatedMoneyTtl / users.length >
+                          item.userRelatedAmtVal ? (
+                            <span className="text-red-900 font-semibold">
+                              {(
+                                totalAmount / users.length -
+                                item.finalAmount
+                              ).toFixed(2) * 1}
+                            </span>
+                          ) : (
+                            <span className="text-green-900 font-semibold">
+                              {(
+                                totalAmount / users.length -
+                                item.finalAmount
+                              ).toFixed(2) * -1}
+                            </span>
+                          )}
+                        </td>
+                      )}
                     </tr>
                   </tbody>
                 ))}
               </table>
             </div>
-            {users.length > data.length && (
+            {users.length > result.length && (
               <p className="text-center mt-3 font-semibold">
                 Others users amount is zero and balance is ₹{" "}
                 <span className="text-red-900 font-semibold">
-                  {(
-                    (totalAmount + relatedMoneyTtl + relatedMoneyTtl) /
-                    users.length
-                  ).toFixed(2) * 1}
+                  {(totalAmount / users.length).toFixed(2) * 1}
                 </span>
               </p>
             )}
-            {users.length > data.length && (
+            {users.length > result.length && (
               <div className="flex justify-center items-center  gap-1">
                 All users -[
                 {users.map((user) => (
@@ -231,7 +297,13 @@ const GeneratedBill = () => {
             )}
             <GeneratedBillDetails />
           </div>
-          <div className="flex gap-2 my-5 justify-center items-center">
+          <p
+            className="text-black font-semibold text-sm cursor-pointer"
+            onClick={() => balanceCalHandler()}
+          >
+            How Balance Calculated?
+          </p>
+          <div className="flex gap-2 mb-5 mt-2 justify-center items-center">
             <button
               className="text-xl bg-gradient-to-br from-green-400 via-green-700 to-green-950 px-4 py-2 text-white font-semibold rounded-xl shadow-xl drop-shadow-xl shadow-green-700"
               onClick={newBillHandler}
@@ -245,6 +317,8 @@ const GeneratedBill = () => {
               Add More
             </button>
           </div>
+
+          {balanceCal && <HowCalculate balanceCalHandler={balanceCalHandler} />}
           <p className="text-md font-bold">
             Please download the pdf, if you want to go through your expenses in
             future. Otherwise it will be lost forever when you click on the new

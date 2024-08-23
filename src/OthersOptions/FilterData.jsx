@@ -36,6 +36,7 @@ const FilterData = () => {
       //initial acc is an empty object
 
       const amount = parseFloat(data.amount);
+      const relatedAmtVal = parseFloat(data.relatedAmtVal) || 0;
       //because we are getting value as a string.
 
       let key;
@@ -48,10 +49,10 @@ const FilterData = () => {
       }
 
       if (acc[key]) {
-        acc[key].amount += amount;
+        acc[key].amount += amount + relatedAmtVal;
         //if same type of value is coming
       } else {
-        acc[key] = { ...data, amount };
+        acc[key] = { ...data, amount, relatedAmtVal };
         //adding for the first time.
       }
       setFetchKey(dynamicKey);

@@ -54,7 +54,7 @@ const OtherExpense = () => {
       }
       setTimeout(() => {
         setSuccessStatus(false);
-        location.reload();
+        setParticualrAmount(false);
       }, 1500);
     } catch (err) {
       alert("Try Again!");

@@ -14,10 +14,10 @@ const PieChart = ({ data, fetchKey }) => {
       amount = data.map((item) => item.amount);
     } else if (fetchKey === "user") {
       value = data.map((item) => item.user);
-      amount = data.map((item) => item.amount);
+      amount = data.map((item) => item.amount + item.relatedAmtVal);
     } else if (fetchKey === "category") {
       value = data.map((item) => item.category);
-      amount = data.map((item) => item.amount);
+      amount = data.map((item) => item.amount + item.relatedAmtVal);
     }
     setChartLables(value);
     setChartValues(amount);

@@ -7,7 +7,7 @@ const OthersComponentCard = (props) => {
       <div className="flex justify-center items-center">
         <p
           className="text-3xl font-semibold w-fit  bg-black mb-3 shadow-black p-3 
-        rounded-xl"
+        rounded-xl cursor-pointer"
           onClick={() => navigate(-1)}
         >
           X
