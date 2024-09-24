@@ -187,18 +187,19 @@ const GeneratedBill = () => {
               <p>Bill From : {startingDate}</p>
               <p>To : {endingDate}</p>
             </div>
+            <p>Generated On: {new Date().toLocaleDateString()}</p>
             <div className="flex flex-col justify-center items-center gap-2 mb-1 mt-3">
               <h2 className="text-xl font-semibold ">
                 Total Expense : ₹ {totalAmount + relatedMoneyTtl}
               </h2>
               {relatedMoneyTtl > 0 && users.length > 1 && (
                 <h2 className="text-xl font-semibold ">
-                  R/L amount - ₹ {relatedMoneyTtl}
+                  R/L amount : ₹ {relatedMoneyTtl}
                 </h2>
               )}
               {relatedMoneyTtl > 0 && (
                 <h2 className="text-xl font-semibold ">
-                  Without R/L amount - ₹ {totalAmount}
+                  Without R/L amount : ₹ {totalAmount}
                 </h2>
               )}
               {totalAmount > 0 && (
@@ -232,43 +233,44 @@ const GeneratedBill = () => {
                       </td>
                       <td className="md:px-6">
                         {item.userAmount + item.userRelatedAmtVal}
+                        {item.userRelatedAmtVal > 0 && item.userAmount > 0 && (
+                          <span className="text-xs ms-1">(Include R/L)</span>
+                        )}
+                        {item.userAmount === 0 &&
+                          item.userRelatedAmtVal > 0 && (
+                            <span className="text-xs ms-1">
+                              (R/L Amt. Only)
+                            </span>
+                          )}
                       </td>
                       {totalAmount > 0 && (
                         <td className="md:px-6">
-                          {totalAmount / users.length + item.relatedToAmtVal >
-                          item.finalAmount ? (
+                          {totalAmount / users.length > item.finalAmount ? (
                             <span className="text-red-900 font-semibold">
                               {(
-                                totalAmount / users.length +
-                                -item.finalAmount
-                              ).toFixed(2) * 1}
+                                item.finalAmount -
+                                totalAmount / users.length
+                              ).toFixed(2) * -1}
                             </span>
                           ) : (
                             <span className="text-green-900 font-semibold">
                               {(
-                                totalAmount / users.length +
-                                -item.finalAmount
-                              ).toFixed(2) * -1}
+                                item.finalAmount -
+                                totalAmount / users.length
+                              ).toFixed(2) * 1}
                             </span>
                           )}
                         </td>
                       )}
                       {totalAmount === 0 && (
                         <td className="md:px-6">
-                          {relatedMoneyTtl / users.length >
-                          item.userRelatedAmtVal ? (
+                          {item.userRelatedAmtVal < item.finalAmount * -1 ? (
                             <span className="text-red-900 font-semibold">
-                              {(
-                                totalAmount / users.length -
-                                item.finalAmount
-                              ).toFixed(2) * 1}
+                              {item.finalAmount.toFixed(2) * -1}
                             </span>
                           ) : (
                             <span className="text-green-900 font-semibold">
-                              {(
-                                totalAmount / users.length -
-                                item.finalAmount
-                              ).toFixed(2) * -1}
+                              {item.finalAmount.toFixed(2) * 1}
                             </span>
                           )}
                         </td>
@@ -279,15 +281,15 @@ const GeneratedBill = () => {
               </table>
             </div>
             {users.length > result.length && (
-              <p className="text-center mt-3 font-semibold">
-                Others users amount is zero and balance is ₹{" "}
-                <span className="text-red-900 font-semibold">
+              <p className="text-center mt-3 font-semibold ">
+                Others users amount is zero and balance is ₹
+                <span className="text-red-900 font-semibold ms-1">
                   {(totalAmount / users.length).toFixed(2) * 1}
                 </span>
               </p>
             )}
             {users.length > result.length && (
-              <div className="flex justify-center items-center  gap-1">
+              <div className="grid grid-cols-3 justify-center items-center  gap-1  md:flex md:flex-row">
                 All users -[
                 {users.map((user) => (
                   <p key={user.id}>{user.userName}, </p>
