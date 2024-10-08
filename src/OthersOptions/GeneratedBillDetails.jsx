@@ -18,8 +18,7 @@ const GeneratedBillDetails = () => {
           P/M -<span className=" ms-1">Pay Method</span>
         </span>
         <span className="min-h-6 min-w-6 rounded-full  flex items-center">
-          R/L
-          <span className=" ms-1">Related To</span>
+          R/L -<span className=" ms-1">Related To</span>
         </span>
       </p>
     </>

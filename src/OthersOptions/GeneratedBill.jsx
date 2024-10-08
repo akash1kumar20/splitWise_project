@@ -187,7 +187,9 @@ const GeneratedBill = () => {
               <p>Bill From : {startingDate}</p>
               <p>To : {endingDate}</p>
             </div>
-            <p>Generated On: {new Date().toLocaleDateString()}</p>
+            <p className="text-center">
+              Generated On: {new Date().toLocaleDateString()}
+            </p>
             <div className="flex flex-col justify-center items-center gap-2 mb-1 mt-3">
               <h2 className="text-xl font-semibold ">
                 Total Expense : ₹ {totalAmount + relatedMoneyTtl}
