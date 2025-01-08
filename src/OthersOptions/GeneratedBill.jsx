@@ -266,7 +266,7 @@ const GeneratedBill = () => {
                       )}
                       {totalAmount === 0 && (
                         <td className="md:px-6">
-                          {item.userRelatedAmtVal < item.finalAmount * -1 ? (
+                          {0 > item.finalAmount  ? (
                             <span className="text-red-900 font-semibold">
                               {item.finalAmount.toFixed(2) * -1}
                             </span>
