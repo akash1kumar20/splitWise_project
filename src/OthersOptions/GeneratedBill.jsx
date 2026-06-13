@@ -63,7 +63,6 @@ const GeneratedBill = () => {
     localStorage.getItem("sp_userMail") ||
     "";
 
-  // isAdmin: hook (localStorage fallback) + Firebase fetch as final safety net
   const { isAdmin: isAdminHook } = useAdminStatus();
   const [sheetAdminResolved, setSheetAdminResolved] = useState(
     localStorage.getItem("sp_sheetAdmin") || "",
@@ -163,9 +162,7 @@ const GeneratedBill = () => {
 
   const settlements = calcSettlements(result, totalAmount, users.length);
 
-  // Settlement paid status — Firebase-persisted, polled every 5s
   const [paidMap, setPaidMap] = useState({});
-
   useEffect(() => {
     if (!code) return;
     const load = () =>
@@ -278,6 +275,7 @@ const GeneratedBill = () => {
       {!isLoading && comingData.length > 0 && (
         <div className="max-w-3xl mx-auto px-4 pb-12 pt-6">
           <div ref={details}>
+            {/* Expense table — desktop/PDF only */}
             <div className="hidden md:block bg-white rounded-2xl shadow border border-gray-100 p-4 mb-4">
               <TableHead />
               <TableBody comingData={comingData} />
@@ -340,7 +338,7 @@ const GeneratedBill = () => {
 
             {/* Contribution breakdown */}
             {result.length > 0 && (
-              <div className="bg-white rounded-2xl shadow border border-gray-100 p-6 mb-4 overflow-x-auto">
+              <div className="bg-white rounded-2xl shadow border border-gray-100 p-6 mb-4 overflow-x-auto font-semibold">
                 <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4">
                   💼 Contribution Breakdown
                 </h2>
@@ -387,7 +385,7 @@ const GeneratedBill = () => {
             )}
 
             {/* Who Pays Whom */}
-            <div className="bg-white rounded-2xl shadow border border-gray-100 p-6 mb-4">
+            <div className="bg-white font-semibold rounded-2xl shadow border border-gray-100 p-6 mb-4">
               <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4">
                 💸 Who Pays Whom
               </h2>
@@ -422,9 +420,10 @@ const GeneratedBill = () => {
                             ₹{s.amount}
                           </p>
                           <p className="text-xl text-gray-400 mt-1">→</p>
+                          {/* ✅ print:hidden — toggle button & status never appear in PDF */}
                           {isAdmin ? (
                             <button
-                              className={`text-xs mt-2 px-3 py-1 rounded-full font-semibold border transition-all
+                              className={`print:hidden text-xs mt-2 px-3 py-1 rounded-full font-semibold border transition-all
                                 ${
                                   paid
                                     ? "bg-green-600 text-white border-green-600 hover:bg-red-500 hover:border-red-500"
@@ -441,7 +440,7 @@ const GeneratedBill = () => {
                             </button>
                           ) : (
                             <span
-                              className={`text-xs mt-2 px-3 py-1 rounded-full font-semibold
+                              className={`print:hidden text-xs mt-2 px-3 py-1 rounded-full font-semibold
                               ${paid ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}
                             >
                               {paid ? "✓ Paid" : "Unpaid"}
@@ -461,12 +460,14 @@ const GeneratedBill = () => {
                       </div>
                     );
                   })}
+                  {/* ✅ print:hidden — "all settled" banner not needed in PDF */}
                   {allSettled && settlements.length > 0 && (
-                    <div className="bg-green-50 border border-green-200 rounded-2xl px-4 py-3 text-center text-green-700 font-semibold text-sm">
+                    <div className="print:hidden bg-green-50 border border-green-200 rounded-2xl px-4 py-3 text-center text-green-700 font-semibold text-sm">
                       🎉 All settlements paid — ready to generate new bill!
                     </div>
                   )}
-                  <p className="text-xs text-gray-400 text-center mt-1 font-semibold">
+                  {/* ✅ print:hidden — helper text not needed in PDF */}
+                  <p className="print:hidden text-xs text-gray-400 text-center mt-1">
                     ✓ Once everyone pays, all balances are cleared.
                   </p>
                 </div>
