@@ -4,6 +4,7 @@ import { FaFilter } from "react-icons/fa";
 import { TiUserDelete } from "react-icons/ti";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import useAdminStatus from "../customHooks/useAdminStatus";
 import { useSelector } from "react-redux";
 import { FaMoneyBill1Wave, FaSheetPlastic } from "react-icons/fa6";
 
@@ -16,8 +17,11 @@ const LeftBar = () => {
   const navigate = useNavigate();
   const sheetCode = useSelector((state) => state.expenseSheet.sheetCode);
 
+  // ✅ Only show Delete User option to admin
+  const { isAdmin } = useAdminStatus();
+
   return (
-    <div className="bg-transparent text-white w-10 fixed top-0 z-50 right-0 h-full flex flex-col gap-3 items-center ">
+    <div className="bg-transparent text-white w-10 fixed top-0 z-50 right-0 h-full flex flex-col gap-3 items-center">
       <div className="relative top-[28%]">
         <Cylinder>
           <p
@@ -45,6 +49,7 @@ const LeftBar = () => {
             />
             {showBill && <span className="text-sm">Generate Bill</span>}
           </p>
+
           <p
             className="flex flex-col items-center cursor-pointer"
             onMouseOver={() => setShowPreviousBill(true)}
@@ -54,8 +59,11 @@ const LeftBar = () => {
               className="text-2xl"
               onClick={() => navigate(`/home/sheets/${sheetCode}/previousBill`)}
             />
-            {showPreviousBill && <span className="text-sm">Previous Bill</span>}
+            {showPreviousBill && (
+              <span className="text-sm">Previous Bill</span>
+            )}
           </p>
+
           <p
             className="flex flex-col items-center cursor-pointer"
             onMouseOver={() => setShowFilter(true)}
@@ -67,17 +75,25 @@ const LeftBar = () => {
             />
             {showFilter && <span className="text-sm">Filter Data</span>}
           </p>
-          <p
-            className="flex flex-col items-center cursor-pointer"
-            onMouseOver={() => setShowDeleteUser(true)}
-            onMouseOut={() => setShowDeleteUser(false)}
-          >
-            <TiUserDelete
-              className="text-2xl"
-              onClick={() => navigate(`/home/sheets/${sheetCode}/deleteUser`)}
-            />
-            {showDeleteUser && <span className="text-sm">Delete User</span>}
-          </p>
+
+          {/* ✅ Delete User option only visible to admin */}
+          {isAdmin && (
+            <p
+              className="flex flex-col items-center cursor-pointer"
+              onMouseOver={() => setShowDeleteUser(true)}
+              onMouseOut={() => setShowDeleteUser(false)}
+            >
+              <TiUserDelete
+                className="text-2xl"
+                onClick={() =>
+                  navigate(`/home/sheets/${sheetCode}/deleteUser`)
+                }
+              />
+              {showDeleteUser && (
+                <span className="text-sm">Delete User</span>
+              )}
+            </p>
+          )}
         </Cylinder>
       </div>
     </div>

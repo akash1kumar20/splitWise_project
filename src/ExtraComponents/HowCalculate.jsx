@@ -4,78 +4,73 @@ const HowCalculate = ({ balanceCalHandler }) => {
     balanceCalHandler();
   };
   return ReactDOM.createPortal(
-    <div className="bg-black bg-opacity-80 text-white min-h-[100vh] fixed top-0">
+    <div className="bg-black bg-opacity-80 min-w-[100vw] text-white min-h-[100vh] fixed top-0">
       <div className="text-center md:mx-16 text-lg mx-2">
         <p
-          className="text-3xl font-semibold  text-center cursor-pointer"
+          className="text-3xl font-semibold  text-center cursor-pointer pt-4"
           onClick={() => calHandler()}
         >
-          X
+          ← Back
         </p>
-        <h1 className="text-2xl underline">How Balance is Calculated?</h1>
+        <h1 className="text-2xl underline mt-16">How is Balance Calculated?</h1>
         <p>
-          <b>First!</b> In the balance - all the amount spend by the user is
-          added.
+          <b>Step 1 —</b> Add up what each user paid <br />
+          Every amount paid by a user is added to their balance.
           <span>
             <br />
             For example:
             <br />
-            User one spend - ₹9250
+            User one spent — ₹9,250
             <br />
-            User two spend - ₹400
+            User two spent — ₹400
           </span>
         </p>
         <p>
-          <b>Second!</b> In the balance - if the amount is spend by the user
-          which is related to another user, then that amount is added in the
-          balance of the user who spend that amount and get deducted from the
-          balance of the user to whose that amount is related.
+          <b>Step 2 —</b> If an amount paid by a user is linked to another user,
+          it is added to the payer's balance and deducted from the linked user's
+          balance.
           <span>
             <br />
-            For Example:
+            For example:
             <br />
-            User two spend ₹500 which is related to user one
+            User two spent ₹500 linked to user one
             <br />
             <span className="text-sm font-semibold">
-              If the user spend a amount which is related to single user and
-              that amount is spend by the same user then that amount is neither
-              added nor subtracted from the balance.
+              Note: If a user pays an amount linked to themselves, it is neither
+              added nor deducted from the balance.
             </span>
           </span>
         </p>
         <p>
-          <b>Final Balance</b> - Now we have the final amount in the balance of
-          each user.
+          <b>Final Balance</b> — We now have the updated balance for each user.
           <span>
-            For Example:
             <br />
-            So, Calculation for user one is 9250 - 500 = 8750
+            For example:
             <br />
-            So, Calculation for user two is 400 + 500 = 900
+            User one: 9,250 − 500 = ₹8,750
+            <br />
+            User two: 400 + 500 = ₹900
           </span>
         </p>
         <p>
-          <b>Third!</b> In the balance - Now subtract per head contribution
-          amount from the final amount of the user, which give us the final
-          balance of the user.
+          <b>Step 3 —</b> Subtract the per head contribution from each user's
+          balance to get their final settlement amount.
           <span>
             <br />
-            For Example:
+            For example:
             <br />
-            Now! Per Head Contribution without (R/L amount) is ₹ 9650 / 2
-            (users) is ₹ 4825
+            Per head contribution (excl. F&L): ₹9,650 ÷ 2 users = ₹4,825
             <br />
-            So, balance of user one is 8750 - 4825 = 3925
+            Balance of user one: 8,750 − 4,825 = ₹3,925
             <br />
-            So, balance of user two is 900 - 4825 = -3925
-            <br />
-            You see negative amount in the red color, this is the amount which
-            is need to given by user two to user one.
+            Balance of user two: 900 − 4,825 = −₹3,925
+            <br />A negative amount shown in red means that user needs to give
+            that amount to the other user.
           </span>
         </p>
       </div>
     </div>,
-    document.querySelector("#balanceCal")
+    document.querySelector("#balanceCal"),
   );
 };
 

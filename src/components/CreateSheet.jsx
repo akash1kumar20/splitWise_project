@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import { useRef } from "react";
 import CardComponent from "../Card/CardComponent";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -24,23 +24,31 @@ const CreateSheet = () => {
     try {
       let res = await axios.post(
         `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${invitationCode}/sheetDetails.json`,
-        sheetDetails
+        sheetDetails,
       );
 
-      let sheetRes = await axios.post(
+      await axios.post(
         `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${changeEmail}/sheets.json`,
-        sheetDetails
+        sheetDetails,
       );
+
+      // ✅ Register creator as member so admin bulk-delete can find all users
+      await axios.post(
+        `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${invitationCode}/members.json`,
+        { convertedMail: changeEmail },
+      );
+
       if (res.status === 200) {
+        // ✅ Signal SheetPresents to refetch — window.focus won't fire in SPA navigation
+        window.dispatchEvent(new Event("sheetCreated"));
         toast.success("Sheet Created!", {
           position: "top-right",
-          autoClose: 2000,
+          autoClose: 1500,
           theme: "colored",
         });
-
         setTimeout(() => {
-          navigate("/home");
-        }, 2000);
+          navigate("/home/sheets");
+        }, 1500);
       }
     } catch (err) {
       toast.error("Please try again!", {

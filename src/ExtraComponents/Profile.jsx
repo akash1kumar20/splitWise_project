@@ -16,56 +16,53 @@ const Profile = () => {
   const dispatch = useDispatch();
 
   const logoutHandler = () => {
+    // ✅ Fix 1: clear all persisted state so next user starts clean
+    localStorage.clear();
     autCtx.logout();
-    toast.error("Logout Successfully!", {
+    toast.error("Logged out successfully!", {
       position: "top-right",
       theme: "dark",
       autoClose: 1000,
     });
-    setTimeout(() => {
-      navigate("/");
-    }, 800);
-  };
-
-  const demoVideoHandler = () => {
-    setOpenDemo((openDemo) => !openDemo);
+    setTimeout(() => navigate("/"), 800);
   };
 
   return (
     <>
       <ToastContainer />
-      <div className=" bg-slate-900 w-fit  flex flex-col right-2 fixed text-white  px-5 mt-1 rounded-lg py-10 border-2 border-slate-400 z-40">
-        <span className="text-center font-bold underline text-sm">
-          {userMail}
-        </span>
+      <div className="bg-slate-900 w-fit flex flex-col right-2 fixed text-white px-5 mt-1 rounded-lg py-10 border-2 border-slate-400 z-40">
+        <span className="text-center font-bold underline text-sm">{userMail}</span>
         <button
           className="bg-slate-500 py-2 px-4 rounded-xl mb-2 mt-5 text-white hover:bg-slate-300 hover:text-black"
           onClick={() => navigate("/changePassword")}
         >
           Change Password
         </button>
+
+        {/* ✅ Fix 6: Change Account now properly logs out and clears state */}
         <button
           className="bg-yellow-500 py-2 px-4 rounded-xl my-2 text-white hover:bg-yellow-300 hover:text-black"
-          onClick={() => navigate("/")}
+          onClick={logoutHandler}
         >
           Change Account
         </button>
+
         <button
           className="bg-purple-500 py-2 px-4 rounded-xl my-2 text-white hover:bg-purple-300 hover:text-black"
-          onClick={() => setThemeHandler((themeHanlder) => !themeHanlder)}
+          onClick={() => setThemeHandler((t) => !t)}
         >
           Choose Theme
         </button>
         {themeHanlder && (
           <p className="flex gap-1 justify-between">
             <button
-              className="bg-gray-500  py-2 px-4 rounded-xl my-2 text-white hover:bg-gray-300 hover:text-black"
+              className="bg-gray-500 py-2 px-4 rounded-xl my-2 text-white hover:bg-gray-300 hover:text-black"
               onClick={() => dispatch(themeSliceActions.setTheme(false))}
             >
               Dark
             </button>
             <button
-              className="bg-white py-2 px-4 rounded-xl my-2 text-black font-semibold hover:text-black hover:font-normal"
+              className="bg-white py-2 px-4 rounded-xl my-2 text-black font-semibold"
               onClick={() => dispatch(themeSliceActions.setTheme(true))}
             >
               Light
@@ -74,7 +71,7 @@ const Profile = () => {
         )}
         <button
           className="bg-green-500 py-2 px-4 rounded-xl my-2 text-white hover:bg-green-300 hover:text-black"
-          onClick={demoVideoHandler}
+          onClick={() => setOpenDemo((o) => !o)}
         >
           Tutorial
         </button>
@@ -85,7 +82,7 @@ const Profile = () => {
           Logout
         </button>
       </div>
-      {openDemo && <DemoVideo demoVideo={demoVideoHandler} />}
+      {openDemo && <DemoVideo demoVideo={() => setOpenDemo(false)} />}
     </>
   );
 };

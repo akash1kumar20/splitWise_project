@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Pie } from "react-chartjs-2";
-import "chart.js/auto";
+import { Chart, ArcElement, Tooltip, Legend, PieController } from "chart.js";
+Chart.register(ArcElement, Tooltip, Legend, PieController);
 
 const PieChart = ({ data, fetchKey }) => {
   const [chartLabels, setChartLables] = useState([]);
@@ -21,7 +22,7 @@ const PieChart = ({ data, fetchKey }) => {
     }
     setChartLables(value);
     setChartValues(amount);
-  }, [fetchKey]);
+  }, [fetchKey, data]);
 
   const chartData = {
     labels: chartLabels,

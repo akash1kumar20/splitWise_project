@@ -15,7 +15,13 @@ const SheetDetails = () => {
   const [greetings, time] = useGreetingsHook();
   const userMail = useSelector((state) => state.expenseSheet.userMail);
   const [displaySheetDetails, setDisplaySheetDetails] = useState(false);
-  let width = screen.width;
+  const [width, setWidth] = useState(window.innerWidth);
+
+  useEffect(() => {
+    const handleResize = () => setWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     if (width > 767) {
@@ -38,7 +44,7 @@ const SheetDetails = () => {
       const fetchData = async () => {
         try {
           let res = await axios.get(
-            `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${inviteCode}/sheetDetails.json`
+            `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${inviteCode}/sheetDetails.json`,
           );
           let sheetArr = [];
           if (res.status === 200) {
@@ -54,7 +60,7 @@ const SheetDetails = () => {
       };
       fetchData();
     }
-  }, []);
+  }, [inviteCode, param.sheetName]);
   return (
     <SheetDetailsCard>
       {isLoading && <Loading />}

@@ -8,6 +8,7 @@ const sheeetInitialState = {
   sheetCode: localStorage.getItem("sheetCode") || null,
   toEdit: [],
   sheetFoundData: [],
+  sheetAdmin: "",
 };
 
 const expenseSheetSlice = createSlice({
@@ -41,6 +42,9 @@ const expenseSheetSlice = createSlice({
     },
     setSheetFoundData(state, action) {
       state.sheetFoundData = action.payload;
+    },
+    setSheetAdmin(state, action) {
+      state.sheetAdmin = action.payload;
     },
   },
 });

@@ -42,12 +42,15 @@ const UpdateExpense = () => {
       relatedAmtVal: 0,
       relatedAmount: false,
       relatedTo: event.target.user.value,
+      // ✅ Track edit history
+      isEdited: true,
+      previousAmount: dataToEdit[0]?.amount, // ✅ always the amount BEFORE this edit, not the original
     };
 
     try {
       let res = await axios.put(
         `${urlKey}/expenseSheet/${id}.json`,
-        expenseAdded
+        expenseAdded,
       );
 
       if (res.status === 200) {
@@ -177,7 +180,7 @@ const UpdateExpense = () => {
                     Cash
                   </option>
                   <option name="payBy" value="Upi">
-                    Upi
+                    UPI
                   </option>
                   <option name="payBy" value="Card">
                     Card

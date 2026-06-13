@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import useFetchDataHook from "../customHooks/useFetchDataHook";
 import Loading from "../ExtraComponents/Loading";
@@ -9,7 +9,7 @@ const OtherExpense = () => {
   const theme = useSelector((state) => state.theme.theme);
   const inviteCode = useSelector((state) => state.expenseSheet.inviteCode);
   const [comingData, isLoading] = useFetchDataHook(
-    `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${inviteCode}/usersList.json`
+    `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${inviteCode}/usersList.json`,
   );
   const navigate = useNavigate();
   const [successStatus, setSuccessStatus] = useState(false);
@@ -55,6 +55,9 @@ const OtherExpense = () => {
       subCategory: event.target.relatedNote.value || "NA",
       payBy: "NA",
       relatedAmount: true,
+      // ✅ Track edit history
+      isEdited: true,
+      previousAmount: dataToEdit[0]?.relatedAmtVal, // ✅ always the F&L amount BEFORE this edit
     };
     url = `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${inviteCode}/expenseSheet/${id}.json`;
 

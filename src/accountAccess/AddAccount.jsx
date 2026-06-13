@@ -11,13 +11,15 @@ import Footer from "../ExtraComponents/Footer";
 import PasswordValidation from "./PasswordValidation";
 import DemoVideo from "../ExtraComponents/DemoVideo";
 import { FaCirclePlay } from "react-icons/fa6";
+import { SIGNIN_URL, SIGNUP_URL } from "../config/firebase";
 
 const AddAccount = () => {
   const [isLogIn, setIsLogIn] = useState(true);
   const [viewPassword, setViewPassword] = useState(false);
   const [viewConfirmPassword, setViewConfirmPassword] = useState(false);
   const mailRef = useRef();
-  const [password, setPassword] = useState(" ");
+  // ✅ FIX: Initialize password as empty string, not " " (space)
+  const [password, setPassword] = useState("");
   const confirmPasswordRef = useRef();
   const navigate = useNavigate();
   const autCtx = useContext(AuthContext);
@@ -32,11 +34,11 @@ const AddAccount = () => {
     let userPassword;
     let confirmPassword;
     let url;
+
     if (isLogIn) {
       userMail = mailRef.current.value;
       userPassword = password;
-      url =
-        "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyBOfzoct-rKO3JwaHNCGoh2qfHdGly_IdI";
+      url = SIGNIN_URL;
     } else {
       if (!submitPassword) {
         return toast.warning("Please match the password condition", {
@@ -44,22 +46,20 @@ const AddAccount = () => {
           autoClose: 1000,
           position: "top-center",
         });
-      } else {
-        userMail = mailRef.current.value;
-        userPassword = password;
-        confirmPassword = confirmPasswordRef.current.value;
-        if (confirmPassword !== userPassword) {
-          return toast.warning("Please type passwords carefully", {
-            position: "top-center",
-            theme: "colored",
-            autoClose: 2000,
-          });
-        }
       }
-      url =
-        "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyBOfzoct-rKO3JwaHNCGoh2qfHdGly_IdI";
+      userMail = mailRef.current.value;
+      userPassword = password;
+      confirmPassword = confirmPasswordRef.current.value;
+      if (confirmPassword !== userPassword) {
+        return toast.warning("Please type passwords carefully", {
+          position: "top-center",
+          theme: "colored",
+          autoClose: 2000,
+        });
+      }
+      url = SIGNUP_URL;
     }
-    let message;
+
     try {
       let res = await axios.post(url, {
         email: userMail,
@@ -70,23 +70,26 @@ const AddAccount = () => {
       dispatch(expenseSheetActions.setUserMail(userMail));
       dispatch(expenseSheetActions.setToken(res.data.idToken));
       dispatch(expenseSheetActions.setChangedMail(userMail));
+
       if (res.status === 200 && isLogIn) {
-        message = "Welcome Back";
-        setTimeout(() => {
-          navigate("/home");
-        }, 2000);
+        toast.success("Welcome Back", {
+          theme: "colored",
+          autoClose: 2000,
+          position: "top-right",
+        });
+        setTimeout(() => navigate("/home"), 2000);
       }
       if (res.status === 200 && !isLogIn) {
-        message = "Account Created Successully!";
+        toast.success("Account Created Successfully!", {
+          theme: "colored",
+          autoClose: 2000,
+          position: "top-right",
+        });
+        // ✅ FIX: Use navigate instead of location.reload()
         setTimeout(() => {
-          location.reload();
+          setIsLogIn(true);
         }, 2000);
       }
-      toast.success(message, {
-        theme: "colored",
-        autoClose: 2000,
-        position: "top-right",
-      });
     } catch (err) {
       toast.error("Authentication Failed!", {
         theme: "colored",
@@ -101,15 +104,12 @@ const AddAccount = () => {
     navigate("/changePassword");
   };
 
-  const demoVideoHandler = () => {
-    setOpenDemo((openDemo) => !openDemo);
-  };
   return (
     <>
       <ToastContainer />
       <div className="mx-auto md:w-[50%] border-2 shadow-2xl drop-shadow-2xl text-center py-6">
         <h1 className="text-3xl font-semibold">
-          {isLogIn ? "Please Login to continue" : "Create Account"}
+          {isLogIn ? "Welcome Back" : "Create Account"}
         </h1>
         <form>
           <div className="flex flex-col static w-[80%] mx-auto mt-6">
@@ -118,10 +118,10 @@ const AddAccount = () => {
             </label>
             <input
               name="mail"
-              type="mail"
+              type="email"
               ref={mailRef}
               required
-              placeholder="Write here..."
+              placeholder="Enter your email..."
               className="w-auto rounded-xl focus:outline-none text-black ps-3 py-2 placeholder:text-black bg-slate-400"
             />
           </div>
@@ -132,22 +132,21 @@ const AddAccount = () => {
             <div className="flex justify-between bg-slate-400 text-black items-center pe-3 rounded-xl">
               <input
                 name="password"
-                type={viewPassword ? "type" : "password"}
+                type={viewPassword ? "text" : "password"}
                 required
                 onChange={(e) => setPassword(e.target.value)}
                 onFocus={() => setCheckPassword(true)}
-                placeholder="Write here..."
-                className="  bg-slate-400 rounded-xl focus:outline-none text-black ps-3 py-2 placeholder:text-black w-[95%]"
+                placeholder="Enter your password..."
+                className="bg-slate-400 rounded-xl focus:outline-none text-black ps-3 py-2 placeholder:text-black w-[95%]"
               />
-              {!viewPassword && (
+              {!viewPassword ? (
                 <FiEye
-                  className="text-2xl"
+                  className="text-2xl cursor-pointer"
                   onClick={() => setViewPassword(true)}
                 />
-              )}
-              {viewPassword && (
+              ) : (
                 <FiEyeOff
-                  className="text-2xl"
+                  className="text-2xl cursor-pointer"
                   onClick={() => setViewPassword(false)}
                 />
               )}
@@ -157,10 +156,10 @@ const AddAccount = () => {
             )}
             {isLogIn && (
               <span
-                className=" text-sm my-2 cursor-pointer"
-                onClick={() => passwordTypeHandler()}
+                className="text-sm my-2 cursor-pointer"
+                onClick={passwordTypeHandler}
               >
-                Forget Password?
+                Forgot Password?
               </span>
             )}
           </div>
@@ -172,49 +171,45 @@ const AddAccount = () => {
               <div className="flex justify-between bg-slate-400 text-black items-center pe-3 rounded-xl">
                 <input
                   name="confirmPassword"
-                  type={viewConfirmPassword ? "type" : "password"}
+                  type={viewConfirmPassword ? "text" : "password"}
                   required
                   ref={confirmPasswordRef}
-                  placeholder="Write here..."
-                  className=" bg-slate-400 rounded-xl focus:outline-none text-black ps-3 py-2 placeholder:text-black w-[95%]"
+                  placeholder="Re-Enter your password..."
+                  className="bg-slate-400 rounded-xl focus:outline-none text-black ps-3 py-2 placeholder:text-black w-[95%]"
                 />
-                {!viewConfirmPassword && (
+                {!viewConfirmPassword ? (
                   <FiEye
-                    className="text-2xl"
+                    className="text-2xl cursor-pointer"
                     onClick={() => setViewConfirmPassword(true)}
                   />
-                )}
-                {viewConfirmPassword && (
+                ) : (
                   <FiEyeOff
-                    className="text-2xl"
+                    className="text-2xl cursor-pointer"
                     onClick={() => setViewConfirmPassword(false)}
                   />
                 )}
               </div>
             </div>
           )}
-
           <button
             className="bg-blue-400 px-6 py-2 rounded-lg my-2 text-slate-900 drop-shadow-2xl shadow-2xl hover:bg-blue-800 hover:text-white"
             onClick={(event) => formSubmitHandler(event)}
           >
-            {isLogIn ? "Login" : "Sign-in"}
+            {isLogIn ? "Log In" : "Sign Up"}
           </button>
-
-          {isLogIn && (
+          {isLogIn ? (
             <p
               className="mt-2 text-sm font-bold cursor-pointer"
               onClick={() => setIsLogIn(false)}
             >
-              Create New Account
+              New here? Sign Up
             </p>
-          )}
-          {!isLogIn && (
+          ) : (
             <p
               className="mt-2 text-sm font-bold cursor-pointer"
               onClick={() => setIsLogIn(true)}
             >
-              Already have a account?
+              Already have an account? Log In
             </p>
           )}
         </form>
@@ -222,11 +217,11 @@ const AddAccount = () => {
       <div className="mt-2 flex gap-2 items-center justify-center">
         <FaCirclePlay
           className="text-3xl cursor-pointer"
-          onClick={demoVideoHandler}
+          onClick={() => setOpenDemo((o) => !o)}
         />
-        <p>How it works?</p>
+        <p>How does it work?</p>
       </div>
-      {openDemo && <DemoVideo demoVideo={demoVideoHandler} />}
+      {openDemo && <DemoVideo demoVideo={() => setOpenDemo((o) => !o)} />}
       <Footer />
     </>
   );

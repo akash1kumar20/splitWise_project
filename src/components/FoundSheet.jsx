@@ -19,18 +19,27 @@ const FoundSheet = () => {
 
   async function createSheet(sheetData) {
     try {
-      let sheetRes = await axios.post(
+      const sheetRes = await axios.post(
         `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${changeEmail}/sheets.json`,
-        sheetData
+        sheetData,
       );
 
       if (sheetRes.status === 200) {
-        navigate("/home");
+        // ✅ Register this user as a member of the sheet (used for admin bulk-delete)
+        await axios.post(
+          `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${sheetData.inviationCode}/members.json`,
+          { convertedMail: changeEmail },
+        );
+
+        // ✅ Fire event so SheetPresents refetches immediately (same fix as CreateSheet)
+        window.dispatchEvent(new Event("sheetCreated"));
+        navigate("/home/sheets");
       }
     } catch (err) {
       alert(err);
     }
   }
+
   return (
     <CardComponent>
       {data.map((sheetData) => (

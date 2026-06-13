@@ -19,10 +19,13 @@ const FilterData = lazy(() => import("./OthersOptions/FilterData.jsx"));
 const GeneratedBill = lazy(() => import("./OthersOptions/GeneratedBill.jsx"));
 const ChangePassword = lazy(() => import("./accountAccess/ChangePassword.jsx"));
 const PreviousBill = lazy(() => import("./OthersOptions/PreviousBill.jsx"));
-const OtherExpense = lazy(() => import("./components/OtherExpense.jsx"));
-const OtherExpenseUpdate = lazy(() =>
-  import("./components/OtherExpenseUpdate.jsx")
+const FavourAndLending = lazy(
+  () => import("./components/FavoursAndLending.jsx"),
 );
+const FavoursAndLendingUpdate = lazy(
+  () => import("./components/FavoursAndLendingUpdate.jsx"),
+);
+
 import Loading from "./ExtraComponents/Loading.jsx";
 
 const router = createBrowserRouter([
@@ -100,7 +103,7 @@ const router = createBrowserRouter([
     path: "/home/sheets/:sheetName/otherExpenseUpdate",
     element: (
       <Suspense fallback={<Loading />}>
-        <OtherExpenseUpdate />
+        <FavoursAndLendingUpdate />
       </Suspense>
     ),
   },
@@ -108,7 +111,7 @@ const router = createBrowserRouter([
     path: "/home/sheets/:sheetName/otherExpense",
     element: (
       <Suspense fallback={<Loading />}>
-        <OtherExpense />
+        <FavourAndLending />
       </Suspense>
     ),
   },
@@ -161,5 +164,5 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <RouterProvider router={router} />
       </React.StrictMode>
     </AuthContextProvider>
-  </Provider>
+  </Provider>,
 );

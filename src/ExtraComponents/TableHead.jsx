@@ -8,7 +8,7 @@ const TableHead = () => {
           <th className="tableElementMain">Category</th>
           <th className="tableElementMain">Note</th>
           <th className="tableHeading">Amount</th>
-          <th className="tableHeading">Spend By</th>
+          <th className="tableHeading">Paid By</th>
         </tr>
       </thead>
     </table>
