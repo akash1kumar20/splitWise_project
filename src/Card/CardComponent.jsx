@@ -1,18 +1,39 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-const CardComponent = (props) => {
+const CardComponent = ({ children }) => {
   const navigate = useNavigate();
+
   return (
-    <div className="fixed top-[0%] bg-black bg-opacity-70 w-[100vw] h-[100vh] px-14 z-10">
-      <p
-        className="text-white text-3xl flex items-center justify-center pt-10 p-2 rounded-lg cursor-pointer font-bold "
+    <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm overflow-y-auto">
+      {/* Close Button */}
+      <button
         onClick={() => navigate(-1)}
+        className="absolute top-4 right-4 text-white text-3xl font-bold hover:text-red-400 transition-colors"
       >
-        X
-      </p>
-      <div className=" bg-[rgba(0,0,0,0.7)] md:px-32 px-3 py-6 rounded-lg drop-shadow-2xl shadow-2xl shadow-black text-white border-2 border-[rgb(230, 57, 70)] text-center z-50 mt-24 w-fit mx-auto">
-        {props.children}
+        ×
+      </button>
+
+      {/* Modal Container */}
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div
+          className="
+            w-full
+            max-w-md
+            bg-[rgba(0,0,0,0.92)]
+            border
+            border-gray-700
+            rounded-2xl
+            shadow-2xl
+            text-white
+            px-4
+            py-5
+            sm:px-6
+            sm:py-6
+          "
+        >
+          {children}
+        </div>
       </div>
     </div>
   );

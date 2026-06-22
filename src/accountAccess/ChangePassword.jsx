@@ -11,19 +11,19 @@ import { RESET_PASSWORD_URL, UPDATE_PASSWORD_URL } from "../config/firebase";
 
 const ChangePassword = () => {
   const navigate = useNavigate();
-  const autCtx = useContext(AuthContext);
-  let forgetPassword = autCtx.forgetPassword;
+  const authCtx = useContext(AuthContext);
+  const submitPassword = useSelector((state) => state.password.submitPassword);
 
-  // ✅ FIX: Renamed for clarity — these are visibility toggles, not passwords
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-  // ✅ FIX: Initialize as empty string, not false (was being compared to a string later)
-  const [enteredPassword, setEnteredPassword] = useState("");
   const mailRef = useRef();
   const confirmPasswordRef = useRef();
-  const submitPassword = useSelector((state) => state.password.submitPassword);
-  const token = autCtx.token;
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [enteredPassword, setEnteredPassword] = useState("");
+  const [checkPassword, setCheckPassword] = useState(false);
+
+  let forgetPassword = authCtx.forgetPassword;
+  const token = authCtx.token;
 
   if (!token) {
     forgetPassword = true;
@@ -34,13 +34,15 @@ const ChangePassword = () => {
 
     if (forgetPassword) {
       const userMail = mailRef.current.value;
+
       try {
         const res = await axios.post(RESET_PASSWORD_URL, {
           requestType: "PASSWORD_RESET",
           email: userMail,
         });
+
         if (res.status === 200) {
-          toast.success("Reset email sent! Check your inbox and spam folder.", {
+          toast.success("Reset email sent. Check your inbox and spam folder.", {
             theme: "colored",
             position: "top-right",
             autoClose: 3000,
@@ -54,10 +56,10 @@ const ChangePassword = () => {
           autoClose: 2000,
         });
       }
+
       return;
     }
 
-    // Changing password while logged in
     if (!submitPassword) {
       return toast.warning("Please match the password condition", {
         theme: "colored",
@@ -68,8 +70,6 @@ const ChangePassword = () => {
 
     const confirmPassword = confirmPasswordRef.current.value;
 
-    // ✅ FIX: Compare enteredPassword (string) to confirmPassword (string)
-    // Original bug: compared `passowrd` (boolean toggle) to `confirmPassword` (string)
     if (enteredPassword !== confirmPassword) {
       return toast.warning("Passwords do not match", {
         theme: "colored",
@@ -84,9 +84,11 @@ const ChangePassword = () => {
         password: enteredPassword,
         returnSecureToken: true,
       });
-      autCtx.login(res.data.idToken);
+
+      authCtx.login(res.data.idToken);
+
       if (res.status === 200) {
-        toast.success("Password changed! Please log in again.", {
+        toast.success("Password changed. Please log in again.", {
           theme: "colored",
           position: "top-right",
           autoClose: 2000,
@@ -102,94 +104,142 @@ const ChangePassword = () => {
     }
   }
 
+  const inputShell =
+    "flex items-center gap-2 rounded-xl bg-white px-3 ring-1 ring-black/5 shadow-sm transition focus-within:ring-2 focus-within:ring-blue-500";
+  const inputField =
+    "w-full bg-transparent py-3 text-sm text-slate-900 placeholder:text-slate-500 focus:outline-none sm:text-base";
+
   return (
     <>
       <ToastContainer />
-      <div className="mx-auto md:w-[60%] w-[90%] text-center border-2 border-black mt-4 md:py-16 py-6 bg-gradient-to-br from-slate-600 via-gray-700 to-black text-white shadow-2xl drop-shadow-2xl rounded-2xl">
-        <h2 className="md:text-2xl font-semibold">
-          {forgetPassword ? "Please Enter Your Email" : "Change Your Password"}
-        </h2>
-        <form className="mt-6" onSubmit={submitFormHandler}>
-          {forgetPassword ? (
-            <div className="flex flex-col gap-3">
-              <span className="text-sm text-red-400">
-                You will receive a reset email.
-              </span>
-              <span className="text-sm text-yellow-300">
-                📬 If you don't see it, please check your{" "}
-                <strong>spam / junk folder</strong>.
-              </span>
-              <input
-                name="mail"
-                type="email"
-                required
-                ref={mailRef}
-                placeholder="Enter Your Email"
-                className="py-2 mx-auto rounded-lg md:w-[60%] w-[90%] ps-2 placeholder:text-black placeholder:text-lg focus:outline-none text-black"
-              />
-            </div>
-          ) : (
-            <div>
-              <div className="flex justify-between items-center md:w-[60%] w-[90%] bg-white text-black mx-auto rounded-lg px-2">
-                <input
-                  name="password"
-                  type={showPassword ? "text" : "password"}
-                  required
-                  placeholder="Enter New Password"
-                  className="placeholder:text-black py-2 rounded-lg w-[95%] placeholder:text-lg focus:outline-none"
-                  onChange={(e) => setEnteredPassword(e.target.value)}
-                />
-                {showPassword ? (
-                  <FiEyeOff
-                    className="cursor-pointer"
-                    onClick={() => setShowPassword(false)}
-                  />
-                ) : (
-                  <FiEye
-                    className="cursor-pointer"
-                    onClick={() => setShowPassword(true)}
-                  />
-                )}
-              </div>
-              <PasswordValidation password={enteredPassword} />
-              <div className="flex justify-between items-center md:w-[60%] w-[90%] bg-white text-black mx-auto rounded-lg px-2 mt-4">
-                <input
-                  name="confirmPassword"
-                  type={showConfirmPassword ? "text" : "password"}
-                  required
-                  ref={confirmPasswordRef}
-                  placeholder="Confirm Password"
-                  className="placeholder:text-black py-2 rounded-lg placeholder:text-lg focus:outline-none w-[95%]"
-                />
-                {showConfirmPassword ? (
-                  <FiEyeOff
-                    className="cursor-pointer"
-                    onClick={() => setShowConfirmPassword(false)}
-                  />
-                ) : (
-                  <FiEye
-                    className="cursor-pointer"
-                    onClick={() => setShowConfirmPassword(true)}
-                  />
-                )}
-              </div>
-            </div>
-          )}
-          <button
-            type="submit"
-            className="mt-4 bg-blue-700 text-white rounded-2xl py-3 px-6"
+      <main className="min-h-screen px-4 py-6 sm:py-10">
+        <section className="mx-auto w-full max-w-xl rounded-3xl border border-white/10 bg-gradient-to-br from-slate-600 via-slate-700 to-slate-950 p-5 text-white shadow-[0_25px_80px_rgba(0,0,0,0.28)] sm:p-8 md:p-10">
+          <div className="text-center">
+            <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+              {forgetPassword ? "Reset Your Password" : "Change Your Password"}
+            </h2>
+            <p className="mt-2 text-sm text-white/70 sm:text-base">
+              {forgetPassword
+                ? "Enter your email and we will send a reset link."
+                : "Use a strong password and confirm it below."}
+            </p>
+          </div>
+
+          <form
+            className="mt-8 space-y-5 sm:mt-10"
+            onSubmit={submitFormHandler}
           >
-            Submit
-          </button>
-          <button
-            type="button"
-            className="mt-4 ms-4 bg-red-700 text-white rounded-2xl py-3 px-6"
-            onClick={() => navigate(-1)}
-          >
-            Cancel
-          </button>
-        </form>
-      </div>
+            {forgetPassword ? (
+              <div className="space-y-4">
+                <div className="rounded-2xl border border-amber-300/20 bg-amber-300/10 px-4 py-3 text-left text-sm text-amber-100">
+                  You will receive a reset email.
+                  <span className="mt-1 block text-amber-200/90">
+                    Check your spam or junk folder if it does not arrive.
+                  </span>
+                </div>
+
+                <label className="block text-left text-sm font-medium text-white/85">
+                  Email address
+                  <div className={`${inputShell} mt-2`}>
+                    <input
+                      name="mail"
+                      type="email"
+                      required
+                      ref={mailRef}
+                      placeholder="Enter your email"
+                      className={inputField}
+                    />
+                  </div>
+                </label>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <label className="block text-left text-sm font-medium text-white/85">
+                  New password
+                  <div className={`${inputShell} mt-2`}>
+                    <input
+                      name="password"
+                      type={showPassword ? "text" : "password"}
+                      required
+                      placeholder="Enter new password"
+                      className={inputField}
+                      onChange={(e) => setEnteredPassword(e.target.value)}
+                      onFocus={() => setCheckPassword(true)}
+                      onBlur={() => setCheckPassword(false)}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      className="shrink-0 rounded-lg p-1 text-slate-600 transition hover:text-slate-900"
+                      aria-label={
+                        showPassword ? "Hide password" : "Show password"
+                      }
+                    >
+                      {showPassword ? (
+                        <FiEyeOff size={18} />
+                      ) : (
+                        <FiEye size={18} />
+                      )}
+                    </button>
+                  </div>
+                </label>
+
+                {checkPassword && (
+                  <div className="rounded-2xl bg-white/5 px-3 py-3 sm:px-4">
+                    <PasswordValidation password={enteredPassword} />
+                  </div>
+                )}
+
+                <label className="block text-left text-sm font-medium text-white/85">
+                  Confirm password
+                  <div className={`${inputShell} mt-2`}>
+                    <input
+                      name="confirmPassword"
+                      type={showConfirmPassword ? "text" : "password"}
+                      required
+                      ref={confirmPasswordRef}
+                      placeholder="Confirm password"
+                      className={inputField}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword((prev) => !prev)}
+                      className="shrink-0 rounded-lg p-1 text-slate-600 transition hover:text-slate-900"
+                      aria-label={
+                        showConfirmPassword
+                          ? "Hide confirm password"
+                          : "Show confirm password"
+                      }
+                    >
+                      {showConfirmPassword ? (
+                        <FiEyeOff size={18} />
+                      ) : (
+                        <FiEye size={18} />
+                      )}
+                    </button>
+                  </div>
+                </label>
+              </div>
+            )}
+
+            <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:justify-center">
+              <button
+                type="submit"
+                className="inline-flex w-full items-center justify-center rounded-xl bg-blue-700 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-900/20 transition hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-2 focus:ring-offset-slate-800 sm:w-auto"
+              >
+                Submit
+              </button>
+              <button
+                type="button"
+                className="inline-flex w-full items-center justify-center rounded-xl bg-red-700 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-red-900/20 transition hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300 focus:ring-offset-2 focus:ring-offset-slate-800 sm:w-auto"
+                onClick={() => navigate(-1)}
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </section>
+      </main>
     </>
   );
 };

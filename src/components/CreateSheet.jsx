@@ -8,6 +8,21 @@ import "react-toastify/dist/ReactToastify.css";
 
 const DB = "https://splitwiseapp-82dbf-default-rtdb.firebaseio.com";
 
+const sheetModes = {
+  split: {
+    label: "Split Sheet",
+    action: "Create Split Sheet",
+    accent: "bg-blue-600 hover:bg-blue-700",
+    dot: "bg-blue-500",
+  },
+  personal: {
+    label: "Personal Sheet",
+    action: "Create Personal Sheet",
+    accent: "bg-purple-600 hover:bg-purple-700",
+    dot: "bg-purple-500",
+  },
+};
+
 const CreateSheet = () => {
   const sheetNameRef = useRef();
   const changeEmail = useSelector((s) => s.expenseSheet.convertedMail);
@@ -19,12 +34,18 @@ const CreateSheet = () => {
 
   const formSubmitHandler = async (event) => {
     event.preventDefault();
-    const name = sheetNameRef.current.value.trim();
-    if (!name) return toast.error("Please enter a sheet name");
+
+    const name = sheetNameRef.current?.value.trim();
+    if (!name) {
+      toast.error("Please enter a sheet name");
+      return;
+    }
 
     setIsLoading(true);
+
     const sheetCode = Math.random().toString(36).substring(2, 7).toUpperCase();
     const invitationCode = changeEmail + sheetCode;
+
     const sheetDetails = {
       code: sheetCode,
       sheetName: name,
@@ -34,10 +55,7 @@ const CreateSheet = () => {
     };
 
     try {
-      await axios.post(
-        `${DB}/${invitationCode}/sheetDetails.json`,
-        sheetDetails,
-      );
+      await axios.post(`${DB}/${invitationCode}/sheetDetails.json`, sheetDetails);
       await axios.post(`${DB}/${changeEmail}/sheets.json`, sheetDetails);
       await axios.post(`${DB}/${invitationCode}/members.json`, {
         convertedMail: changeEmail,
@@ -50,13 +68,15 @@ const CreateSheet = () => {
       }
 
       window.dispatchEvent(new Event("sheetCreated"));
-      toast.success("Sheet Created!", {
-        position: "top-right",
+
+      toast.success("Sheet created!", {
+        position: "center",
         autoClose: 1000,
       });
+
       setTimeout(() => navigate("/home/sheets"), 1000);
-    } catch {
-      toast.error("Something went wrong.");
+    } catch (error) {
+      toast.error("Something went wrong. Please try again.");
       setIsLoading(false);
     }
   };
@@ -64,56 +84,76 @@ const CreateSheet = () => {
   return (
     <CardComponent>
       <ToastContainer />
-      <div className="max-w-sm mx-auto p-4 sm:p-6 w-full">
-        <h2 className="text-2xl font-bold mb-6 text-center text-white">
-          Create New Sheet
-        </h2>
+      <div className="w-full max-w-md mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        <div className="rounded-[24px] border border-white/20 bg-zinc-950/95 shadow-[0_24px_80px_rgba(0,0,0,0.45)] backdrop-blur-xl">
+          <div className="px-5 sm:px-7 pt-6 sm:pt-7 pb-7 sm:pb-8">
+            <h2 className="text-center text-xl sm:text-2xl font-semibold text-white">
+              Create New Sheet
+            </h2>
 
-        {/* Toggle Switch */}
-        <div className="flex bg-gray-800 rounded-2xl p-1 border border-gray-700 mb-4">
-          <button
-            type="button"
-            onClick={() => setSheetType("split")}
-            className={`flex-1 py-2.5 text-sm font-semibold rounded-xl transition-all duration-300 ${sheetType === "split" ? "bg-blue-600 text-white shadow-lg" : "text-gray-400 hover:text-white"}`}
-          >
-            Split Sheet
-          </button>
-          <button
-            type="button"
-            onClick={() => setSheetType("personal")}
-            className={`flex-1 py-2.5 text-sm font-semibold rounded-xl transition-all duration-300 ${sheetType === "personal" ? "bg-purple-600 text-white shadow-lg" : "text-gray-400 hover:text-white"}`}
-          >
-            Personal Sheet
-          </button>
+            <p className="mt-2 text-center text-sm text-slate-400">
+              Choose the sheet type, name it, and continue.
+            </p>
+
+            <div className="mt-6 flex rounded-2xl bg-slate-800/80 p-1 border border-white/10">
+              {Object.entries(sheetModes).map(([key, mode]) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setSheetType(key)}
+                  className={`flex-1 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all duration-200 ${
+                    sheetType === key
+                      ? `${mode.accent} text-white shadow-lg shadow-black/20`
+                      : "text-slate-300 hover:text-white hover:bg-white/5"
+                  }`}
+                >
+                  {mode.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="mt-4 min-h-[20px] text-center text-xs sm:text-sm text-slate-400 leading-relaxed">
+              {sheetType === "split"
+                ? "Share expenses with others and settle debts together."
+                : "Track your own expenses privately without sharing."}
+            </div>
+
+            <form onSubmit={formSubmitHandler} className="mt-6 flex flex-col gap-4">
+              <div>
+                <label
+                  htmlFor="sheetName"
+                  className="mb-2 block text-sm font-medium text-slate-300 text-left"
+                >
+                  Sheet name
+                </label>
+                <input
+                  id="sheetName"
+                  type="text"
+                  ref={sheetNameRef}
+                  required
+                  autoComplete="off"
+                  placeholder="Enter sheet name..."
+                  className="w-full rounded-xl border border-slate-600 bg-slate-800/90 px-4 py-3 text-white placeholder:text-slate-500 outline-none transition-colors focus:border-blue-500"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className={`w-full rounded-xl px-4 py-3.5 text-sm font-bold text-white transition-all duration-200 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70 ${
+                  isLoading
+                    ? "bg-slate-600"
+                    : sheetModes[sheetType].accent
+                }`}
+              >
+                {isLoading ? "Creating..." : sheetModes[sheetType].action}
+              </button>
+            </form>
+          </div>
         </div>
-
-        <p className="text-xs text-gray-400 text-center mb-6 h-4">
-          {sheetType === "split"
-            ? "Share expenses with others and settle debts."
-            : "Track your own daily expenses privately."}
-        </p>
-
-        <form onSubmit={formSubmitHandler} className="flex flex-col gap-4">
-          <input
-            type="text"
-            ref={sheetNameRef}
-            required
-            placeholder="Enter sheet name..."
-            className="bg-gray-800 border border-gray-600 text-white rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 w-full transition-colors placeholder:text-gray-500"
-          />
-
-          <button
-            type="submit"
-            disabled={isLoading}
-            className={`text-white font-bold py-3 rounded-xl w-full transition-transform active:scale-95 ${isLoading ? "bg-gray-600 cursor-not-allowed" : sheetType === "split" ? "bg-blue-600 hover:bg-blue-700" : "bg-purple-600 hover:bg-purple-700"}`}
-          >
-            {isLoading
-              ? "Creating..."
-              : `Create ${sheetType === "split" ? "Split" : "Personal"} Sheet`}
-          </button>
-        </form>
       </div>
     </CardComponent>
   );
 };
+
 export default CreateSheet;
