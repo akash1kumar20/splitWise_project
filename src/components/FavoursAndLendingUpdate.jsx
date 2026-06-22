@@ -4,15 +4,15 @@ import useFetchDataHook from "../customHooks/useFetchDataHook";
 import Loading from "../ExtraComponents/Loading";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const OtherExpense = () => {
-  const theme = useSelector((state) => state.theme.theme);
   const inviteCode = useSelector((state) => state.expenseSheet.inviteCode);
   const [comingData, isLoading] = useFetchDataHook(
     `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${inviteCode}/usersList.json`,
   );
   const navigate = useNavigate();
-  const [successStatus, setSuccessStatus] = useState(false);
   const sheetCode = useSelector((state) => state.expenseSheet.sheetCode);
   const token = useSelector((state) => state.expenseSheet.token);
   const [dataToEdit, setDataToEdit] = useState([]);
@@ -21,218 +21,173 @@ const OtherExpense = () => {
   useEffect(() => {
     if (!token) {
       navigate("/");
+    } else if (data.length === 0) {
+      navigate(`/home/sheets/${sheetCode}`);
     } else {
-      if (data.length === 0) {
-        navigate(`/home/sheets/${sheetCode}`);
-      } else {
-        setDataToEdit(data);
-      }
+      setDataToEdit(data);
     }
   }, []);
 
   async function otherExpenseHandler(event, id) {
     event.preventDefault();
-    let url;
-    let date = new Date().toLocaleDateString();
-    let expenseRelatedTo;
-    let expensePayByUser;
-    if (event.target.expenseRel.value === event.target.relatedPayBy.value) {
-      expenseRelatedTo = event.target.expenseRel.value;
-      expensePayByUser = event.target.relatedPayBy.value;
-    } else if (
-      event.target.expenseRel.value !== event.target.relatedPayBy.value
-    ) {
-      expenseRelatedTo = event.target.relatedPayBy.value;
-      expensePayByUser = event.target.expenseRel.value;
+    const expenseRel = event.target.expenseRel.value;
+    const relatedPayBy = event.target.relatedPayBy.value;
+    if (relatedPayBy === expenseRel) {
+      alert("Both users can not be same");
+      return;
     }
-    let objToStore = {
-      date: date,
-      user: expenseRelatedTo,
-      relatedTo: expensePayByUser,
+
+    const objToStore = {
+      date: new Date().toLocaleDateString(),
+      user: expenseRel !== relatedPayBy ? relatedPayBy : expenseRel,
+      relatedTo: expenseRel !== relatedPayBy ? expenseRel : relatedPayBy,
       category: event.target.expenseCategory.value,
       relatedAmtVal: event.target.relatedAmount.value,
       amount: 0,
       subCategory: event.target.relatedNote.value || "NA",
       payBy: "NA",
       relatedAmount: true,
-      // ✅ Track edit history
       isEdited: true,
-      previousAmount: dataToEdit[0]?.relatedAmtVal, // ✅ always the F&L amount BEFORE this edit
+      previousAmount: dataToEdit[0]?.relatedAmtVal,
     };
-    url = `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${inviteCode}/expenseSheet/${id}.json`;
 
     try {
-      let res = await axios.put(url, objToStore);
+      const res = await axios.put(
+        `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${inviteCode}/expenseSheet/${id}.json`,
+        objToStore,
+      );
       if (res.status === 200) {
-        setSuccessStatus(true);
+        toast.success("Updated Successfully");
+        setTimeout(() => navigate(`/home/sheets/${sheetCode}`), 1200);
       }
-      setTimeout(() => {
-        setSuccessStatus(false);
-        navigate(`/home/sheets/${sheetCode}`);
-      }, 1500);
     } catch (err) {
-      alert("Try Again!");
+      toast.error("Try Again!");
     }
   }
 
   return (
     <>
-      {isLoading && <Loading />}
-      {!isLoading && (
-        <center
-          className={
-            theme
-              ? "text-gray-900 bg-white h-[100vh] w-[100vw]"
-              : "bg-gray-900 text-white h-[100vh] w-[100vw]"
-          }
-        >
-          <h2 className="text-slate-500 text-3xl cursor-pointer font-bold pt-4">
-            Other Expenses
-          </h2>
+      <ToastContainer />
+      {isLoading ? (
+        <Loading />
+      ) : (
+        <div className="min-h-screen bg-slate-900 text-white p-4 md:p-8 flex justify-center items-center">
+          {dataToEdit.map((toEdit) => (
+            <form
+              onSubmit={(event) => otherExpenseHandler(event, toEdit.id)}
+              key={toEdit.id}
+              className="w-full max-w-2xl bg-slate-800 p-6 md:p-10 rounded-2xl shadow-2xl border border-slate-700"
+            >
+              <h1 className="text-2xl md:text-4xl font-bold mb-8 text-center text-blue-400">
+                Favours & Lending
+              </h1>
+              <p className="text-center mb-6 text-slate-400">
+                Update Entry Here
+              </p>
 
-          <div className="md:w-[80%] mx-auto">
-            <p className="px-2 font-semibold mt-2">Update Other Expense Here</p>
-          </div>
-
-          <div className="mt-4 shadow-xl drop-shadow-xl border-2 px-4 py-2 md:w-[40%] mx-auto">
-            {dataToEdit.map((toEdit) => (
-              <form
-                onSubmit={(event) => otherExpenseHandler(event, toEdit.id)}
-                key={toEdit.id}
-                className=""
-              >
-                <h4 className="text-blue-600 text-xl cursor-pointer font-semibold mb-4">
-                  Add Related Expense/Loan:
-                </h4>
-
-                <div className="flex gap-3 justify-between items-center my-3">
-                  <label htmlFor="expenseRel"> Expense Related To</label>
-                  <select
-                    className="text-black p-1 rounded-lg mx-1 placeholder:text-black"
-                    name="expenseRel"
-                    required
+              <div className="space-y-6">
+                {[
+                  {
+                    label: "Expense related to (Beneficiary)",
+                    name: "expenseRel",
+                    val: toEdit.relatedTo,
+                    type: "select",
+                    options: comingData,
+                  },
+                  {
+                    label: "Paid by",
+                    name: "relatedPayBy",
+                    val: toEdit.user,
+                    type: "select",
+                    options: comingData,
+                  },
+                  {
+                    label: "Category",
+                    name: "expenseCategory",
+                    val: toEdit.category,
+                    type: "select",
+                    options: [
+                      "Food & Drinks",
+                      "Household Items",
+                      "Transport & Vehicle",
+                      "Shopping",
+                      "Life & Entertainment",
+                      "Housing",
+                    ],
+                  },
+                  {
+                    label: "Amount",
+                    name: "relatedAmount",
+                    val: toEdit.relatedAmtVal,
+                    type: "number",
+                  },
+                  {
+                    label: "Note",
+                    name: "relatedNote",
+                    val: toEdit.subCategory,
+                    type: "text",
+                  },
+                ].map((field) => (
+                  <div
+                    key={field.name}
+                    className="grid grid-cols-1 md:grid-cols-3 gap-2 items-center"
                   >
-                    <option
-                      name="expenseRel"
-                      hidden
-                      defaultValue
-                      value={toEdit.relatedTo}
-                    >
-                      {toEdit.relatedTo}
-                    </option>
-                    {comingData.map((userData) => (
-                      <option
-                        name="expenseRel"
-                        value={userData.userName}
-                        key={userData.id}
+                    <label className="text-lg font-medium text-slate-300">
+                      {field.label}
+                    </label>
+                    {field.type === "select" ? (
+                      <select
+                        name={field.name}
+                        defaultValue={field.val}
+                        className="col-span-2 w-full bg-slate-700 border border-slate-600 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                       >
-                        {userData.userName}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="flex gap-3 justify-between items-center my-3">
-                  <label htmlFor="relatedPayBy">Pay By</label>
-                  <select
-                    className="text-black p-1 rounded-lg mx-1 placeholder:text-black"
-                    name="relatedPayBy"
-                    required
-                  >
-                    <option
-                      name="relatedPayBy"
-                      hidden
-                      defaultValue
-                      value={toEdit.user}
-                    >
-                      {toEdit.user}
-                    </option>
-                    {comingData.map((userData) => (
-                      <option
-                        name="relatedPayBy"
-                        value={userData.userName}
-                        key={userData.id}
-                      >
-                        {userData.userName}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="flex gap-3 justify-between items-center my-3">
-                  <label htmlFor="expenseCategory">Category</label>
-                  <select
-                    className="text-black p-1 rounded-lg mx-1 placeholder:text-black"
-                    name="expenseCategory"
-                    placeholder="Choose Category"
-                    required
-                  >
-                    <option hidden defaultValue value={toEdit.category}>
-                      {toEdit.category}
-                    </option>
-                    <option value="Food & Drinks" name="expenseCategory">
-                      Food & Drinks
-                    </option>
-                    <option value="Household Items" name="expenseCategory">
-                      Household Items
-                    </option>
-                    <option value="Transport & Vehicle" name="expenseCategory">
-                      Transport & Vehicle
-                    </option>
-                    <option value="Shopping" name="expenseCategory">
-                      Shopping
-                    </option>
-                    <option value="Life & Entertainment" name="expenseCategory">
-                      Life & Entertainment
-                    </option>
-                    <option value="Housing" name="expenseCategory">
-                      Housing
-                    </option>
-                  </select>
-                </div>
+                        <option value={field.val} hidden>
+                          {field.val}
+                        </option>
+                        {field.options.map((opt) => (
+                          <option
+                            key={opt.id || opt}
+                            value={opt.userName || opt}
+                          >
+                            {opt.userName || opt}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <input
+                        type={field.type}
+                        name={field.name}
+                        defaultValue={field.val}
+                        className="col-span-2 w-full bg-slate-700 border border-slate-600 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
 
-                <div className="flex gap-3 justify-between items-center my-3">
-                  <label htmlFor="relatedAmount">Amount</label>
-                  <input
-                    required
-                    name="relatedAmount"
-                    type="number"
-                    defaultValue={toEdit.relatedAmtVal}
-                    className="text-black p-1 rounded-lg mx-1 placeholder:text-black"
-                  />
-                </div>
-                <div className="flex gap-3 justify-between items-center my-3">
-                  <label htmlFor="relatedNote">Note</label>
-                  <input
-                    name="relatedNote"
-                    type="text"
-                    placeholder="Add Note Here..."
-                    defaultValue={toEdit.subCategory}
-                    className="text-black p-1 rounded-lg mx-1 placeholder:text-black"
-                  />
-                </div>
-                <div className="flex gap-3 justify-between items-center my-3">
-                  <button
-                    className="bg-red-500 text-2xl text-white px-6 py-1 rounded-xl font-bold "
-                    onClick={() => navigate(-1)}
-                  >
-                    Back
-                  </button>
-                  <button
-                    type="submit"
-                    className="bg-blue-600 text-2xl text-white px-6 py-1 rounded-xl font-bold"
-                  >
-                    Edit
-                  </button>
-                </div>
-              </form>
-            ))}
-          </div>
-
-          {successStatus && (
-            <p className="m-2 text-green-500 text-xl font-semibold">
-              Details Successufully Added!
-            </p>
-          )}
-        </center>
+              <div className="flex gap-4 mt-10 justify-center mb-4">
+                <button
+                  type="button"
+                  onClick={() => navigate(-1)}
+                  className="flex-1 bg-red-600 hover:bg-red-700 transition py-3 rounded-xl font-bold text-lg"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 transition py-3 rounded-xl font-bold text-lg"
+                >
+                  Save Changes
+                </button>
+              </div>
+              <span className="  text-white text-xs">
+                Note: Clicking Submit saves the status as{" "}
+                <strong>Edited </strong> regardless of changes. Use Exit to
+                discard without saving.
+              </span>
+            </form>
+          ))}
+        </div>
       )}
     </>
   );

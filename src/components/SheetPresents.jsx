@@ -12,26 +12,28 @@ import { useState, useEffect } from "react";
 const DB = "https://splitwiseapp-82dbf-default-rtdb.firebaseio.com";
 
 const SheetPresents = () => {
-  const changeEmail = useSelector((state) => state.expenseSheet.convertedMail);
-  const theme = useSelector((state) => state.theme.theme);
+  const changeEmail = useSelector((s) => s.expenseSheet.convertedMail);
+  const theme = useSelector((s) => s.theme.theme);
   const dispatch = useDispatch();
-  const userMail = useSelector((state) => state.expenseSheet.userMail);
+  const userMail = useSelector((s) => s.expenseSheet.userMail);
+  const navigate = useNavigate();
+
   const [comingData, isLoading, , refetch] = useFetchDataHook(
     `${DB}/${changeEmail}/sheets.json`,
   );
 
-  // ✅ Listen for sheetCreated event fired by both CreateSheet and FoundSheet
   useEffect(() => {
-    const handleSheetCreated = () => refetch();
-    window.addEventListener("sheetCreated", handleSheetCreated);
-    return () => window.removeEventListener("sheetCreated", handleSheetCreated);
+    const h = () => refetch();
+    window.addEventListener("sheetCreated", h);
+    return () => window.removeEventListener("sheetCreated", h);
   }, [refetch]);
 
   const [deletedIds, setDeletedIds] = useState([]);
   const [pendingDelete, setPendingDelete] = useState(null);
-  const navigate = useNavigate();
+  const [blockedDelete, setBlockedDelete] = useState(null);
+  const [checking, setChecking] = useState(false);
 
-  const openSpecificSheetHandler = (sheet) => {
+  const openSheet = (sheet) => {
     dispatch(
       expenseSheetActions.setCodes({
         sheetCode: sheet.code,
@@ -39,55 +41,79 @@ const SheetPresents = () => {
       }),
     );
     dispatch(expenseSheetActions.setSheetAdmin(sheet.userMail));
+    localStorage.setItem("sp_sheetType", sheet.sheetType || "split");
+    localStorage.setItem("sp_sheetAdmin", sheet.userMail);
     navigate(`/home/sheets/${sheet.code}`);
+  };
+
+  const checkCanDelete = async (sheet) => {
+    try {
+      const expRes = await axios.get(
+        `${DB}/${sheet.inviationCode}/expenseSheet.json`,
+      );
+      if (expRes.data && Object.keys(expRes.data).length > 0)
+        return {
+          canDelete: false,
+          reason:
+            "This sheet still has unsettled expenses. Please generate and settle the bill before deleting.",
+        };
+      if (sheet.sheetType !== "personal") {
+        const paidRes = await axios.get(
+          `${DB}/${sheet.inviationCode}/settlementPaid.json`,
+        );
+        if (paidRes.data && typeof paidRes.data === "object") {
+          if (!Object.values(paidRes.data).every((v) => v === true))
+            return {
+              canDelete: false,
+              reason:
+                "Some settlements are still pending. Please mark all as Paid before deleting.",
+            };
+        }
+      }
+      return { canDelete: true };
+    } catch {
+      return { canDelete: true };
+    }
+  };
+
+  const handleTrashClick = async (sheet) => {
+    setChecking(true);
+    const { canDelete, reason } = await checkCanDelete(sheet);
+    setChecking(false);
+    if (!canDelete) {
+      setBlockedDelete({ sheetName: sheet.sheetName, reason });
+      return;
+    }
+    setPendingDelete(sheet);
   };
 
   const deleteSheetHandler = async () => {
     const sheet = pendingDelete;
     setPendingDelete(null);
     try {
-      // Always remove from current user's own list
       await axios.delete(`${DB}/${changeEmail}/sheets/${sheet.id}.json`);
-
       if (sheet.userMail === userMail) {
-        // ✅ Admin deleting: remove sheet from ALL members' lists before wiping shared data
         try {
           const membersRes = await axios.get(
             `${DB}/${sheet.inviationCode}/members.json`,
           );
           if (membersRes.data) {
             for (let key in membersRes.data) {
-              const memberEmail = membersRes.data[key].convertedMail;
-              if (memberEmail === changeEmail) continue; // already deleted above
+              const mem = membersRes.data[key].convertedMail;
+              if (mem === changeEmail) continue;
               try {
-                const sheetsRes = await axios.get(
-                  `${DB}/${memberEmail}/sheets.json`,
-                );
-                for (let sheetKey in sheetsRes.data) {
-                  if (
-                    sheetsRes.data[sheetKey].inviationCode ===
-                    sheet.inviationCode
-                  ) {
-                    await axios.delete(
-                      `${DB}/${memberEmail}/sheets/${sheetKey}.json`,
-                    );
-                  }
-                }
-              } catch (err) {
-                console.log(err);
-              }
+                const sr = await axios.get(`${DB}/${mem}/sheets.json`);
+                for (let sk in sr.data)
+                  if (sr.data[sk].inviationCode === sheet.inviationCode)
+                    await axios.delete(`${DB}/${mem}/sheets/${sk}.json`);
+              } catch (_) {}
             }
           }
-        } catch (err) {
-          console.log(err);
-        }
-
-        // Wipe all shared sheet data
+        } catch (_) {}
         await axios.delete(`${DB}/${sheet.inviationCode}.json`);
       }
-
-      setDeletedIds((prev) => [...prev, sheet.id]);
-    } catch (error) {
+      setDeletedIds((p) => [...p, sheet.id]);
+    } catch {
       alert("Could not delete sheet. Please try again.");
     }
   };
@@ -96,18 +122,34 @@ const SheetPresents = () => {
 
   return (
     <>
+      {blockedDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
+          <div className="bg-white text-black rounded-2xl p-6 mx-4 max-w-sm w-full text-center shadow-2xl">
+            <h2 className="text-xl font-bold mb-2">Cannot Delete Sheet</h2>
+            <p className="text-sm font-semibold text-gray-700 mb-1">
+              {blockedDelete.sheetName}
+            </p>
+            <p className="text-sm text-gray-600 mb-5">{blockedDelete.reason}</p>
+            <button
+              className="bg-gray-800 text-white px-8 py-2 rounded-xl font-semibold"
+              onClick={() => setBlockedDelete(null)}
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      )}
       {pendingDelete && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
           <div className="bg-white text-black rounded-2xl p-6 mx-4 max-w-sm w-full text-center shadow-2xl">
-            <p className="text-2xl mb-2">🗑️</p>
             <h2 className="text-xl font-bold mb-2">Delete Sheet?</h2>
             <p className="text-sm text-gray-600 mb-1">
               <strong>{pendingDelete.sheetName}</strong>
             </p>
             <p className="text-sm text-gray-600 mb-4">
               {pendingDelete.userMail === userMail
-                ? "You are the admin. This will permanently delete the sheet and all its data for every member."
-                : "This will remove the sheet from your list only. The sheet will remain for the admin and other members."}
+                ? "You are the admin. This will permanently delete the sheet and all data for every member."
+                : "This will remove the sheet from your list only."}
             </p>
             <div className="flex gap-3 justify-center">
               <button
@@ -123,6 +165,13 @@ const SheetPresents = () => {
                 Cancel
               </button>
             </div>
+          </div>
+        </div>
+      )}
+      {checking && (
+        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl px-8 py-5 shadow-xl text-gray-700 font-semibold text-sm">
+            Checking settlement status...
           </div>
         </div>
       )}
@@ -142,23 +191,33 @@ const SheetPresents = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 py-8 md:mx-32 gap-y-6">
             {visibleSheets.map((sheet) => (
               <div
-                className="flex flex-col items-center gap-3 static"
+                className="flex flex-col items-center gap-2 static"
                 key={sheet.id}
               >
                 <FaTrash
                   className="relative top-[20px] left-6 text-red-500 hover:text-red-700 cursor-pointer hover:scale-150"
-                  onClick={() => setPendingDelete(sheet)}
+                  onClick={() => handleTrashClick(sheet)}
                 />
                 <p
                   className="text-xl p-6 rounded-full bg-gray-600 border-2 border-gray-500 shadow-xl cursor-pointer text-white"
-                  onClick={() => openSpecificSheetHandler(sheet)}
+                  onClick={() => openSheet(sheet)}
                 >
-                  {sheet.sheetName.substring(0, 4)}…
+                  {sheet.sheetName.substring(0, 4)}...
                 </p>
-                <span className="text-sm">{sheet.sheetName}</span>
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${sheet.userMail === userMail ? "bg-blue-600 text-white" : "bg-gray-500 text-white"}`}>
-                  {sheet.userMail === userMail ? "Admin" : "Member"}
+                <span className="text-sm font-semibold shadow-lg">
+                  {sheet.sheetName}
                 </span>
+                {sheet.sheetType === "personal" ? (
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-600 text-white">
+                    Personal
+                  </span>
+                ) : (
+                  <span
+                    className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${sheet.userMail === userMail ? "bg-blue-600 text-white" : "bg-gray-500 text-white"}`}
+                  >
+                    {sheet.userMail === userMail ? "Admin" : "Member"}
+                  </span>
+                )}
               </div>
             ))}
             <div className="flex flex-col items-center gap-3 mt-9">
@@ -168,7 +227,7 @@ const SheetPresents = () => {
               >
                 <IoMdAdd />
               </p>
-              <span className="text-sm">Add Sheet</span>
+              <span className="text-sm font-semibold shadow-lg">Add Sheet</span>
             </div>
             <div className="flex flex-col items-center gap-3 mt-9">
               <p
@@ -177,7 +236,9 @@ const SheetPresents = () => {
               >
                 <FaSearch />
               </p>
-              <span className="text-sm">Find Sheet</span>
+              <span className="text-sm font-semibold shadow-lg">
+                Find Sheet
+              </span>
             </div>
           </div>
         )}
@@ -186,5 +247,4 @@ const SheetPresents = () => {
     </>
   );
 };
-
 export default SheetPresents;

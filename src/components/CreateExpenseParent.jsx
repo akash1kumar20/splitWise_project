@@ -8,30 +8,28 @@ import SheetDetailsCard from "../Card/SheetDetailsCard";
 import { useNavigate } from "react-router-dom";
 
 const CreateExpenseParent = ({ onExpenseAdded }) => {
-  const inviteCode = useSelector((state) => state.expenseSheet.inviteCode);
+  const inviteCode = useSelector((s) => s.expenseSheet.inviteCode);
   const [addUser, setAddUser] = useState(false);
+  const sheetType = localStorage.getItem("sp_sheetType") || "split";
+  const isPersonal = sheetType === "personal";
 
-  // ✅ Single source of truth for usersList — passed down to both Users and CreateExpense.
-  // Previously, Users had its own separate hook instance, so its refetch() only updated
-  // its own private state. Now CreateExpenseParent owns the data, and Users calls
-  // the refetch via the onUserAdded prop.
   const [comingData, isLoading, , refetch] = useFetchDataHook(
     `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${inviteCode}/usersList.json`,
   );
 
   const navigate = useNavigate();
-  const sheetCode = useSelector((state) => state.expenseSheet.sheetCode);
+  const sheetCode = useSelector((s) => s.expenseSheet.sheetCode);
 
   return (
     <SheetDetailsCard>
       {isLoading && <Loading />}
       {!isLoading && (
         <div>
-          {addUser && (
+          {/* Add users section — hidden for personal sheets */}
+          {!isPersonal && addUser && (
             <Users existingUsers={comingData} onUserAdded={refetch} />
           )}
-
-          {comingData.length > 0 && addUser && (
+          {!isPersonal && comingData.length > 0 && addUser && (
             <p
               className="text-blue-400 font-bold cursor-pointer mt-2 w-fit"
               onClick={() => setAddUser(false)}
@@ -40,16 +38,23 @@ const CreateExpenseParent = ({ onExpenseAdded }) => {
             </p>
           )}
 
-          {!addUser && comingData.length > 0 && (
-            <CreateExpense users={comingData} onExpenseAdded={onExpenseAdded} />
+          {/* Expense form */}
+          {(!addUser || isPersonal) && comingData.length > 0 && (
+            <CreateExpense
+              users={comingData}
+              onExpenseAdded={onExpenseAdded}
+              isPersonal={isPersonal}
+            />
           )}
 
-          {comingData.length === 0 && !addUser && (
-            <p className="mt-2">Please atleast add one user name to continue</p>
+          {comingData.length === 0 && !isPersonal && (
+            <p className="mt-2">
+              Please add at least one user name to continue
+            </p>
           )}
 
-          {!addUser && (
-            <div className="flex gap-x-3">
+          {!isPersonal && !addUser && (
+            <div className="flex gap-x-3 md:pl-[72px] pl-10">
               <p
                 className="text-blue-400 font-bold cursor-pointer mt-2 w-fit border-2 border-blue-600 rounded-lg px-1"
                 onClick={() => setAddUser(true)}
@@ -73,5 +78,4 @@ const CreateExpenseParent = ({ onExpenseAdded }) => {
     </SheetDetailsCard>
   );
 };
-
 export default CreateExpenseParent;

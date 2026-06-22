@@ -17,8 +17,16 @@ const LeftBar = () => {
   const navigate = useNavigate();
   const sheetCode = useSelector((state) => state.expenseSheet.sheetCode);
 
-  // ✅ Only show Delete User option to admin
+  // ✅ Only show Delete User option to admin and in split sheet
   const { isAdmin } = useAdminStatus();
+  const sheetType = localStorage.getItem("sp_sheetType");
+  let isPersonal = false;
+
+  if (sheetType === "personal") {
+    isPersonal = true;
+  } else {
+    isPersonal = false;
+  }
 
   return (
     <div className="bg-transparent text-white w-10 fixed top-0 z-50 right-0 h-full flex flex-col gap-3 items-center">
@@ -59,9 +67,7 @@ const LeftBar = () => {
               className="text-2xl"
               onClick={() => navigate(`/home/sheets/${sheetCode}/previousBill`)}
             />
-            {showPreviousBill && (
-              <span className="text-sm">Previous Bill</span>
-            )}
+            {showPreviousBill && <span className="text-sm">Previous Bill</span>}
           </p>
 
           <p
@@ -77,7 +83,7 @@ const LeftBar = () => {
           </p>
 
           {/* ✅ Delete User option only visible to admin */}
-          {isAdmin && (
+          {isAdmin && !isPersonal && (
             <p
               className="flex flex-col items-center cursor-pointer"
               onMouseOver={() => setShowDeleteUser(true)}
@@ -85,13 +91,9 @@ const LeftBar = () => {
             >
               <TiUserDelete
                 className="text-2xl"
-                onClick={() =>
-                  navigate(`/home/sheets/${sheetCode}/deleteUser`)
-                }
+                onClick={() => navigate(`/home/sheets/${sheetCode}/deleteUser`)}
               />
-              {showDeleteUser && (
-                <span className="text-sm">Delete User</span>
-              )}
+              {showDeleteUser && <span className="text-sm">Delete User</span>}
             </p>
           )}
         </Cylinder>

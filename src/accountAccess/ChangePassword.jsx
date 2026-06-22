@@ -116,7 +116,8 @@ const ChangePassword = () => {
                 You will receive a reset email.
               </span>
               <span className="text-sm text-yellow-300">
-                📬 If you don't see it, please check your <strong>spam / junk folder</strong>.
+                📬 If you don't see it, please check your{" "}
+                <strong>spam / junk folder</strong>.
               </span>
               <input
                 name="mail"

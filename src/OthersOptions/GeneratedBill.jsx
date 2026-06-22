@@ -10,6 +10,7 @@ import axios from "axios";
 import HowCalculate from "../ExtraComponents/HowCalculate";
 import useAdminStatus from "../customHooks/useAdminStatus";
 import { expenseSheetActions } from "../../store/expenseSheetSlice";
+import GeneratedBillDetails from "../OthersOptions/GeneratedBillDetails";
 
 const sKey = (s) => `${s.from}__${s.to}`;
 
@@ -51,6 +52,11 @@ const GeneratedBill = () => {
   const token = useSelector((s) => s.expenseSheet.token);
   const navigate = useNavigate();
   const details = useRef();
+  const sheetType = localStorage.getItem("sp_sheetType") || "Not_Personal";
+  let isPersonal = false;
+  if (sheetType === "personal") {
+    isPersonal = true;
+  }
 
   const sheetCode = useSelector((s) => s.expenseSheet.sheetCode);
   const code =
@@ -102,9 +108,11 @@ const GeneratedBill = () => {
     `${urlKey}/expenseSheet.json`,
   );
   const [users, setUsers] = useState([]);
+  const [usersLoading, setUsersLoading] = useState(true);
   const [result, setResult] = useState([]);
 
   useEffect(() => {
+    setUsersLoading(true);
     axios
       .get(`${urlKey}/usersList.json`)
       .then((res) => {
@@ -112,7 +120,8 @@ const GeneratedBill = () => {
         for (let key in res.data) arr.push({ ...res.data[key], id: key });
         setUsers(arr);
       })
-      .catch(console.error);
+      .catch(console.error)
+      .finally(() => setUsersLoading(false));
   }, []);
 
   const dataArray = comingData.map((i) => i.date);
@@ -132,7 +141,13 @@ const GeneratedBill = () => {
     ? (totalAmount / users.length).toFixed(2) * 1
     : 0;
 
+  // ✅ THE REAL FIX: result useEffect now also depends on `users`.
+  // After building userMap from expenses, we add any users with ZERO expenses
+  // (finalAmount = 0). Without this, those users are invisible to calcSettlements,
+  // which then finds no debtors and returns [] → "Everyone is settled!" incorrectly.
   useEffect(() => {
+    if (usersLoading) return; // wait for users to load first
+
     const userMap = comingData.reduce((acc, item) => {
       const { user, relatedTo } = item;
       const amt = parseFloat(item.amount) || 0;
@@ -146,21 +161,42 @@ const GeneratedBill = () => {
       acc[relatedTo].relatedToAmtVal += rl;
       return acc;
     }, {});
-    setResult(
-      Object.keys(userMap).map((user) => {
-        const { amount, relatedAmtVal, relatedToAmtVal } = userMap[user];
-        return {
-          user,
-          finalAmount: amount + relatedAmtVal - relatedToAmtVal,
-          userAmount: amount,
-          userRelatedAmtVal: relatedAmtVal,
-          relatedToAmtVal,
-        };
-      }),
-    );
-  }, [comingData]);
 
-  const settlements = calcSettlements(result, totalAmount, users.length);
+    const computed = Object.keys(userMap).map((user) => {
+      const { amount, relatedAmtVal, relatedToAmtVal } = userMap[user];
+      return {
+        user,
+        finalAmount: amount + relatedAmtVal - relatedToAmtVal,
+        userAmount: amount,
+        userRelatedAmtVal: relatedAmtVal,
+        relatedToAmtVal,
+      };
+    });
+
+    // Add users who have zero expenses so they appear as debtors
+    const computedNames = new Set(computed.map((r) => r.user));
+    users.forEach((u) => {
+      if (!computedNames.has(u.userName)) {
+        computed.push({
+          user: u.userName,
+          finalAmount: 0,
+          userAmount: 0,
+          userRelatedAmtVal: 0,
+          relatedToAmtVal: 0,
+        });
+      }
+    });
+
+    setResult(computed);
+  }, [comingData, users, usersLoading]);
+
+  // settlements is null until both result and users are ready
+  const [settlements, setSettlements] = useState(null);
+  useEffect(() => {
+    if (!isLoading && !usersLoading && users.length > 0) {
+      setSettlements(calcSettlements(result, totalAmount, users.length));
+    }
+  }, [result, users, isLoading, usersLoading, totalAmount]);
 
   const [paidMap, setPaidMap] = useState({});
   useEffect(() => {
@@ -170,6 +206,7 @@ const GeneratedBill = () => {
         .get(`${urlKey}/settlementPaid.json`)
         .then((res) => {
           if (res.data && typeof res.data === "object") setPaidMap(res.data);
+          else setPaidMap({});
         })
         .catch(() => {});
     load();
@@ -186,7 +223,8 @@ const GeneratedBill = () => {
   };
 
   const allSettled =
-    settlements.length === 0 || settlements.every((s) => paidMap[sKey(s)]);
+    settlements !== null &&
+    (settlements.length === 0 || settlements.every((s) => paidMap[sKey(s)]));
 
   const [balanceCal, setBalanceCal] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -221,7 +259,7 @@ const GeneratedBill = () => {
 
   return (
     <div className="min-h-screen bg-[rgb(56,102,65)]">
-      {isLoading && <Loading />}
+      {(isLoading || usersLoading) && <Loading />}
 
       {!isLoading && (
         <div className="flex items-center justify-between px-6 py-4 border-b bg-white shadow-sm sticky top-0 z-10">
@@ -229,7 +267,7 @@ const GeneratedBill = () => {
             className="text-sm bg-gray-800 text-white px-4 py-2 rounded-xl hover:bg-gray-700"
             onClick={() => navigate(-1)}
           >
-            ← Back
+            Back
           </button>
           <h1 className="text-xl font-bold text-gray-800">Bill Summary</h1>
           <div className="w-20" />
@@ -239,7 +277,6 @@ const GeneratedBill = () => {
       {showConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
           <div className="bg-white text-black rounded-2xl p-6 mx-4 max-w-sm w-full text-center shadow-2xl">
-            <p className="text-3xl mb-2">⚠️</p>
             <h2 className="text-xl font-bold mb-2">Generate New Bill?</h2>
             <p className="text-sm text-gray-600 mb-4">
               This will <strong>permanently delete all current expenses</strong>
@@ -275,7 +312,6 @@ const GeneratedBill = () => {
       {!isLoading && comingData.length > 0 && (
         <div className="max-w-3xl mx-auto px-4 pb-12 pt-6">
           <div ref={details}>
-            {/* Expense table — desktop/PDF only */}
             <div className="hidden md:block bg-white rounded-2xl shadow border border-gray-100 p-4 mb-4">
               <TableHead />
               <TableBody comingData={comingData} />
@@ -290,7 +326,7 @@ const GeneratedBill = () => {
                 <div>
                   <p className="text-xs text-gray-400 uppercase">Time Frame</p>
                   <p className="font-semibold text-gray-800">
-                    {startingDate} → {endingDate}
+                    {startingDate} to {endingDate}
                   </p>
                 </div>
                 <div>
@@ -299,37 +335,43 @@ const GeneratedBill = () => {
                   </p>
                   <p className="font-semibold text-gray-800">{today}</p>
                 </div>
-                <div>
-                  <p className="text-xs text-gray-400 uppercase">Total Users</p>
-                  <p className="font-semibold text-gray-800">{users.length}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-400 uppercase">
-                    Per Head (excl. F&L)
-                  </p>
-                  <p className="font-semibold text-gray-800">₹{perHead}</p>
-                </div>
+                {!isPersonal && (
+                  <div>
+                    <p className="text-xs text-gray-400 uppercase">
+                      Total Users
+                    </p>
+                    <p className="font-semibold text-gray-800">
+                      {users.length}
+                    </p>
+                  </div>
+                )}
+                {!isPersonal && (
+                  <div>
+                    <p className="text-xs text-gray-400 uppercase">
+                      Per Head (excl. F&L)
+                    </p>
+                    <p className="font-semibold text-gray-800">Rs.{perHead}</p>
+                  </div>
+                )}
               </div>
               <div className="border-t pt-4 flex flex-col gap-2">
                 <div className="flex justify-between items-center">
                   <span className="text-gray-500">Total Expense</span>
                   <span className="text-2xl font-extrabold text-gray-900">
-                    ₹{grandTotal}
+                    Rs.{grandTotal}
                   </span>
                 </div>
                 {relatedMoneyTtl > 0 && (
                   <>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-400">F&L Amount</span>
-                      <span className="font-semibold text-gray-700">
-                        ₹{relatedMoneyTtl}
+                      <span className="font-semibold">
+                        Rs.{relatedMoneyTtl}
                       </span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-400">Without F&L</span>
-                      <span className="font-semibold text-gray-700">
-                        ₹{totalAmount}
-                      </span>
+                      <span className="font-semibold">Rs.{totalAmount}</span>
                     </div>
                   </>
                 )}
@@ -337,10 +379,10 @@ const GeneratedBill = () => {
             </div>
 
             {/* Contribution breakdown */}
-            {result.length > 0 && (
-              <div className="bg-white rounded-2xl shadow border border-gray-100 p-6 mb-4 overflow-x-auto font-semibold">
+            {!isPersonal && result.length > 0 && (
+              <div className="bg-white rounded-2xl font-semibold shadow border border-gray-100 p-6 mb-4 overflow-x-auto">
                 <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4">
-                  💼 Contribution Breakdown
+                  Contribution Breakdown
                 </h2>
                 <table className="w-full text-sm min-w-[340px]">
                   <thead>
@@ -359,20 +401,20 @@ const GeneratedBill = () => {
                           {item.user}
                         </td>
                         <td className="py-2 text-right text-gray-600">
-                          ₹{item.userAmount}
+                          Rs.{item.userAmount}
                         </td>
                         <td className="py-2 text-right text-green-600">
                           {item.userRelatedAmtVal > 0
-                            ? `₹${item.userRelatedAmtVal}`
-                            : "—"}
+                            ? `Rs.${item.userRelatedAmtVal}`
+                            : "-"}
                         </td>
                         <td className="py-2 text-right text-orange-500">
                           {item.relatedToAmtVal > 0
-                            ? `₹${item.relatedToAmtVal}`
-                            : "—"}
+                            ? `Rs.${item.relatedToAmtVal}`
+                            : "-"}
                         </td>
-                        <td className="py-2 text-right font-bold text-gray-900">
-                          ₹{item.userAmount + item.userRelatedAmtVal}
+                        <td className="py-2 text-right font-bold">
+                          Rs.{item.userAmount + item.userRelatedAmtVal}
                         </td>
                       </tr>
                     ))}
@@ -385,18 +427,30 @@ const GeneratedBill = () => {
             )}
 
             {/* Who Pays Whom */}
-            <div className="bg-white font-semibold rounded-2xl shadow border border-gray-100 p-6 mb-4">
-              <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4">
-                💸 Who Pays Whom
-              </h2>
-              {settlements.length === 0 ? (
+            <div className="bg-white rounded-2xl shadow border border-gray-100 p-6 mb-4">
+              {!isPersonal && (
+                <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4">
+                  Who Pays Whom
+                </h2>
+              )}
+
+              {settlements === null && (
+                <p className="text-center text-gray-400 text-sm py-4">
+                  Calculating settlements...
+                </p>
+              )}
+
+              {settlements !== null && settlements.length === 0 && (
                 <div className="bg-green-50 border border-green-200 rounded-2xl px-6 py-6 text-center">
-                  <p className="text-4xl mb-2">🎉</p>
                   <p className="text-lg font-bold text-green-700">
-                    Everyone is settled!
+                    {isPersonal
+                      ? "Bill is ready to generate"
+                      : " Everyone is settled!"}
                   </p>
                 </div>
-              ) : (
+              )}
+
+              {settlements !== null && settlements.length > 0 && (
                 <div className="flex flex-col gap-3">
                   {settlements.map((s, i) => {
                     const paid = !!paidMap[sKey(s)];
@@ -417,10 +471,9 @@ const GeneratedBill = () => {
                         </div>
                         <div className="flex flex-col items-center flex-1">
                           <p className="text-2xl font-black text-gray-900">
-                            ₹{s.amount}
+                            Rs.{s.amount}
                           </p>
-                          <p className="text-xl text-gray-400 mt-1">→</p>
-                          {/* ✅ print:hidden — toggle button & status never appear in PDF */}
+                          <p className="text-xl text-gray-400 mt-1">to</p>
                           {isAdmin ? (
                             <button
                               className={`print:hidden text-xs mt-2 px-3 py-1 rounded-full font-semibold border transition-all
@@ -430,20 +483,15 @@ const GeneratedBill = () => {
                                     : "bg-white text-gray-600 border-gray-300 hover:border-green-500 hover:text-green-600"
                                 }`}
                               onClick={() => togglePaid(s)}
-                              title={
-                                paid
-                                  ? "Click to mark as Unpaid"
-                                  : "Click to mark as Paid"
-                              }
                             >
-                              {paid ? "✓ Paid — Undo" : "Mark as Paid"}
+                              {paid ? "Paid - Undo" : "Mark as Paid"}
                             </button>
                           ) : (
                             <span
                               className={`print:hidden text-xs mt-2 px-3 py-1 rounded-full font-semibold
                               ${paid ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}
                             >
-                              {paid ? "✓ Paid" : "Unpaid"}
+                              {paid ? "Paid" : "Unpaid"}
                             </span>
                           )}
                         </div>
@@ -460,15 +508,13 @@ const GeneratedBill = () => {
                       </div>
                     );
                   })}
-                  {/* ✅ print:hidden — "all settled" banner not needed in PDF */}
-                  {allSettled && settlements.length > 0 && (
+                  {allSettled && (
                     <div className="print:hidden bg-green-50 border border-green-200 rounded-2xl px-4 py-3 text-center text-green-700 font-semibold text-sm">
-                      🎉 All settlements paid — ready to generate new bill!
+                      All settlements paid - ready to generate new bill!
                     </div>
                   )}
-                  {/* ✅ print:hidden — helper text not needed in PDF */}
-                  <p className="print:hidden text-xs text-gray-400 text-center mt-1">
-                    ✓ Once everyone pays, all balances are cleared.
+                  <p className="print:hidden text-md font-semibold text-gray-400 text-center mt-1">
+                    Once everyone pays, all balances are cleared.
                   </p>
                 </div>
               )}
@@ -477,28 +523,21 @@ const GeneratedBill = () => {
             {/* Legend */}
             <div className="bg-white rounded-2xl shadow border border-gray-100 px-6 py-4 mb-4">
               <div className="flex flex-wrap justify-center gap-6 text-sm text-gray-500">
-                <span className="flex items-center gap-1">
-                  <span className="w-3 h-3 rounded-full bg-green-600 inline-block" />
-                  Amount to Receive
-                </span>
-                <span className="flex items-center gap-1">
-                  <span className="w-3 h-3 rounded-full bg-red-600 inline-block" />
-                  Amount to Give
-                </span>
-                <span>P/M — Pay Method</span>
-                <span>F&L — Favours &amp; Lending</span>
+                <GeneratedBillDetails />
               </div>
             </div>
           </div>
 
-          <div className="text-center mb-4">
-            <button
-              className="text-sm bg-blue-600 text-white p-1 rounded-md underline"
-              onClick={() => setBalanceCal((b) => !b)}
-            >
-              How is Balance Calculated?
-            </button>
-          </div>
+          {!isPersonal && (
+            <div className="text-center mb-4">
+              <button
+                className="text-sm bg-blue-600 text-white p-1 rounded-md underline"
+                onClick={() => setBalanceCal((b) => !b)}
+              >
+                How is Balance Calculated?
+              </button>
+            </div>
+          )}
           {balanceCal && (
             <HowCalculate balanceCalHandler={() => setBalanceCal(false)} />
           )}
@@ -510,28 +549,28 @@ const GeneratedBill = () => {
                   className="bg-green-600 hover:bg-green-700 text-white font-bold px-8 py-3 rounded-2xl shadow-lg"
                   onClick={() => setShowConfirm(true)}
                 >
-                  ✓ Generate New Bill
+                  Generate New Bill
                 </button>
               ) : (
                 <div className="bg-orange-50 border border-orange-300 text-orange-800 text-sm px-5 py-3 rounded-2xl text-center max-w-xs">
-                  ⏳ Mark all settlements as <strong>Paid</strong> before
-                  generating a new bill.
+                  Mark all settlements as Paid before generating a new bill.
                 </div>
               )
             ) : (
               <div className="bg-yellow-50 border border-yellow-300 text-yellow-800 text-sm px-5 py-3 rounded-2xl">
-                🔒 Only the <strong>sheet admin</strong> can generate the bill.
+                Only the sheet admin can generate the bill.
               </div>
             )}
             <button
               className="bg-gray-800 hover:bg-gray-700 text-white font-bold px-8 py-3 rounded-2xl shadow-lg"
               onClick={() => navigate(-1)}
             >
-              + Add More
+              Add More
             </button>
           </div>
           <p className="text-center text-xs text-white mt-4">
-            Download the PDF before generating a new bill.
+            Please ensure the PDF is generated in landscape orientation before
+            creating the new bill.
           </p>
         </div>
       )}

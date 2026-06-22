@@ -107,119 +107,131 @@ const AddAccount = () => {
   return (
     <>
       <ToastContainer />
-      <div className="mx-auto md:w-[50%] border-2 shadow-2xl drop-shadow-2xl text-center py-6">
-        <h1 className="text-3xl font-semibold">
-          {isLogIn ? "Welcome Back" : "Create Account"}
-        </h1>
-        <form>
-          <div className="flex flex-col static w-[80%] mx-auto mt-6">
-            <label className="text-black text-lg font-semibold relative top-2 ml-[7px] px-[3px] bg-[#e8e8e8] w-fit">
-              Email
-            </label>
-            <input
-              name="mail"
-              type="email"
-              ref={mailRef}
-              required
-              placeholder="Enter your email..."
-              className="w-auto rounded-xl focus:outline-none text-black ps-3 py-2 placeholder:text-black bg-slate-400"
-            />
-          </div>
-          <div className="flex flex-col static w-[80%] mx-auto mt-6">
-            <label className="text-black text-lg font-semibold relative top-2 ml-[7px] px-[3px] bg-[#e8e8e8] w-fit">
-              Password
-            </label>
-            <div className="flex justify-between bg-slate-400 text-black items-center pe-3 rounded-xl">
-              <input
-                name="password"
-                type={viewPassword ? "text" : "password"}
-                required
-                onChange={(e) => setPassword(e.target.value)}
-                onFocus={() => setCheckPassword(true)}
-                placeholder="Enter your password..."
-                className="bg-slate-400 rounded-xl focus:outline-none text-black ps-3 py-2 placeholder:text-black w-[95%]"
-              />
-              {!viewPassword ? (
-                <FiEye
-                  className="text-2xl cursor-pointer"
-                  onClick={() => setViewPassword(true)}
-                />
-              ) : (
-                <FiEyeOff
-                  className="text-2xl cursor-pointer"
-                  onClick={() => setViewPassword(false)}
-                />
-              )}
-            </div>
-            {!isLogIn && checkPassword && (
-              <PasswordValidation password={password} />
-            )}
-            {isLogIn && (
-              <span
-                className="text-sm my-2 cursor-pointer"
-                onClick={passwordTypeHandler}
-              >
-                Forgot Password?
-              </span>
-            )}
-          </div>
-          {!isLogIn && (
+      {/* App branding */}
+      <div className="bg-[rgb(33,47,69)] min-h-[90vh]">
+        <div className="mb-6 text-center pt-4">
+          <h1 className="text-4xl font-extrabold text-white tracking-tight">
+            Split<span className="text-blue-500">Expense</span>
+          </h1>
+          <p className="text-gray-400 text-sm mt-1">
+            Track, split, and settle with ease
+          </p>
+        </div>
+        <div className="md:mx-auto mx-2 md:w-[50%] border-2 rounded-lg shadow-2xl drop-shadow-2xl text-center py-6">
+          <h1 className="text-3xl font-semibold">
+            {isLogIn ? "Welcome Back" : "Create Account"}
+          </h1>
+          <form>
             <div className="flex flex-col static w-[80%] mx-auto mt-6">
-              <label className="text-black text-md font-semibold relative top-2 ml-[7px] px-[3px] bg-[#e8e8e8] w-fit">
-                Confirm Password
+              <label className="text-black text-lg font-semibold relative top-2 ml-[7px] px-[3px] bg-[#e8e8e8] w-fit">
+                Email
+              </label>
+              <input
+                name="mail"
+                type="email"
+                ref={mailRef}
+                required
+                placeholder="Enter your email..."
+                className="w-auto rounded-xl focus:outline-none text-black ps-3 py-2 placeholder:text-black bg-slate-400"
+              />
+            </div>
+            <div className="flex flex-col static w-[80%] mx-auto mt-6">
+              <label className="text-black text-lg font-semibold relative top-2 ml-[7px] px-[3px] bg-[#e8e8e8] w-fit">
+                Password
               </label>
               <div className="flex justify-between bg-slate-400 text-black items-center pe-3 rounded-xl">
                 <input
-                  name="confirmPassword"
-                  type={viewConfirmPassword ? "text" : "password"}
+                  name="password"
+                  type={viewPassword ? "text" : "password"}
                   required
-                  ref={confirmPasswordRef}
-                  placeholder="Re-Enter your password..."
+                  onChange={(e) => setPassword(e.target.value)}
+                  onFocus={() => setCheckPassword(true)}
+                  onBlur={() => setCheckPassword(false)}
+                  placeholder="Enter your password..."
                   className="bg-slate-400 rounded-xl focus:outline-none text-black ps-3 py-2 placeholder:text-black w-[95%]"
                 />
-                {!viewConfirmPassword ? (
+                {!viewPassword ? (
                   <FiEye
                     className="text-2xl cursor-pointer"
-                    onClick={() => setViewConfirmPassword(true)}
+                    onClick={() => setViewPassword(true)}
                   />
                 ) : (
                   <FiEyeOff
                     className="text-2xl cursor-pointer"
-                    onClick={() => setViewConfirmPassword(false)}
+                    onClick={() => setViewPassword(false)}
                   />
                 )}
               </div>
+              {!isLogIn && checkPassword && (
+                <PasswordValidation password={password} />
+              )}
+              {isLogIn && (
+                <span
+                  className="text-sm my-2 cursor-pointer"
+                  onClick={passwordTypeHandler}
+                >
+                  Forgot Password?
+                </span>
+              )}
             </div>
-          )}
-          <button
-            className="bg-blue-400 px-6 py-2 rounded-lg my-2 text-slate-900 drop-shadow-2xl shadow-2xl hover:bg-blue-800 hover:text-white"
-            onClick={(event) => formSubmitHandler(event)}
-          >
-            {isLogIn ? "Log In" : "Sign Up"}
-          </button>
-          {isLogIn ? (
-            <p
-              className="mt-2 text-sm font-bold cursor-pointer"
-              onClick={() => setIsLogIn(false)}
+            {!isLogIn && (
+              <div className="flex flex-col static w-[80%] mx-auto mt-6">
+                <label className="text-black text-md font-semibold relative top-2 ml-[7px] px-[3px] bg-[#e8e8e8] w-fit">
+                  Confirm Password
+                </label>
+                <div className="flex justify-between bg-slate-400 text-black items-center pe-3 rounded-xl">
+                  <input
+                    name="confirmPassword"
+                    type={viewConfirmPassword ? "text" : "password"}
+                    required
+                    ref={confirmPasswordRef}
+                    placeholder="Re-Enter your password..."
+                    className="bg-slate-400 rounded-xl focus:outline-none text-black ps-3 py-2 placeholder:text-black w-[95%]"
+                  />
+                  {!viewConfirmPassword ? (
+                    <FiEye
+                      className="text-2xl cursor-pointer"
+                      onClick={() => setViewConfirmPassword(true)}
+                    />
+                  ) : (
+                    <FiEyeOff
+                      className="text-2xl cursor-pointer"
+                      onClick={() => setViewConfirmPassword(false)}
+                    />
+                  )}
+                </div>
+              </div>
+            )}
+            <button
+              className="bg-blue-400 px-6 py-2 rounded-lg my-2 text-slate-900 drop-shadow-2xl shadow-2xl hover:bg-blue-800 hover:text-white"
+              onClick={(event) => formSubmitHandler(event)}
             >
-              New here? Sign Up
-            </p>
-          ) : (
-            <p
-              className="mt-2 text-sm font-bold cursor-pointer"
-              onClick={() => setIsLogIn(true)}
-            >
-              Already have an account? Log In
-            </p>
-          )}
-        </form>
-      </div>
-      <div className="mt-2 flex gap-2 items-center justify-center">
-        <FaCirclePlay
-          className="text-3xl cursor-pointer"
-          onClick={() => setOpenDemo((o) => !o)}
-        />
-        <p>How does it work?</p>
+              {isLogIn ? "Log In" : "Sign Up"}
+            </button>
+            {isLogIn ? (
+              <p
+                className="mt-2 text-sm font-bold cursor-pointer"
+                onClick={() => setIsLogIn(false)}
+              >
+                New here? Sign Up
+              </p>
+            ) : (
+              <p
+                className="mt-2 text-sm font-bold cursor-pointer"
+                onClick={() => setIsLogIn(true)}
+              >
+                Already have an account? Log In
+              </p>
+            )}
+          </form>
+        </div>
+        <div className="mt-2 flex gap-2 items-center justify-center">
+          <FaCirclePlay
+            className="text-3xl cursor-pointer"
+            onClick={() => setOpenDemo((o) => !o)}
+          />
+          <p>How does it work?</p>
+        </div>
       </div>
       {openDemo && <DemoVideo demoVideo={() => setOpenDemo((o) => !o)} />}
       <Footer />

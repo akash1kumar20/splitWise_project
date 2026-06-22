@@ -16,6 +16,8 @@ const SheetDetails = () => {
   const userMail = useSelector((state) => state.expenseSheet.userMail);
   const [displaySheetDetails, setDisplaySheetDetails] = useState(false);
   const [width, setWidth] = useState(window.innerWidth);
+  const sheetType = localStorage.getItem("sp_sheetType") || "split";
+  const isPersonal = sheetType === "personal";
 
   useEffect(() => {
     const handleResize = () => setWidth(window.innerWidth);
@@ -85,22 +87,31 @@ const SheetDetails = () => {
                   <p className="text-sm md:text-lg">
                     Sheet Name: {sheet.sheetName}
                   </p>
-                  {userMail !== sheet.userMail ? (
-                    <p className="text-[14px] md:text-lg">
-                      Admin: <span>{sheet.userMail}</span>
-                    </p>
-                  ) : (
-                    <p className="text-[14px] md:text-lg">
-                      You: <span>{sheet.userMail}</span>
+                  {isPersonal && (
+                    <p className="text-lg text-purple-400 font-semibold mt-1">
+                      Personal Sheet
                     </p>
                   )}
-                  {userMail !== sheet.userMail && <p>You: {userMail}</p>}
-                  <p className="text-sm md:text-lg">
-                    Invitation Code:
-                    <span className="text-md font-semibold underline ps-2">
-                      {sheet.inviationCode}
-                    </span>
-                  </p>
+                  {!isPersonal && (
+                    <>
+                      {userMail !== sheet.userMail ? (
+                        <p className="text-[14px] md:text-lg">
+                          Admin: <span>{sheet.userMail}</span>
+                        </p>
+                      ) : (
+                        <p className="text-[14px] md:text-lg">
+                          You: <span>{sheet.userMail}</span>
+                        </p>
+                      )}
+                      {userMail !== sheet.userMail && <p>You: {userMail}</p>}
+                      <p className="text-sm md:text-lg">
+                        Invitation Code:
+                        <span className="text-md font-semibold underline ps-2">
+                          {sheet.inviationCode}
+                        </span>
+                      </p>{" "}
+                    </>
+                  )}
                 </div>
               )}
             </div>
