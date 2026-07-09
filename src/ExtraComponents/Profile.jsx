@@ -29,7 +29,7 @@ const Profile = () => {
 
   return (
     <>
-      <ToastContainer />
+      <ToastContainer autoClose={2000} />
       <div className="bg-slate-900 w-fit flex flex-col right-2 fixed text-white px-5 mt-1 rounded-lg py-10 border-2 border-slate-400 z-40">
         <span className="text-center font-bold underline text-sm">{userMail}</span>
         <button

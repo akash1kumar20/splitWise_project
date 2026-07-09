@@ -7,16 +7,25 @@ import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 import PasswordValidation from "./PasswordValidation";
 import { useSelector } from "react-redux";
-import { RESET_PASSWORD_URL, UPDATE_PASSWORD_URL } from "../config/firebase";
+import {
+  RESET_PASSWORD_URL,
+  SIGNIN_URL,
+  UPDATE_PASSWORD_URL,
+} from "../config/firebase";
 
 const ChangePassword = () => {
   const navigate = useNavigate();
   const authCtx = useContext(AuthContext);
   const submitPassword = useSelector((state) => state.password.submitPassword);
+  const userMail =
+    useSelector((state) => state.expenseSheet.userMail) ||
+    localStorage.getItem("user-mail");
 
   const mailRef = useRef();
+  const currentPasswordRef = useRef();
   const confirmPasswordRef = useRef();
 
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [enteredPassword, setEnteredPassword] = useState("");
@@ -69,6 +78,7 @@ const ChangePassword = () => {
     }
 
     const confirmPassword = confirmPasswordRef.current.value;
+    const currentPassword = currentPasswordRef.current.value;
 
     if (enteredPassword !== confirmPassword) {
       return toast.warning("Passwords do not match", {
@@ -78,9 +88,23 @@ const ChangePassword = () => {
       });
     }
 
+    if (!userMail) {
+      return toast.error("Please log in again before changing password", {
+        theme: "colored",
+        position: "top-right",
+        autoClose: 2000,
+      });
+    }
+
     try {
+      const verifiedUser = await axios.post(SIGNIN_URL, {
+        email: userMail,
+        password: currentPassword,
+        returnSecureToken: true,
+      });
+
       const res = await axios.post(UPDATE_PASSWORD_URL, {
-        idToken: token,
+        idToken: verifiedUser.data.idToken,
         password: enteredPassword,
         returnSecureToken: true,
       });
@@ -96,11 +120,22 @@ const ChangePassword = () => {
         setTimeout(() => navigate("/"), 2000);
       }
     } catch (err) {
-      toast.error("Please try again", {
-        theme: "colored",
-        position: "top-right",
-        autoClose: 2000,
-      });
+      const errorMessage = err.response?.data?.error?.message;
+      const isWrongCurrentPassword =
+        errorMessage === "INVALID_PASSWORD" ||
+        errorMessage === "INVALID_LOGIN_CREDENTIALS" ||
+        errorMessage === "INVALID_CREDENTIAL";
+
+      toast.error(
+        isWrongCurrentPassword
+          ? "Current password is incorrect"
+          : "Please try again",
+        {
+          theme: "colored",
+          position: "top-right",
+          autoClose: 2000,
+        }
+      );
     }
   }
 
@@ -111,7 +146,7 @@ const ChangePassword = () => {
 
   return (
     <>
-      <ToastContainer />
+      <ToastContainer autoClose={2000} />
       <main className="min-h-screen px-4 py-6 sm:py-10">
         <section className="mx-auto w-full max-w-xl rounded-3xl border border-white/10 bg-gradient-to-br from-slate-600 via-slate-700 to-slate-950 p-5 text-white shadow-[0_25px_80px_rgba(0,0,0,0.28)] sm:p-8 md:p-10">
           <div className="text-center">
@@ -154,6 +189,36 @@ const ChangePassword = () => {
               </div>
             ) : (
               <div className="space-y-4">
+                <label className="block text-left text-sm font-medium text-white/85">
+                  Current password
+                  <div className={`${inputShell} mt-2`}>
+                    <input
+                      name="currentPassword"
+                      type={showCurrentPassword ? "text" : "password"}
+                      required
+                      ref={currentPasswordRef}
+                      placeholder="Enter current password"
+                      className={inputField}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowCurrentPassword((prev) => !prev)}
+                      className="shrink-0 rounded-lg p-1 text-slate-600 transition hover:text-slate-900"
+                      aria-label={
+                        showCurrentPassword
+                          ? "Hide current password"
+                          : "Show current password"
+                      }
+                    >
+                      {showCurrentPassword ? (
+                        <FiEyeOff size={18} />
+                      ) : (
+                        <FiEye size={18} />
+                      )}
+                    </button>
+                  </div>
+                </label>
+
                 <label className="block text-left text-sm font-medium text-white/85">
                   New password
                   <div className={`${inputShell} mt-2`}>

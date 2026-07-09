@@ -50,11 +50,11 @@ const UpdateExpense = () => {
         expenseAdded,
       );
       if (res.status === 200) {
-        toast.success("Expense updated successfully!");
+        toast.success("Expense updated successfully!", { theme: "colored", autoClose: 2000, position: "top-center" });
         setTimeout(() => navigate(`/home/sheets/${sheetCode}`), 1100);
       }
     } catch (err) {
-      toast.error("Update failed. Please try again.");
+      toast.error("Update failed. Please try again.", { theme: "colored", autoClose: 2000, position: "top-center" });
     }
   };
 

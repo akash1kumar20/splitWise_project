@@ -37,7 +37,11 @@ const CreateSheet = () => {
 
     const name = sheetNameRef.current?.value.trim();
     if (!name) {
-      toast.error("Please enter a sheet name");
+      toast.error("Please enter a sheet name", {
+        theme: "colored",
+        autoClose: 2000,
+        position: "top-center",
+      });
       return;
     }
 
@@ -55,7 +59,10 @@ const CreateSheet = () => {
     };
 
     try {
-      await axios.post(`${DB}/${invitationCode}/sheetDetails.json`, sheetDetails);
+      await axios.post(
+        `${DB}/${invitationCode}/sheetDetails.json`,
+        sheetDetails,
+      );
       await axios.post(`${DB}/${changeEmail}/sheets.json`, sheetDetails);
       await axios.post(`${DB}/${invitationCode}/members.json`, {
         convertedMail: changeEmail,
@@ -70,13 +77,18 @@ const CreateSheet = () => {
       window.dispatchEvent(new Event("sheetCreated"));
 
       toast.success("Sheet created!", {
-        position: "center",
+        theme: "colored",
         autoClose: 1000,
+        position: "top-center",
       });
 
-      setTimeout(() => navigate("/home/sheets"), 1000);
+      setTimeout(() => navigate("/home/sheets"), 2000);
     } catch (error) {
-      toast.error("Something went wrong. Please try again.");
+      toast.error("Something went wrong. Please try again.", {
+        theme: "colored",
+        autoClose: 2000,
+        position: "top-center",
+      });
       setIsLoading(false);
     }
   };
@@ -118,7 +130,10 @@ const CreateSheet = () => {
                 : "Track your own expenses privately without sharing."}
             </div>
 
-            <form onSubmit={formSubmitHandler} className="mt-6 flex flex-col gap-4">
+            <form
+              onSubmit={formSubmitHandler}
+              className="mt-6 flex flex-col gap-4"
+            >
               <div>
                 <label
                   htmlFor="sheetName"
@@ -141,9 +156,7 @@ const CreateSheet = () => {
                 type="submit"
                 disabled={isLoading}
                 className={`w-full rounded-xl px-4 py-3.5 text-sm font-bold text-white transition-all duration-200 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70 ${
-                  isLoading
-                    ? "bg-slate-600"
-                    : sheetModes[sheetType].accent
+                  isLoading ? "bg-slate-600" : sheetModes[sheetType].accent
                 }`}
               >
                 {isLoading ? "Creating..." : sheetModes[sheetType].action}

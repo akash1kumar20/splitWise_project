@@ -31,7 +31,16 @@ const getMonthYear = (dateStr) => {
 // does not support Unicode U+20B9 and renders it as "1"
 const R = "Rs.";
 
-const generatePDF = async (bill, sheetAdmin, billIndex) => {
+const totalContributed = (item) => {
+  if (typeof item.finalAmount === "number") return item.finalAmount;
+  return (
+    (Number(item.userAmount) || 0) +
+    (Number(item.userRelatedAmtVal) || 0) -
+    (Number(item.relatedToAmtVal) || 0)
+  );
+};
+
+const generatePDF = async (bill, sheetAdmin, billIndex, currentSheetMeta) => {
   try {
     const { jsPDF } = await import("jspdf");
     const { default: autoTable } = await import("jspdf-autotable");
@@ -39,44 +48,66 @@ const generatePDF = async (bill, sheetAdmin, billIndex) => {
     const pageWidth = doc.internal.pageSize.getWidth();
     const generatedOn =
       bill.generatedAt || decodeFirebaseDate(bill.id) || "N/A";
+    const sheetName =
+      bill.sheetName || currentSheetMeta.sheetName || "Not recorded";
+    const sheetType = bill.sheetType || currentSheetMeta.sheetType || "split";
+    const isPersonal = sheetType === "personal";
 
     doc.setFontSize(18);
     doc.setFont("helvetica", "bold");
-    doc.text("Split Expense - Bill Summary", pageWidth / 2, 18, {
-      align: "center",
-    });
+    doc.text(
+      isPersonal ? "Personal Bill Summary" : "Split Expense - Bill Summary",
+      pageWidth / 2,
+      18,
+      {
+        align: "center",
+      },
+    );
 
     doc.setFontSize(11);
     doc.setFont("helvetica", "normal");
-    doc.text(`Bill #${billIndex + 1}`, 14, 30);
-    doc.text(`Admin: ${sheetAdmin}`, 14, 37);
+    let y = 30;
+    doc.text(`Bill #${billIndex + 1}`, 14, y);
+    y += 7;
+    doc.text(`Sheet Name: ${sheetName}`, 14, y);
+    y += 7;
+    doc.text(`Sheet Type: ${isPersonal ? "Personal" : "Split"}`, 14, y);
+    y += 7;
+    doc.text(`Admin: ${sheetAdmin}`, 14, y);
+    y += 7;
     doc.text(
       `Time Frame: ${bill.startingDate || "Not recorded"} - ${bill.endingDate || "Not recorded"}`,
       14,
-      44,
+      y,
     );
-    doc.text(`Generated On: ${generatedOn}`, 14, 51);
+    y += 7;
+    doc.text(`Generated On: ${generatedOn}`, 14, y);
+    y += 7;
     doc.text(
       `Total (incl. F&L): ${R}${(bill.totalAmount || 0) + (bill.relatedMoneyTtl || 0)}`,
       14,
-      58,
+      y,
     );
-    doc.text(`Direct Expenses: ${R}${bill.totalAmount || 0}`, 14, 65);
-    let y = 72;
+    y += 7;
+    doc.text(`Direct Expenses: ${R}${bill.totalAmount || 0}`, 14, y);
+    y += 7;
     if (bill.relatedMoneyTtl > 0) {
       doc.text(`F&L Amount: ${R}${bill.relatedMoneyTtl}`, 14, y);
       y += 7;
     }
-    doc.text(`Total Users: ${bill.totalUsers}`, 14, y);
-    y += 7;
-    doc.text(
-      `Per Head (excl. F&L): ${R}${(bill.totalAmount / bill.totalUsers).toFixed(2)}`,
-      14,
-      y,
-    );
+    if (!isPersonal) {
+      doc.text(`Total Users: ${bill.totalUsers}`, 14, y);
+      y += 7;
+      doc.text(
+        `Per Head (excl. F&L): ${R}${(bill.totalAmount / bill.totalUsers).toFixed(2)}`,
+        14,
+        y,
+      );
+      y += 7;
+    }
 
     autoTable(doc, {
-      startY: y + 10,
+      startY: y + 5,
       head: [
         [
           "User",
@@ -91,7 +122,7 @@ const generatePDF = async (bill, sheetAdmin, billIndex) => {
         `${R}${item.userAmount || 0}`,
         item.userRelatedAmtVal > 0 ? `${R}${item.userRelatedAmtVal}` : "-",
         item.relatedToAmtVal > 0 ? `${R}${item.relatedToAmtVal}` : "-",
-        `${R}${(item.userAmount || 0) + (item.userRelatedAmtVal || 0)}`,
+        `${R}${totalContributed(item)}`,
       ]),
       styles: { fontSize: 10 },
       headStyles: { fillColor: [55, 65, 81] },
@@ -107,6 +138,10 @@ const PreviousBill = () => {
   const code = useSelector((s) => s.expenseSheet.inviteCode);
   const { isAdmin, sheetAdmin } = useAdminStatus();
   const navigate = useNavigate();
+  const currentSheetMeta = {
+    sheetName: localStorage.getItem("sp_sheetName") || "",
+    sheetType: localStorage.getItem("sp_sheetType") || "split",
+  };
   const [comingData, isLoading] = useFetchDataHook(
     `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${code}/previousBills.json`,
   );
@@ -159,7 +194,9 @@ const PreviousBill = () => {
                 {isAdmin && (
                   <button
                     className="bg-gray-800 hover:bg-gray-700 text-white text-xs px-2 py-1.5 rounded-xl whitespace-nowrap"
-                    onClick={() => generatePDF(data, sheetAdmin, i)}
+                    onClick={() =>
+                      generatePDF(data, sheetAdmin, i, currentSheetMeta)
+                    }
                   >
                     Download PDF
                   </button>

@@ -6,11 +6,13 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { EXPENSE_CATEGORIES } from "../config/constants";
 
-const OtherExpense = () => {
+const FavoursAndLendingUpdate = () => {
   const inviteCode = useSelector((state) => state.expenseSheet.inviteCode);
   const [comingData, isLoading] = useFetchDataHook(
     `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${inviteCode}/usersList.json`,
+    5000, // poll every 5s — other users' additions appear automatically
   );
   const navigate = useNavigate();
   const sheetCode = useSelector((state) => state.expenseSheet.sheetCode);
@@ -33,7 +35,11 @@ const OtherExpense = () => {
     const expenseRel = event.target.expenseRel.value;
     const relatedPayBy = event.target.relatedPayBy.value;
     if (relatedPayBy === expenseRel) {
-      alert("Both users can not be same");
+      toast.warning("Both users cannot be the same!", {
+        theme: "colored",
+        autoClose: 2000,
+        position: "top-center",
+      });
       return;
     }
 
@@ -57,17 +63,25 @@ const OtherExpense = () => {
         objToStore,
       );
       if (res.status === 200) {
-        toast.success("Updated Successfully");
-        setTimeout(() => navigate(`/home/sheets/${sheetCode}`), 1200);
+        toast.success("Updated Successfully", {
+          theme: "colored",
+          autoClose: 2000,
+          position: "top-center",
+        });
+        setTimeout(() => navigate(`/home/sheets/${sheetCode}`), 2200);
       }
     } catch (err) {
-      toast.error("Try Again!");
+      toast.error("Try Again!", {
+        theme: "colored",
+        autoClose: 2000,
+        position: "top-center",
+      });
     }
   }
 
   return (
     <>
-      <ToastContainer />
+      <ToastContainer autoClose={2000} />
       {isLoading ? (
         <Loading />
       ) : (
@@ -106,14 +120,7 @@ const OtherExpense = () => {
                     name: "expenseCategory",
                     val: toEdit.category,
                     type: "select",
-                    options: [
-                      "Food & Drinks",
-                      "Household Items",
-                      "Transport & Vehicle",
-                      "Shopping",
-                      "Life & Entertainment",
-                      "Housing",
-                    ],
+                    options: EXPENSE_CATEGORIES,
                   },
                   {
                     label: "Amount",
@@ -193,4 +200,4 @@ const OtherExpense = () => {
   );
 };
 
-export default OtherExpense;
+export default FavoursAndLendingUpdate;

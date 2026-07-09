@@ -47,7 +47,7 @@ const DeleteUser = () => {
 
   return (
     <div className="min-h-screen bg-[rgba(154,140,152,0.8)]">
-      <ToastContainer />
+      <ToastContainer autoClose={2000} />
 
       {/* Confirmation modal */}
       {pendingDelete && (

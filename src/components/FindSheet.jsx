@@ -4,6 +4,8 @@ import axios from "axios";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { expenseSheetActions } from "../../store/expenseSheetSlice";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const FindSheet = () => {
   const codeRef = useRef();
@@ -17,7 +19,8 @@ const FindSheet = () => {
         `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${invitationCode}/sheetDetails.json`
       );
       if (res.data === null) {
-        return alert("No Sheet found");
+        toast.warning("No sheet found. Please check the invitation code.", { theme: "colored", autoClose: 2500, position: "top-center" });
+        return;
       }
       let dataArr = [];
       for (let key in res.data) {
@@ -32,7 +35,9 @@ const FindSheet = () => {
     }
   }
   return (
-    <CardComponent>
+    <>
+      <ToastContainer autoClose={2000} />
+      <CardComponent>
       <h2 className="text-xl font-semibold">Find Sheet</h2>
       <form className="mt-4" onSubmit={(event) => findSheetHandler(event)}>
         <input
@@ -48,6 +53,7 @@ const FindSheet = () => {
         </button>
       </form>
     </CardComponent>
+    </>
   );
 };
 

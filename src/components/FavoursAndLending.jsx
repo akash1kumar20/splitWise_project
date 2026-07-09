@@ -4,13 +4,16 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { EXPENSE_CATEGORIES } from "../config/constants";
 import useFetchDataHook from "../customHooks/useFetchDataHook";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const FavoursAndLending = () => {
   const code = useSelector((s) => s.expenseSheet.inviteCode);
   const navigate = useNavigate();
   const url = `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${code}`;
-  const [comingData] = useFetchDataHook(`${url}/usersList.json`);
+  const [comingData] = useFetchDataHook(`${url}/usersList.json`, 5000);
   const [successStatus, setSuccessStatus] = useState(false);
+  const sheetCode = useSelector((state) => state.expenseSheet.sheetCode);
 
   const relatedAmountRef = useRef();
   const categoryRef = useRef();
@@ -23,13 +26,18 @@ const FavoursAndLending = () => {
     e.preventDefault();
     const date = new Date().toLocaleDateString();
     if (expenseRelatedTo === expensePayByUser) {
-      alert("Both users can not be same");
+      // ✅ FIX: Replaced alert() with toast — consistent with rest of app
+      toast.warning("Both users cannot be the same!", {
+        position: "top-center",
+        theme: "colored",
+        autoClose: 2000,
+      });
       return;
     }
     const objToStore = {
       date,
-      user: expenseRelatedTo,
-      relatedTo: expensePayByUser,
+      user: expensePayByUser, // ✅ who paid
+      relatedTo: expenseRelatedTo, // ✅ beneficiary
       category: categoryRef.current.value,
       relatedAmtVal: relatedAmountRef.current.value,
       amount: 0,
@@ -44,15 +52,23 @@ const FavoursAndLending = () => {
         e.target.reset();
         setExpenseRelatedTo("");
         setExpensePayByUser("");
-        setTimeout(() => setSuccessStatus(false), 2000);
+        setTimeout(() => {
+          setSuccessStatus(false);
+          navigate(`/home/sheets/${sheetCode}`);
+        }, 2000);
       }
     } catch {
-      alert("Something went wrong. Please try again.");
+      toast.error("Something went wrong. Please try again.", {
+        position: "top-center",
+        theme: "colored",
+        autoClose: 2000,
+      });
     }
   };
 
   return (
     <div className=" bg-[rgb(233,237,201)] min-h-[100vh]  ">
+      <ToastContainer autoClose={2000} />
       <div className="bg-[rgba(100,116,139,0.3)] flex flex-col items-center py-6 md:px-4 min-h-[100vh]">
         <div className="flex items-center justify-between w-[96%] max-w-lg mb-4 border-2 border-[rgba(100,116,139,0.5)] py-2 px-4 shadow-lg drop-shadow-xl mx-auto rounded-md">
           <button

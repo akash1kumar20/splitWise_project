@@ -106,7 +106,7 @@ const AddAccount = () => {
 
   return (
     <>
-      <ToastContainer />
+      <ToastContainer autoClose={2000} />
       {/* App branding */}
       <div className="bg-[rgb(33,47,69)] min-h-[90vh]">
         <div className="mb-6 text-center pt-4">

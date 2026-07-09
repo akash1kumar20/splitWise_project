@@ -15,6 +15,7 @@ const CreateExpenseParent = ({ onExpenseAdded }) => {
 
   const [comingData, isLoading, , refetch] = useFetchDataHook(
     `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${inviteCode}/usersList.json`,
+    5000, // poll every 5s — other users' additions appear automatically
   );
 
   const navigate = useNavigate();
@@ -54,16 +55,20 @@ const CreateExpenseParent = ({ onExpenseAdded }) => {
           )}
 
           {!isPersonal && !addUser && (
-            <div className="flex gap-x-3 md:pl-[72px] pl-10">
+            <div
+              className={`flex flex-nowrap items-center gap-3 ${
+                comingData.length > 0 ? "mx-auto w-full max-w-[80%]" : "w-full"
+              }`}
+            >
               <p
-                className="text-blue-400 font-bold cursor-pointer mt-2 w-fit border-2 border-blue-600 rounded-lg px-1"
+                className="mt-2 w-fit cursor-pointer whitespace-nowrap rounded-lg border-2 border-blue-600 px-1 text-sm font-bold text-blue-400"
                 onClick={() => setAddUser(true)}
               >
                 Add users
               </p>
               {comingData.length > 1 && (
                 <p
-                  className="text-blue-400 font-bold cursor-pointer mt-2 w-fit border-2 border-blue-600 rounded-lg px-1 "
+                  className="mt-2 w-fit cursor-pointer whitespace-nowrap rounded-lg border-2 border-blue-600 px-1 text-sm font-bold text-blue-400"
                   onClick={() =>
                     navigate(`/home/sheets/${sheetCode}/otherExpense`)
                   }

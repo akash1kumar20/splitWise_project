@@ -8,6 +8,8 @@ import { expenseSheetActions } from "../../store/expenseSheetSlice";
 import useFetchDataHook from "../customHooks/useFetchDataHook";
 import Loading from "../ExtraComponents/Loading";
 import { useState, useEffect } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const DB = "https://splitwiseapp-82dbf-default-rtdb.firebaseio.com";
 
@@ -43,6 +45,7 @@ const SheetPresents = () => {
     dispatch(expenseSheetActions.setSheetAdmin(sheet.userMail));
     localStorage.setItem("sp_sheetType", sheet.sheetType || "split");
     localStorage.setItem("sp_sheetAdmin", sheet.userMail);
+    localStorage.setItem("sp_sheetName", sheet.sheetName);
     navigate(`/home/sheets/${sheet.code}`);
   };
 
@@ -98,23 +101,39 @@ const SheetPresents = () => {
             `${DB}/${sheet.inviationCode}/members.json`,
           );
           if (membersRes.data) {
-            for (let key in membersRes.data) {
-              const mem = membersRes.data[key].convertedMail;
-              if (mem === changeEmail) continue;
-              try {
-                const sr = await axios.get(`${DB}/${mem}/sheets.json`);
-                for (let sk in sr.data)
-                  if (sr.data[sk].inviationCode === sheet.inviationCode)
-                    await axios.delete(`${DB}/${mem}/sheets/${sk}.json`);
-              } catch (_) {}
-            }
+            // ✅ FIX: Fetch all member sheet lists in parallel, then delete in parallel.
+            // Old pattern: sequential for...in with await = O(n) serial API calls.
+            // New pattern: Promise.all = all deletes fire simultaneously.
+            const otherMembers = Object.values(membersRes.data)
+              .map((m) => m.convertedMail)
+              .filter((mem) => mem !== changeEmail);
+
+            await Promise.all(
+              otherMembers.map(async (mem) => {
+                try {
+                  const sr = await axios.get(`${DB}/${mem}/sheets.json`);
+                  const matchingKeys = Object.entries(sr.data || {})
+                    .filter(([, s]) => s.inviationCode === sheet.inviationCode)
+                    .map(([sk]) => sk);
+                  await Promise.all(
+                    matchingKeys.map((sk) =>
+                      axios.delete(`${DB}/${mem}/sheets/${sk}.json`),
+                    ),
+                  );
+                } catch (_) {}
+              }),
+            );
           }
         } catch (_) {}
         await axios.delete(`${DB}/${sheet.inviationCode}.json`);
       }
       setDeletedIds((p) => [...p, sheet.id]);
     } catch {
-      alert("Could not delete sheet. Please try again.");
+      toast.error("Could not delete sheet. Please try again.", {
+        theme: "colored",
+        autoClose: 2000,
+        position: "top-center",
+      });
     }
   };
 
@@ -122,6 +141,7 @@ const SheetPresents = () => {
 
   return (
     <>
+      <ToastContainer autoClose={1000} />
       {blockedDelete && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
           <div className="bg-white text-black rounded-2xl p-6 mx-4 max-w-sm w-full text-center shadow-2xl">
@@ -202,10 +222,10 @@ const SheetPresents = () => {
                   className="text-xl p-6 rounded-full bg-gray-600 border-2 border-gray-500 shadow-xl cursor-pointer text-white"
                   onClick={() => openSheet(sheet)}
                 >
-                  {sheet.sheetName.substring(0, 4)}...
+                  {sheet.sheetName.substring(0, 4).toUpperCase()}...
                 </p>
                 <span className="text-sm font-semibold shadow-lg">
-                  {sheet.sheetName}
+                  {sheet.sheetName.toUpperCase()}
                 </span>
                 {sheet.sheetType === "personal" ? (
                   <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-600 text-white">

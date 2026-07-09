@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import useFetchDataHook from "../customHooks/useFetchDataHook";
 import Loading from "../ExtraComponents/Loading";
@@ -9,10 +9,36 @@ import TableBody from "../ExtraComponents/TableBody";
 import axios from "axios";
 import HowCalculate from "../ExtraComponents/HowCalculate";
 import useAdminStatus from "../customHooks/useAdminStatus";
-import { expenseSheetActions } from "../../store/expenseSheetSlice";
+import { toast } from "react-toastify";
+
 import GeneratedBillDetails from "../OthersOptions/GeneratedBillDetails";
 
 const sKey = (s) => `${s.from}__${s.to}`;
+
+const formatAmount = (amount) => `Rs.${Math.abs(Number(amount) || 0)}`;
+
+const calcDirectFandLSettlements = (expenseData) => {
+  const pairMap = new Map();
+
+  expenseData.forEach((item) => {
+    const amount = Number(item.relatedAmtVal) || 0;
+    if (!item.relatedAmount || amount <= 0 || !item.user || !item.relatedTo) {
+      return;
+    }
+
+    const key = `${item.relatedTo}__${item.user}`;
+    const existing = pairMap.get(key) || {
+      from: item.relatedTo,
+      to: item.user,
+      amount: 0,
+    };
+
+    existing.amount = parseFloat((existing.amount + amount).toFixed(2));
+    pairMap.set(key, existing);
+  });
+
+  return Array.from(pairMap.values());
+};
 
 const calcSettlements = (resultData, totalAmt, userCount) => {
   if (!resultData.length || !userCount) return [];
@@ -48,7 +74,6 @@ const calcSettlements = (resultData, totalAmt, userCount) => {
 };
 
 const GeneratedBill = () => {
-  const dispatch = useDispatch();
   const token = useSelector((s) => s.expenseSheet.token);
   const navigate = useNavigate();
   const details = useRef();
@@ -59,6 +84,11 @@ const GeneratedBill = () => {
   }
 
   const sheetCode = useSelector((s) => s.expenseSheet.sheetCode);
+  const sheetName =
+    localStorage.getItem("sp_sheetName") ||
+    sheetCode ||
+    localStorage.getItem("sp_sheetCode") ||
+    "-";
   const code =
     useSelector((s) => s.expenseSheet.inviteCode) ||
     localStorage.getItem("sp_inviteCode") ||
@@ -69,36 +99,12 @@ const GeneratedBill = () => {
     localStorage.getItem("sp_userMail") ||
     "";
 
-  const { isAdmin: isAdminHook } = useAdminStatus();
-  const [sheetAdminResolved, setSheetAdminResolved] = useState(
-    localStorage.getItem("sp_sheetAdmin") || "",
-  );
-  const isAdmin =
-    isAdminHook ||
-    (!!userMail && !!sheetAdminResolved && userMail === sheetAdminResolved);
-
-  useEffect(() => {
-    const local = localStorage.getItem("sp_sheetAdmin");
-    if (local) {
-      setSheetAdminResolved(local);
-      return;
-    }
-    if (!code) return;
-    axios
-      .get(`${urlKey}/sheetDetails.json`)
-      .then((res) => {
-        if (res.data) {
-          const firstKey = Object.keys(res.data)[0];
-          const admin = res.data[firstKey]?.userMail;
-          if (admin) {
-            setSheetAdminResolved(admin);
-            localStorage.setItem("sp_sheetAdmin", admin);
-            dispatch(expenseSheetActions.setSheetAdmin(admin));
-          }
-        }
-      })
-      .catch(() => {});
-  }, [code]);
+  // ✅ FIX: Removed redundant sheetAdminResolved state + manual isAdmin fallback.
+  // useAdminStatus already reads from Redux AND localStorage synchronously,
+  // so there is no timing gap. The Firebase fetch fallback lives in SingleSheet
+  // which always mounts before GeneratedBill in normal navigation flow.
+  // For direct URL navigation, SingleSheet's useEffect handles the fetch.
+  const { isAdmin } = useAdminStatus();
 
   useEffect(() => {
     if (!token) navigate("/");
@@ -194,9 +200,21 @@ const GeneratedBill = () => {
   const [settlements, setSettlements] = useState(null);
   useEffect(() => {
     if (!isLoading && !usersLoading && users.length > 0) {
-      setSettlements(calcSettlements(result, totalAmount, users.length));
+      if (totalAmount === 0 && relatedMoneyTtl > 0) {
+        setSettlements(calcDirectFandLSettlements(comingData));
+      } else {
+        setSettlements(calcSettlements(result, totalAmount, users.length));
+      }
     }
-  }, [result, users, isLoading, usersLoading, totalAmount]);
+  }, [
+    comingData,
+    result,
+    users,
+    isLoading,
+    usersLoading,
+    totalAmount,
+    relatedMoneyTtl,
+  ]);
 
   const [paidMap, setPaidMap] = useState({});
   useEffect(() => {
@@ -243,6 +261,8 @@ const GeneratedBill = () => {
         generatedBy: userMail,
         totalUsers: users.length,
         data: result,
+        sheetName,
+        sheetType,
         startingDate,
         endingDate,
         generatedAt: today,
@@ -253,7 +273,7 @@ const GeneratedBill = () => {
         navigate(`/home/sheets/${sheetCode}`);
       }
     } catch {
-      alert("Something went wrong. Please try again.");
+      toast.error("Something went wrong. Please try again.", { theme: "colored", autoClose: 2000, position: "top-center" });
     }
   };
 
@@ -312,6 +332,15 @@ const GeneratedBill = () => {
       {!isLoading && comingData.length > 0 && (
         <div className="max-w-3xl mx-auto px-4 pb-12 pt-6">
           <div ref={details}>
+            <div className="bg-white rounded-2xl shadow border border-gray-100 p-5 mb-4 text-center">
+              <h2 className="text-lg font-extrabold text-gray-900">
+                {isPersonal ? "Personal Bill Summary" : "Split Bill Summary"}
+              </h2>
+              <p className="mt-1 text-sm font-semibold text-gray-500">
+                Sheet Name: {sheetName}
+              </p>
+            </div>
+
             <div className="hidden md:block bg-white rounded-2xl shadow border border-gray-100 p-4 mb-4">
               <TableHead />
               <TableBody comingData={comingData} />
@@ -413,8 +442,14 @@ const GeneratedBill = () => {
                             ? `Rs.${item.relatedToAmtVal}`
                             : "-"}
                         </td>
-                        <td className="py-2 text-right font-bold">
-                          Rs.{item.userAmount + item.userRelatedAmtVal}
+                        <td
+                          className={`py-2 text-right font-bold ${
+                            item.finalAmount < 0
+                              ? "text-red-500"
+                              : "text-green-600"
+                          }`}
+                        >
+                          {formatAmount(item.finalAmount)}
                         </td>
                       </tr>
                     ))}

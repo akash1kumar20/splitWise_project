@@ -67,7 +67,7 @@ const SingleSheet = () => {
 
   return (
     <div>
-      <ToastContainer />
+      <ToastContainer autoClose={2000} />
       <Navbar openProfile={() => setOpenProfile((p) => !p)} />
       {openProfile && <Profile />}
       {showCylinder && <OtherOptions />}

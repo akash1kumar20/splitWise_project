@@ -3,6 +3,8 @@ import { useSelector } from "react-redux";
 import CardComponent from "../Card/CardComponent";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const FoundSheet = () => {
   const [data, setData] = useState([]);
@@ -36,12 +38,14 @@ const FoundSheet = () => {
         navigate("/home/sheets");
       }
     } catch (err) {
-      alert(err);
+      toast.error("Could not join sheet. Please check the code and try again.", { theme: "colored", autoClose: 2500, position: "top-center" });
     }
   }
 
   return (
-    <CardComponent>
+    <>
+      <ToastContainer autoClose={2000} />
+      <CardComponent>
       {data.map((sheetData) => (
         <div className="px-4 text-xl font-bold" key={sheetData.id}>
           <p>
@@ -65,6 +69,7 @@ const FoundSheet = () => {
         </div>
       ))}
     </CardComponent>
+    </>
   );
 };
 
