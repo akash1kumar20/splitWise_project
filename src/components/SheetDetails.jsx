@@ -83,7 +83,7 @@ const SheetDetails = () => {
                 )}
               </div>
               {displaySheetDetails && (
-                <div>
+                <div className="pl-4 md:pl-0">
                   <p className="text-sm md:text-lg">
                     Sheet Name: {sheet.sheetName}
                   </p>
@@ -116,7 +116,7 @@ const SheetDetails = () => {
               )}
             </div>
           ))}
-          <div className="flex lg:flex-col flex-row md:gap-x-3 gap-x-[6px] text-end">
+          <div className="flex lg:flex-col flex-row md:gap-x-3 gap-x-[6px] text-end pl-4 md:pl-0">
             <p className="text-sm md:text-lg">{time.toDateString()}</p>
             <p className="text-sm md:text-lg">{time.toLocaleTimeString()}</p>
             <p className="text-sm md:text-lg leading-snug">{greetings}</p>
