@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { RxCross2 } from "react-icons/rx";
 import { useNavigate } from "react-router-dom";
 
 const WrongURL = () => {
   const [counter, setCounter] = useState(5);
   const navigate = useNavigate();
-  setInterval(() => {
-    setCounter(counter - 1);
-  }, 1000);
+  useEffect(() => {
+    const id = setInterval(() => setCounter((c) => c - 1), 1000);
+    return () => clearInterval(id);
+  }, []);
   useEffect(() => {
     setTimeout(() => {
       navigate("/home");

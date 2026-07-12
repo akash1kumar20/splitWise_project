@@ -3,6 +3,8 @@ import useFetchDataHook from "../customHooks/useFetchDataHook";
 import { useNavigate } from "react-router-dom";
 import Loading from "../ExtraComponents/Loading";
 import useAdminStatus from "../customHooks/useAdminStatus";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const PUSH_CHARS =
   "-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_";
@@ -130,7 +132,14 @@ const generatePDF = async (bill, sheetAdmin, billIndex, currentSheetMeta) => {
 
     doc.save(`bill-${billIndex + 1}-${generatedOn}.pdf`);
   } catch {
-    alert("Run: npm install jspdf jspdf-autotable");
+    toast.error(
+      "PDF library not found. Run: npm install jspdf jspdf-autotable",
+      {
+        theme: "colored",
+        autoClose: 4000,
+        position: "top-center",
+      },
+    );
   }
 };
 
@@ -148,6 +157,7 @@ const PreviousBill = () => {
 
   return (
     <div className="min-h-screen bg-[rgb(56,102,65)] pb-10">
+      <ToastContainer autoClose={4000} />
       <div className="bg-white shadow-sm border-b px-4 py-3 sticky top-0">
         <div className="flex items-center justify-between">
           <button

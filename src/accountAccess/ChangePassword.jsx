@@ -19,7 +19,7 @@ const ChangePassword = () => {
   const submitPassword = useSelector((state) => state.password.submitPassword);
   const userMail =
     useSelector((state) => state.expenseSheet.userMail) ||
-    localStorage.getItem("user-mail");
+    localStorage.getItem("sp_userMail");
 
   const mailRef = useRef();
   const currentPasswordRef = useRef();
@@ -134,7 +134,7 @@ const ChangePassword = () => {
           theme: "colored",
           position: "top-right",
           autoClose: 2000,
-        }
+        },
       );
     }
   }

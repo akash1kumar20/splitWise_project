@@ -39,7 +39,7 @@ const CreateSheet = () => {
     if (!name) {
       toast.error("Please enter a sheet name", {
         theme: "colored",
-        autoClose: 2000,
+        autoClose: 1000,
         position: "top-center",
       });
       return;
@@ -76,17 +76,19 @@ const CreateSheet = () => {
 
       window.dispatchEvent(new Event("sheetCreated"));
 
+      // ✅ onClose fires when the toast fully finishes (including animation)
+      // Navigation happens at that exact moment — global store is clean,
+      // SheetPresents won't pick up any orphaned toast.
       toast.success("Sheet created!", {
         theme: "colored",
-        autoClose: 1000,
+        autoClose: 1500,
         position: "top-center",
+        onClose: () => navigate("/home/sheets"),
       });
-
-      setTimeout(() => navigate("/home/sheets"), 2000);
     } catch (error) {
       toast.error("Something went wrong. Please try again.", {
         theme: "colored",
-        autoClose: 2000,
+        autoClose: 1000,
         position: "top-center",
       });
       setIsLoading(false);

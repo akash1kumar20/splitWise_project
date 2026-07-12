@@ -25,7 +25,9 @@ const SheetPresents = () => {
   );
 
   useEffect(() => {
-    const h = () => refetch();
+    const h = () => {
+      refetch();
+    };
     window.addEventListener("sheetCreated", h);
     return () => window.removeEventListener("sheetCreated", h);
   }, [refetch]);
@@ -101,9 +103,6 @@ const SheetPresents = () => {
             `${DB}/${sheet.inviationCode}/members.json`,
           );
           if (membersRes.data) {
-            // ✅ FIX: Fetch all member sheet lists in parallel, then delete in parallel.
-            // Old pattern: sequential for...in with await = O(n) serial API calls.
-            // New pattern: Promise.all = all deletes fire simultaneously.
             const otherMembers = Object.values(membersRes.data)
               .map((m) => m.convertedMail)
               .filter((mem) => mem !== changeEmail);
@@ -127,9 +126,18 @@ const SheetPresents = () => {
         } catch (_) {}
         await axios.delete(`${DB}/${sheet.inviationCode}.json`);
       }
+      // ✅ Fire toast BEFORE setDeletedIds so re-render doesn't
+      // interfere with toast rendering
+      toast.error("Sheet deleted.", {
+        containerId: "sheets",
+        theme: "colored",
+        autoClose: 2000,
+        position: "top-center",
+      });
       setDeletedIds((p) => [...p, sheet.id]);
     } catch {
       toast.error("Could not delete sheet. Please try again.", {
+        containerId: "sheets",
         theme: "colored",
         autoClose: 2000,
         position: "top-center",
@@ -141,7 +149,7 @@ const SheetPresents = () => {
 
   return (
     <>
-      <ToastContainer autoClose={1000} />
+      <ToastContainer containerId="sheets" autoClose={2000} position="top-center" />
       {blockedDelete && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
           <div className="bg-white text-black rounded-2xl p-6 mx-4 max-w-sm w-full text-center shadow-2xl">
