@@ -3,6 +3,7 @@ import { useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { EXPENSE_CATEGORIES } from "../config/constants";
+import { FIREBASE_DB_URL } from "../config/firebase";
 
 const CreateExpense = ({ users, onExpenseAdded }) => {
   const [formKey, setFormKey] = useState(0);
@@ -30,7 +31,7 @@ const CreateExpense = ({ users, onExpenseAdded }) => {
 
     try {
       const res = await axios.post(
-        `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${inviteCode}/expenseSheet.json`,
+        `${FIREBASE_DB_URL}/${inviteCode}/expenseSheet.json`,
         expenseAdded,
       );
 

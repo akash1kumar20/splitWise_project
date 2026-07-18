@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import ForLargerScreen from "./ForLargerScreen";
 import ForSmallerScreen from "./ForSmallerScreen";
 import useAdminStatus from "../customHooks/useAdminStatus";
+import { FIREBASE_DB_URL } from "../config/firebase";
 
 // ✅ Fix 8: Export expenses to CSV
 const exportToCSV = (comingData) => {
@@ -45,7 +46,7 @@ const exportToCSV = (comingData) => {
 
 const DisplayExpense = ({ expenseTrigger }) => {
   const inviteCode = useSelector((state) => state.expenseSheet.inviteCode);
-  const url = `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${inviteCode}/expenseSheet`;
+  const url = `${FIREBASE_DB_URL}/${inviteCode}/expenseSheet`;
   const [comingData, isLoading, , refetch] = useFetchDataHook(
     `${url}.json`,
     5000,
@@ -115,7 +116,7 @@ const DisplayExpense = ({ expenseTrigger }) => {
     const fetchData = async () => {
       try {
         const res = await axios.get(
-          `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${inviteCode}/previousBills.json`,
+          `${FIREBASE_DB_URL}/${inviteCode}/previousBills.json`,
         );
         let resArr = [];
         for (let key in res.data) resArr.push({ ...res.data[key] });
