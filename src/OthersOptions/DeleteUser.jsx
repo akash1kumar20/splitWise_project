@@ -8,6 +8,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Loading from "../ExtraComponents/Loading";
 import useAdminStatus from "../customHooks/useAdminStatus";
+import { FIREBASE_DB_URL } from "../config/firebase";
 
 const DeleteUser = () => {
   const token = useSelector((s) => s.expenseSheet.token);
@@ -19,7 +20,7 @@ const DeleteUser = () => {
   }, []);
 
   const code = useSelector((s) => s.expenseSheet.inviteCode);
-  const urlKey = `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${code}/usersList`;
+  const urlKey = `${FIREBASE_DB_URL}/${code}/usersList`;
   const [comingData, isLoading, , refetch] = useFetchDataHook(`${urlKey}.json`);
   const [pendingDelete, setPendingDelete] = useState(null);
 

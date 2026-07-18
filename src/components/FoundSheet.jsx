@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { FIREBASE_DB_URL } from "../config/firebase";
 
 const FoundSheet = () => {
   const [data, setData] = useState([]);
@@ -22,14 +23,14 @@ const FoundSheet = () => {
   async function createSheet(sheetData) {
     try {
       const sheetRes = await axios.post(
-        `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${changeEmail}/sheets.json`,
+        `${FIREBASE_DB_URL}/${changeEmail}/sheets.json`,
         sheetData,
       );
 
       if (sheetRes.status === 200) {
         // ✅ Register this user as a member of the sheet (used for admin bulk-delete)
         await axios.post(
-          `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${sheetData.inviationCode}/members.json`,
+          `${FIREBASE_DB_URL}/${sheetData.inviationCode}/members.json`,
           { convertedMail: changeEmail },
         );
 

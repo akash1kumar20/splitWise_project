@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { expenseSheetActions } from "../../store/expenseSheetSlice";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { FIREBASE_DB_URL } from "../config/firebase";
 
 const FindSheet = () => {
   const codeRef = useRef();
@@ -16,7 +17,7 @@ const FindSheet = () => {
     let invitationCode = codeRef.current.value;
     try {
       let res = await axios.get(
-        `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${invitationCode}/sheetDetails.json`
+        `${FIREBASE_DB_URL}/${invitationCode}/sheetDetails.json`
       );
       if (res.data === null) {
         toast.warning("No sheet found. Please check the invitation code.", { theme: "colored", autoClose: 2500, position: "top-center" });

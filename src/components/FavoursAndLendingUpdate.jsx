@@ -7,11 +7,12 @@ import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { EXPENSE_CATEGORIES } from "../config/constants";
+import { FIREBASE_DB_URL } from "../config/firebase";
 
 const FavoursAndLendingUpdate = () => {
   const inviteCode = useSelector((state) => state.expenseSheet.inviteCode);
   const [comingData, isLoading] = useFetchDataHook(
-    `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${inviteCode}/usersList.json`,
+    `${FIREBASE_DB_URL}/${inviteCode}/usersList.json`,
     5000, // poll every 5s — other users' additions appear automatically
   );
   const navigate = useNavigate();
@@ -59,7 +60,7 @@ const FavoursAndLendingUpdate = () => {
 
     try {
       const res = await axios.put(
-        `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${inviteCode}/expenseSheet/${id}.json`,
+        `${FIREBASE_DB_URL}/${inviteCode}/expenseSheet/${id}.json`,
         objToStore,
       );
       if (res.status === 200) {

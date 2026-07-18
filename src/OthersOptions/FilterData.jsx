@@ -3,6 +3,7 @@ import useFetchDataHook from "../customHooks/useFetchDataHook";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import PieChart from "./PieChart";
+import { FIREBASE_DB_URL } from "../config/firebase";
 
 const FilterData = () => {
   const [data, setData] = useState([]);
@@ -12,7 +13,7 @@ const FilterData = () => {
   const navigate = useNavigate();
 
   const [comingData, isLoading] = useFetchDataHook(
-    `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${code}/expenseSheet.json`,
+    `${FIREBASE_DB_URL}/${code}/expenseSheet.json`,
   );
 
   const filterDataHandler = (dynamicKey) => {

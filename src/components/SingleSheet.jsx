@@ -13,7 +13,7 @@ import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import { expenseSheetActions } from "../../store/expenseSheetSlice";
 
-const DB = "https://splitwiseapp-82dbf-default-rtdb.firebaseio.com";
+import { FIREBASE_DB_URL as DB } from "../config/firebase";
 
 const SingleSheet = () => {
   const navigate  = useNavigate();

@@ -5,6 +5,7 @@ import useFetchDataHook from "../customHooks/useFetchDataHook";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { FIREBASE_DB_URL } from "../config/firebase";
 
 const UpdateExpense = () => {
   const token = useSelector((state) => state.expenseSheet.token);
@@ -24,7 +25,7 @@ const UpdateExpense = () => {
   }, [token, data, navigate, sheetCode]);
 
   let inviteCode = useSelector((state) => state.expenseSheet.inviteCode);
-  let urlKey = `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${inviteCode}`;
+  let urlKey = `${FIREBASE_DB_URL}/${inviteCode}`;
   const [comingData] = useFetchDataHook(`${urlKey}/usersList.json`);
 
   const updateExpenseHandler = async (event, id) => {

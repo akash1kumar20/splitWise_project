@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 import SheetDetailsCard from "../Card/SheetDetailsCard";
 import { useNavigate } from "react-router-dom";
+import { FIREBASE_DB_URL } from "../config/firebase";
 
 const CreateExpenseParent = ({ onExpenseAdded }) => {
   const inviteCode = useSelector((s) => s.expenseSheet.inviteCode);
@@ -14,7 +15,7 @@ const CreateExpenseParent = ({ onExpenseAdded }) => {
   const isPersonal = sheetType === "personal";
 
   const [comingData, isLoading, , refetch] = useFetchDataHook(
-    `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${inviteCode}/usersList.json`,
+    `${FIREBASE_DB_URL}/${inviteCode}/usersList.json`,
     5000, // poll every 5s — other users' additions appear automatically
   );
 

@@ -6,11 +6,12 @@ import { EXPENSE_CATEGORIES } from "../config/constants";
 import useFetchDataHook from "../customHooks/useFetchDataHook";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { FIREBASE_DB_URL } from "../config/firebase";
 
 const FavoursAndLending = () => {
   const code = useSelector((s) => s.expenseSheet.inviteCode);
   const navigate = useNavigate();
-  const url = `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${code}`;
+  const url = `${FIREBASE_DB_URL}/${code}`;
   const [comingData] = useFetchDataHook(`${url}/usersList.json`, 5000);
   const [successStatus, setSuccessStatus] = useState(false);
   const sheetCode = useSelector((state) => state.expenseSheet.sheetCode);

@@ -6,7 +6,7 @@ import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const DB = "https://splitwiseapp-82dbf-default-rtdb.firebaseio.com";
+import { FIREBASE_DB_URL as DB } from "../config/firebase";
 
 const sheetModes = {
   split: {

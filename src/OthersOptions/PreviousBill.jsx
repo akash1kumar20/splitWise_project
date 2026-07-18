@@ -5,6 +5,7 @@ import Loading from "../ExtraComponents/Loading";
 import useAdminStatus from "../customHooks/useAdminStatus";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { FIREBASE_DB_URL } from "../config/firebase";
 
 const PUSH_CHARS =
   "-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_";
@@ -152,7 +153,7 @@ const PreviousBill = () => {
     sheetType: localStorage.getItem("sp_sheetType") || "split",
   };
   const [comingData, isLoading] = useFetchDataHook(
-    `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${code}/previousBills.json`,
+    `${FIREBASE_DB_URL}/${code}/previousBills.json`,
   );
 
   return (

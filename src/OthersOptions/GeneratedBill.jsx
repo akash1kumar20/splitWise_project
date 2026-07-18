@@ -12,6 +12,7 @@ import useAdminStatus from "../customHooks/useAdminStatus";
 import { toast } from "react-toastify";
 
 import GeneratedBillDetails from "../OthersOptions/GeneratedBillDetails";
+import { FIREBASE_DB_URL } from "../config/firebase";
 
 const sKey = (s) => `${s.from}__${s.to}`;
 
@@ -93,7 +94,7 @@ const GeneratedBill = () => {
     useSelector((s) => s.expenseSheet.inviteCode) ||
     localStorage.getItem("sp_inviteCode") ||
     "";
-  const urlKey = `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${code}`;
+  const urlKey = `${FIREBASE_DB_URL}/${code}`;
   const userMail =
     useSelector((s) => s.expenseSheet.userMail) ||
     localStorage.getItem("sp_userMail") ||

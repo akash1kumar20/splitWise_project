@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useRef, useState } from "react";
 import { useSelector } from "react-redux";
+import { FIREBASE_DB_URL } from "../config/firebase";
 
 // ✅ FIX: Users no longer fetches its own data.
 // CreateExpenseParent owns the fetch and passes existingUsers + onUserAdded down.
@@ -10,7 +11,7 @@ import { useSelector } from "react-redux";
 const Users = ({ existingUsers = [], onUserAdded }) => {
   const nameRef = useRef();
   const invitationCode = useSelector((state) => state.expenseSheet.inviteCode);
-  const url = `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${invitationCode}/usersList.json`;
+  const url = `${FIREBASE_DB_URL}/${invitationCode}/usersList.json`;
   const [canAdd, setCanAdd] = useState(true);
 
   const addUsersList = () => {

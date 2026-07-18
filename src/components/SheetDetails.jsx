@@ -6,6 +6,7 @@ import Loading from "../ExtraComponents/Loading";
 import useGreetingsHook from "../customHooks/useGreetingsHook";
 import { IoIosArrowDropdown, IoIosArrowDropup } from "react-icons/io";
 import SheetDetailsCard from "../Card/SheetDetailsCard";
+import { FIREBASE_DB_URL } from "../config/firebase";
 
 const SheetDetails = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -46,7 +47,7 @@ const SheetDetails = () => {
       const fetchData = async () => {
         try {
           let res = await axios.get(
-            `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${inviteCode}/sheetDetails.json`,
+            `${FIREBASE_DB_URL}/${inviteCode}/sheetDetails.json`,
           );
           let sheetArr = [];
           if (res.status === 200) {
