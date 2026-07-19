@@ -67,6 +67,11 @@ const AddAccount = () => {
         returnSecureToken: true,
       });
       autCtx.login(res.data.idToken);
+      // ✅ AUTO-LOGIN: Save refresh token — never expires, used to silently
+      // get a new idToken so users don't have to log in again.
+      if (res.data.refreshToken) {
+        localStorage.setItem("sp_refresh_token", res.data.refreshToken);
+      }
       dispatch(expenseSheetActions.setUserMail(userMail));
       dispatch(expenseSheetActions.setToken(res.data.idToken));
       dispatch(expenseSheetActions.setChangedMail(userMail));
