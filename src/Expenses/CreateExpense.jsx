@@ -24,7 +24,7 @@ const CreateExpense = ({ users, onExpenseAdded }) => {
     if (!aiText.trim()) return;
     setAiLoading(true);
     try {
-      const res = await fetch("/api/parseExpense", {
+      const res = await fetch("/.netlify/functions/parseExpense", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -114,7 +114,9 @@ const CreateExpense = ({ users, onExpenseAdded }) => {
             type="text"
             value={aiText}
             onChange={(e) => setAiText(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && !aiLoading && handleAIParse()}
+            onKeyDown={(e) =>
+              e.key === "Enter" && !aiLoading && handleAIParse()
+            }
             placeholder='✨ Try "Raj paid 500 for dinner via UPI"'
             className="flex-1 py-2.5 ps-3 rounded-xl bg-slate-700 text-white text-sm focus:outline-none placeholder:text-slate-400"
           />
@@ -150,9 +152,13 @@ const CreateExpense = ({ users, onExpenseAdded }) => {
             required
             className="bg-slate-400 text-black font-bold rounded-xl px-3 py-2.5 sm:py-2 w-full text-sm sm:text-base"
           >
-            <option value="" disabled hidden>Category</option>
+            <option value="" disabled hidden>
+              Category
+            </option>
             {EXPENSE_CATEGORIES.map((cat) => (
-              <option key={cat} value={cat}>{cat}</option>
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
             ))}
           </select>
 
@@ -173,7 +179,9 @@ const CreateExpense = ({ users, onExpenseAdded }) => {
             className="py-2.5 sm:py-2 px-3 rounded-xl bg-slate-400 text-black font-bold w-full text-sm sm:text-base"
           >
             {users.length > 1 && (
-              <option value="" disabled hidden>Spend By</option>
+              <option value="" disabled hidden>
+                Spend By
+              </option>
             )}
             {users.map((userData) => (
               <option value={userData.userName} key={userData.id}>
