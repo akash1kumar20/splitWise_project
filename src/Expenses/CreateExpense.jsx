@@ -6,13 +6,10 @@ import { EXPENSE_CATEGORIES } from "../config/constants";
 import { FIREBASE_DB_URL } from "../config/firebase";
 
 const CreateExpense = ({ users, onExpenseAdded }) => {
-  const [formKey, setFormKey]   = useState(0);
-  const [aiText, setAiText]     = useState("");
+  const [formKey, setFormKey]     = useState(0);
+  const [aiText, setAiText]       = useState("");
   const [aiLoading, setAiLoading] = useState(false);
-  // Holds AI-parsed values — used as defaultValue when form remounts
-  const [prefilled, setPrefilled] = useState(null);
 
-  // Refs read values at submit time — always accurate regardless of render
   const noteRef     = useRef();
   const categoryRef = useRef();
   const amountRef   = useRef();
@@ -21,7 +18,9 @@ const CreateExpense = ({ users, onExpenseAdded }) => {
 
   const inviteCode = useSelector((state) => state.expenseSheet.inviteCode);
 
-  // ── AI parse ─────────────────────────────────────────────────────────────
+  // ── AI parse — sets values directly on DOM elements via refs ─────────────
+  // This is the most reliable approach: no state batching, no key remounting,
+  // values appear instantly. Refs already read current DOM value at submit.
   const handleAIParse = async () => {
     if (!aiText.trim()) return;
     setAiLoading(true);
@@ -29,17 +28,32 @@ const CreateExpense = ({ users, onExpenseAdded }) => {
       const res = await fetch("/.netlify/functions/parseExpense", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: aiText, users, categories: EXPENSE_CATEGORIES }),
+        body: JSON.stringify({
+          text: aiText,
+          users,
+          categories: EXPENSE_CATEGORIES,
+        }),
       });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
 
-      // ✅ Key approach: set prefilled data THEN increment formKey.
-      // The form remounts with defaultValue from prefilled — always visible.
-      // Controlled state (useState per field) can silently fail to re-render;
-      // defaultValue + key remount is the most reliable pre-fill pattern.
-      setPrefilled(data);
-      setFormKey((k) => k + 1);
+      // ✅ Directly set DOM values — bypasses React state/batching entirely.
+      // Refs always point to the mounted DOM element so this is always safe.
+      if (noteRef.current)
+        noteRef.current.value = (data.note && data.note !== "NA") ? data.note : "";
+      if (categoryRef.current && EXPENSE_CATEGORIES.includes(data.category))
+        categoryRef.current.value = data.category;
+      if (amountRef.current && data.amount)
+        amountRef.current.value = String(data.amount);
+      if (userRef.current) {
+        const match = users.find(
+          (u) => u.userName.toLowerCase() === (data.user || "").toLowerCase()
+        );
+        if (match) userRef.current.value = match.userName;
+      }
+      if (payByRef.current && ["Cash", "Upi", "Card"].includes(data.payBy))
+        payByRef.current.value = data.payBy;
+
       setAiText("");
       toast.success("Form filled! Review and click Add.", {
         position: "top-center", theme: "colored", autoClose: 2000,
@@ -78,7 +92,6 @@ const CreateExpense = ({ users, onExpenseAdded }) => {
         toast.success("Expense Added!", {
           position: "top-center", theme: "colored", autoClose: 1000,
         });
-        setPrefilled(null);
         setFormKey((k) => k + 1); // reset form to empty
         if (onExpenseAdded) onExpenseAdded();
       }
@@ -89,13 +102,9 @@ const CreateExpense = ({ users, onExpenseAdded }) => {
     }
   }
 
-  const defaultUser =
-    prefilled?.user ||
-    (users.length === 1 ? users[0]?.userName : "");
-
   return (
     <div>
-      {/* ── AI Quick Entry — NOT inside the keyed form ─────────────────── */}
+      {/* ── AI Quick Entry ─────────────────────────────────────────────── */}
       <div className="w-[94%] sm:max-w-[80%] mx-auto mb-3">
         <div className="flex gap-2">
           <input
@@ -103,7 +112,7 @@ const CreateExpense = ({ users, onExpenseAdded }) => {
             value={aiText}
             onChange={(e) => setAiText(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && !aiLoading && handleAIParse()}
-            placeholder='✨ Try "Raj paid 500 for dinner via UPI"'
+            placeholder='✨ Try "Akash paid 500 for dinner via UPI"'
             className="flex-1 py-2.5 ps-3 rounded-xl bg-slate-700 text-white text-sm focus:outline-none placeholder:text-slate-400"
           />
           <button
@@ -120,23 +129,20 @@ const CreateExpense = ({ users, onExpenseAdded }) => {
         </p>
       </div>
 
-      {/* ── Expense Form — key causes remount on AI fill & after submit ─── */}
+      {/* ── Expense Form ───────────────────────────────────────────────── */}
       <form key={formKey} onSubmit={expenseCreateHandler}>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 pe-0 sm:pe-1 w-[94%] sm:max-w-[80%] mx-auto border-b-2 pb-3 md:border-b-0">
-
           <input
             type="text"
             ref={noteRef}
-            defaultValue={prefilled?.note !== "NA" ? (prefilled?.note ?? "") : ""}
             placeholder="Note"
             className="py-2.5 sm:py-2 ps-3 rounded-xl bg-slate-400 text-black font-bold text-sm sm:text-base focus:outline-none placeholder:text-black w-full"
           />
-
           <select
             ref={categoryRef}
-            defaultValue={prefilled?.category || ""}
             name="expenseCategory"
             required
+            defaultValue=""
             className="bg-slate-400 text-black font-bold rounded-xl px-3 py-2.5 sm:py-2 w-full text-sm sm:text-base"
           >
             <option value="" disabled hidden>Category</option>
@@ -144,21 +150,18 @@ const CreateExpense = ({ users, onExpenseAdded }) => {
               <option key={cat} value={cat}>{cat}</option>
             ))}
           </select>
-
           <input
             type="number"
             required
             ref={amountRef}
-            defaultValue={prefilled?.amount ?? ""}
             placeholder="Amount in ₹"
             className="py-2.5 sm:py-2 ps-3 rounded-xl bg-slate-400 text-black font-bold text-sm sm:text-base focus:outline-none placeholder:text-black w-full"
           />
-
           <select
             ref={userRef}
-            defaultValue={defaultUser}
             name="expenseAdder"
             required
+            defaultValue={users.length === 1 ? users[0]?.userName : ""}
             className="py-2.5 sm:py-2 px-3 rounded-xl bg-slate-400 text-black font-bold w-full text-sm sm:text-base"
           >
             {users.length > 1 && (
@@ -168,18 +171,16 @@ const CreateExpense = ({ users, onExpenseAdded }) => {
               <option value={u.userName} key={u.id}>{u.userName}</option>
             ))}
           </select>
-
           <select
             ref={payByRef}
-            defaultValue={prefilled?.payBy || "Cash"}
             name="payBy"
+            defaultValue="Cash"
             className="py-2.5 sm:py-2 px-3 rounded-xl bg-slate-400 text-black font-bold w-full text-sm sm:text-base"
           >
             <option value="Cash">Cash</option>
             <option value="Upi">UPI</option>
             <option value="Card">Card</option>
           </select>
-
           <button
             className="text-white bg-gradient-to-br from-purple-500 via-blue-600 to-blue-900 px-6 sm:px-10 py-2.5 sm:py-2 rounded-2xl w-full text-sm sm:text-base font-semibold active:scale-[0.99] transition-transform"
             type="submit"
