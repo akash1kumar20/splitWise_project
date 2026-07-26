@@ -14,7 +14,6 @@ const FavoursAndLending = () => {
   const url = `${FIREBASE_DB_URL}/${code}`;
   const [comingData] = useFetchDataHook(`${url}/usersList.json`, 5000);
   const [successStatus, setSuccessStatus] = useState(false);
-  const sheetCode = useSelector((state) => state.expenseSheet.sheetCode);
 
   const relatedAmountRef = useRef();
   const categoryRef = useRef();
@@ -55,7 +54,6 @@ const FavoursAndLending = () => {
         setExpensePayByUser("");
         setTimeout(() => {
           setSuccessStatus(false);
-          navigate(`/home/sheets/${sheetCode}`);
         }, 2000);
       }
     } catch {
@@ -68,22 +66,27 @@ const FavoursAndLending = () => {
   };
 
   return (
-    <div className=" bg-[rgb(233,237,201)] min-h-[100vh]  ">
+    <div className=" bg-[rgb(241,245,249)] min-h-[100vh]  ">
       <ToastContainer autoClose={2000} />
-      <div className="bg-[rgba(100,116,139,0.3)] flex flex-col items-center py-6 md:px-4 min-h-[100vh]">
-        <div className="flex items-center justify-between w-[96%] max-w-lg mb-4 border-2 border-[rgba(100,116,139,0.5)] py-2 px-4 shadow-lg drop-shadow-xl mx-auto rounded-md">
+      <div className="bg-[rgb(241,245,249)]flex flex-col items-center py-6 md:px-4 min-h-[100vh]">
+        <div
+          className="flex items-center justify-between w-[96%] max-w-lg mb-4 bg-[rgb(255,255,255)]
+           border border-[rgb(203,213,225)] py-2 px-4 shadow-lg drop-shadow-xl mx-auto rounded-md"
+        >
           <button
-            className="text-sm bg-gray-800 text-white px-4 py-2 rounded-xl hover:bg-gray-700"
+            className="text-sm bg-[rgb(30,41,59)] text-white px-4 py-2 rounded-xl hover:bg-[rgb(15,23,42)]"
             onClick={() => navigate(-1)}
           >
             ← Back
           </button>
-          <h2 className="sm:text-2xl text-lg font-bold">Favours & Lending</h2>
+          <h2 className="sm:text-2xl text-lg font-bold text-[rgb(15,23,42)]">
+            Favours & Lending
+          </h2>
           <div className="w-20" />
         </div>
 
         <form
-          className="flex flex-col gap-4 w-[96%] mx-auto max-w-lg border-2 rounded-md border-[rgba(100,116,139,0.5)] p-4 shadow-lg drop-shadow-xl"
+          className="flex flex-col gap-4 w-[96%] mx-auto max-w-lg bg-[rgb(255,255,255)] border border-[rgb(203,213,225)] rounded-xl p-4 shadow-lg drop-shadow-xl"
           onSubmit={formSubmitHandler}
         >
           {/* ✅ Fix 5: use EXPENSE_CATEGORIES from constants */}
@@ -91,7 +94,7 @@ const FavoursAndLending = () => {
             ref={categoryRef}
             required
             defaultValue=""
-            className="bg-slate-400 text-black font-bold rounded-xl px-4 py-2"
+            className="bg-[rgb(248,250,252)] text-[rgb(30,41,59)] border border-[rgb(203,213,225)]k font-bold rounded-xl px-4 py-2"
           >
             <option value="" disabled hidden>
               Category
@@ -108,25 +111,25 @@ const FavoursAndLending = () => {
             ref={relatedAmountRef}
             required
             placeholder="Amount in ₹"
-            className="bg-slate-400 text-black font-bold py-2 ps-3 rounded-xl placeholder:text-black focus:outline-none"
+            className=" font-bold py-2 ps-3 rounded-xl focus:outline-none bg-[rgb(248,250,252)] text-[rgb(30,41,59)] placeholder:text-[rgb(100,116,139)] border border-[rgb(203,213,225)] focus:border-[rgb(59,130,246)] focus:ring-2 focus:ring-[rgb(191,219,254)] transition-all"
           />
 
           <input
             type="text"
             ref={relatedNoteRef}
             placeholder="Note (optional)"
-            className="bg-slate-400 text-black font-bold py-2 ps-3 rounded-xl placeholder:text-black focus:outline-none"
+            className=" bg-[rgb(248,250,252)] text-[rgb(30,41,59)] placeholder:text-[rgb(100,116,139)] border border-[rgb(203,213,225)] font-bold py-2 ps-3 rounded-xl focus:outline-none focus:border-[rgb(59,130,246)] focus:ring-2 focus:ring-[rgb(191,219,254)] transition-all"
           />
 
           <div className="flex flex-col gap-1">
-            <label className="text-sm font-semibold">
+            <label className="text-sm font-semibold text-[rgb(51,65,85)]">
               Expense related to (Beneficiary):
             </label>
             <select
               value={expenseRelatedTo}
               onChange={(e) => setExpenseRelatedTo(e.target.value)}
               required
-              className="bg-slate-400 text-black font-bold rounded-xl px-4 py-2"
+              className="bg-[rgb(248,250,252)] text-[rgb(30,41,59)] border border-[rgb(203,213,225)] font-bold rounded-xl px-4 py-2 focus:outline-none focus:border-[rgb(59,130,246)] focus:ring-2 focus:ring-[rgb(191,219,254)] transition-all"
             >
               <option value="" disabled>
                 Select User
@@ -140,12 +143,14 @@ const FavoursAndLending = () => {
           </div>
 
           <div className="flex flex-col gap-1">
-            <label className="text-sm font-semibold">Paid by:</label>
+            <label className="text-sm font-semibold text-[rgb(51,65,85)]">
+              Paid by:
+            </label>
             <select
               value={expensePayByUser}
               onChange={(e) => setExpensePayByUser(e.target.value)}
               required
-              className="bg-slate-400 text-black font-bold rounded-xl px-4 py-2"
+              className="bg-[rgb(248,250,252)] text-[rgb(30,41,59)] border border-[rgb(203,213,225)] font-bold rounded-xl px-4 py-2 focus:outline-none focus:border-[rgb(59,130,246)] focus:ring-2 focus:ring-[rgb(191,219,254)] transition-all"
             >
               <option value="" disabled>
                 Select User
@@ -160,13 +165,13 @@ const FavoursAndLending = () => {
 
           <button
             type="submit"
-            className="bg-gradient-to-br from-purple-500 via-blue-600 to-blue-900 text-white font-bold py-3 rounded-2xl"
+            className="bg-gradient-to-r from-[rgb(139,92,246)] via-[rgb(59,130,246)] to-[rgb(37,99,235)] text-white font-bold py-3 rounded-2xl"
           >
             Save Entry
           </button>
         </form>
         {successStatus && (
-          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded-xl m-4 text-sm font-semibold">
+          <div className="bg-[rgb(220,252,231)] border-[rgb(74,222,128)] text-[rgb(21,128,61)] px-4 py-2 rounded-xl m-4 text-sm font-semibold text-center">
             ✅ Entry added successfully!
           </div>
         )}
