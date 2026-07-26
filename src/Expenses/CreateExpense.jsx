@@ -9,21 +9,43 @@ const CreateExpense = ({ users, onExpenseAdded }) => {
   const [formKey, setFormKey]     = useState(0);
   const [aiText, setAiText]       = useState("");
   const [aiLoading, setAiLoading] = useState(false);
+  const [aiResult, setAiResult]   = useState(null); // parsed AI result for preview
 
-  const noteRef     = useRef();
-  const categoryRef = useRef();
-  const amountRef   = useRef();
-  const userRef     = useRef();
-  const payByRef    = useRef();
+  const subCategoryRef = useRef();
+  const categoryRef    = useRef();
+  const amountRef      = useRef();
+  const userRef        = useRef();
+  const payBy          = useRef();
 
   const inviteCode = useSelector((state) => state.expenseSheet.inviteCode);
 
-  // ── AI parse — sets values directly on DOM elements via refs ─────────────
-  // This is the most reliable approach: no state batching, no key remounting,
-  // values appear instantly. Refs already read current DOM value at submit.
+  // ── Save expense to Firebase ──────────────────────────────────────────────
+  const saveExpense = async (expenseData) => {
+    try {
+      const res = await axios.post(
+        `${FIREBASE_DB_URL}/${inviteCode}/expenseSheet.json`,
+        expenseData,
+      );
+      if (res.status === 200) {
+        toast.success("Expense Added!", {
+          position: "top-center", theme: "colored", autoClose: 1000,
+        });
+        if (onExpenseAdded) onExpenseAdded();
+        return true;
+      }
+    } catch {
+      toast.error("Please try again!", {
+        position: "top-center", theme: "colored", autoClose: 1000,
+      });
+    }
+    return false;
+  };
+
+  // ── AI parse — shows a preview card, user confirms to add ────────────────
   const handleAIParse = async () => {
     if (!aiText.trim()) return;
     setAiLoading(true);
+    setAiResult(null);
     try {
       const res = await fetch("/.netlify/functions/parseExpense", {
         method: "POST",
@@ -37,27 +59,15 @@ const CreateExpense = ({ users, onExpenseAdded }) => {
       const data = await res.json();
       if (data.error) throw new Error(data.error);
 
-      // ✅ Directly set DOM values — bypasses React state/batching entirely.
-      // Refs always point to the mounted DOM element so this is always safe.
-      if (noteRef.current)
-        noteRef.current.value = (data.note && data.note !== "NA") ? data.note : "";
-      if (categoryRef.current && EXPENSE_CATEGORIES.includes(data.category))
-        categoryRef.current.value = data.category;
-      if (amountRef.current && data.amount)
-        amountRef.current.value = String(data.amount);
-      if (userRef.current) {
-        const match = users.find(
-          (u) => u.userName.toLowerCase() === (data.user || "").toLowerCase()
-        );
-        if (match) userRef.current.value = match.userName;
-      }
-      if (payByRef.current && ["Cash", "Upi", "Card"].includes(data.payBy))
-        payByRef.current.value = data.payBy;
-
-      setAiText("");
-      toast.success("Form filled! Review and click Add.", {
-        position: "top-center", theme: "colored", autoClose: 2000,
+      // Match user case-insensitively
+      const match = users.find(
+        (u) => u.userName.toLowerCase() === (data.user || "").toLowerCase()
+      );
+      setAiResult({
+        ...data,
+        user: match?.userName || (users[0]?.userName ?? ""),
       });
+      setAiText("");
     } catch {
       toast.error("Could not parse. Try again or fill manually.", {
         position: "top-center", theme: "colored", autoClose: 2000,
@@ -67,52 +77,52 @@ const CreateExpense = ({ users, onExpenseAdded }) => {
     }
   };
 
-  // ── Submit ────────────────────────────────────────────────────────────────
+  // ── Confirm AI result — adds directly to Firebase ────────────────────────
+  const handleAIConfirm = async () => {
+    if (!aiResult) return;
+    const ok = await saveExpense({
+      date:          new Date().toLocaleDateString(),
+      subCategory:   aiResult.note !== "NA" ? aiResult.note : "NA",
+      category:      aiResult.category,
+      amount:        aiResult.amount,
+      relatedAmtVal: 0,
+      user:          aiResult.user,
+      payBy:         aiResult.payBy,
+      relatedAmount: false,
+      relatedTo:     aiResult.user,
+    });
+    if (ok) setAiResult(null);
+  };
+
+  // ── Manual form submit ────────────────────────────────────────────────────
   async function expenseCreateHandler(event) {
     event.preventDefault();
     const user = userRef.current?.value;
-    const expenseAdded = {
+    const ok = await saveExpense({
       date:          new Date().toLocaleDateString(),
-      subCategory:   noteRef.current?.value     || "NA",
-      category:      categoryRef.current?.value || "",
-      amount:        amountRef.current?.value   || 0,
+      subCategory:   subCategoryRef.current?.value || "NA",
+      category:      categoryRef.current?.value    || "",
+      amount:        amountRef.current?.value      || 0,
       relatedAmtVal: 0,
       user,
-      payBy:         payByRef.current?.value    || "Cash",
+      payBy:         payBy.current?.value          || "Cash",
       relatedAmount: false,
       relatedTo:     user,
-    };
-
-    try {
-      const res = await axios.post(
-        `${FIREBASE_DB_URL}/${inviteCode}/expenseSheet.json`,
-        expenseAdded,
-      );
-      if (res.status === 200) {
-        toast.success("Expense Added!", {
-          position: "top-center", theme: "colored", autoClose: 1000,
-        });
-        setFormKey((k) => k + 1); // reset form to empty
-        if (onExpenseAdded) onExpenseAdded();
-      }
-    } catch {
-      toast.error("Please try again!", {
-        position: "top-center", theme: "colored", autoClose: 1000,
-      });
-    }
+    });
+    if (ok) setFormKey((k) => k + 1);
   }
 
   return (
     <div>
       {/* ── AI Quick Entry ─────────────────────────────────────────────── */}
-      <div className="w-[94%] sm:max-w-[80%] mx-auto mb-3">
+      <div className="w-[94%] sm:max-w-[80%] mx-auto mb-2">
         <div className="flex gap-2">
           <input
             type="text"
             value={aiText}
             onChange={(e) => setAiText(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && !aiLoading && handleAIParse()}
-            placeholder='✨ Try "Akash paid 500 for dinner via UPI"'
+            placeholder='✨ e.g. "Akash paid 500 for dinner via UPI"'
             className="flex-1 py-2.5 ps-3 rounded-xl bg-slate-700 text-white text-sm focus:outline-none placeholder:text-slate-400"
           />
           <button
@@ -121,29 +131,65 @@ const CreateExpense = ({ users, onExpenseAdded }) => {
             disabled={aiLoading || !aiText.trim()}
             className="px-4 py-2.5 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 text-white text-sm font-semibold disabled:opacity-50 whitespace-nowrap active:scale-95 transition-transform"
           >
-            {aiLoading ? "..." : "✨ Fill"}
+            {aiLoading ? "Thinking..." : "✨ Fill"}
           </button>
         </div>
         <p className="text-xs text-slate-400 mt-1 ps-1">
-          Type in plain English — AI fills the form. Review and click Add.
+          Describe the expense — AI parses it. Confirm or fill manually below.
         </p>
+
+        {/* AI Result Preview Card */}
+        {aiResult && (
+          <div className="mt-2 bg-slate-800 border border-violet-500 rounded-xl px-4 py-3 flex flex-col sm:flex-row sm:items-center gap-3">
+            <div className="flex-1 text-sm text-white space-y-1">
+              <p>
+                <span className="text-slate-400">By:</span>{" "}
+                <strong>{aiResult.user}</strong>
+                <span className="mx-2 text-slate-500">·</span>
+                <span className="text-slate-400">₹</span>
+                <strong>{aiResult.amount}</strong>
+                <span className="mx-2 text-slate-500">·</span>
+                <strong>{aiResult.category}</strong>
+                <span className="mx-2 text-slate-500">·</span>
+                <span className="text-slate-400">{aiResult.payBy}</span>
+              </p>
+              {aiResult.note && aiResult.note !== "NA" && (
+                <p className="text-slate-400 text-xs">Note: {aiResult.note}</p>
+              )}
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={handleAIConfirm}
+                className="bg-green-600 hover:bg-green-500 text-white text-sm font-semibold px-4 py-2 rounded-lg active:scale-95 transition-transform"
+              >
+                ✓ Confirm
+              </button>
+              <button
+                onClick={() => setAiResult(null)}
+                className="bg-slate-600 hover:bg-slate-500 text-white text-sm px-3 py-2 rounded-lg"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* ── Expense Form ───────────────────────────────────────────────── */}
+      {/* ── Manual Form ─────────────────────────────────────────────────── */}
       <form key={formKey} onSubmit={expenseCreateHandler}>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 pe-0 sm:pe-1 w-[94%] sm:max-w-[80%] mx-auto border-b-2 pb-3 md:border-b-0">
           <input
             type="text"
-            ref={noteRef}
+            ref={subCategoryRef}
             placeholder="Note"
             className="py-2.5 sm:py-2 ps-3 rounded-xl bg-slate-400 text-black font-bold text-sm sm:text-base focus:outline-none placeholder:text-black w-full"
           />
           <select
+            className="bg-slate-400 text-black font-bold rounded-xl px-3 py-2.5 sm:py-2 w-full text-sm sm:text-base"
             ref={categoryRef}
             name="expenseCategory"
             required
             defaultValue=""
-            className="bg-slate-400 text-black font-bold rounded-xl px-3 py-2.5 sm:py-2 w-full text-sm sm:text-base"
           >
             <option value="" disabled hidden>Category</option>
             {EXPENSE_CATEGORIES.map((cat) => (
@@ -158,24 +204,26 @@ const CreateExpense = ({ users, onExpenseAdded }) => {
             className="py-2.5 sm:py-2 ps-3 rounded-xl bg-slate-400 text-black font-bold text-sm sm:text-base focus:outline-none placeholder:text-black w-full"
           />
           <select
-            ref={userRef}
+            className="py-2.5 sm:py-2 px-3 rounded-xl bg-slate-400 text-black font-bold w-full text-sm sm:text-base"
             name="expenseAdder"
+            ref={userRef}
             required
             defaultValue={users.length === 1 ? users[0]?.userName : ""}
-            className="py-2.5 sm:py-2 px-3 rounded-xl bg-slate-400 text-black font-bold w-full text-sm sm:text-base"
           >
             {users.length > 1 && (
               <option value="" disabled hidden>Spend By</option>
             )}
-            {users.map((u) => (
-              <option value={u.userName} key={u.id}>{u.userName}</option>
+            {users.map((userData) => (
+              <option value={userData.userName} key={userData.id}>
+                {userData.userName}
+              </option>
             ))}
           </select>
           <select
-            ref={payByRef}
+            ref={payBy}
             name="payBy"
-            defaultValue="Cash"
             className="py-2.5 sm:py-2 px-3 rounded-xl bg-slate-400 text-black font-bold w-full text-sm sm:text-base"
+            defaultValue="Cash"
           >
             <option value="Cash">Cash</option>
             <option value="Upi">UPI</option>
