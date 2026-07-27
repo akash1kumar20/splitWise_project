@@ -7,6 +7,7 @@ import { AuthContextProvider } from "../store/auth-context.jsx";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux";
 import store from "../store/index.js";
+import ErrorBoundary from "./ExtraComponents/ErrorBoundary";
 const Home = lazy(() => import("./components/Home.jsx"));
 const CreateSheet = lazy(() => import("./components/CreateSheet.jsx"));
 const Sheets = lazy(() => import("./components/Sheets.jsx"));
@@ -160,10 +161,12 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <Provider store={store}>
-    <AuthContextProvider>
-      <React.StrictMode>
-        <RouterProvider router={router} />
-      </React.StrictMode>
-    </AuthContextProvider>
+    <ErrorBoundary>
+      <AuthContextProvider>
+        <React.StrictMode>
+          <RouterProvider router={router} />
+        </React.StrictMode>
+      </AuthContextProvider>
+    </ErrorBoundary>
   </Provider>,
 );
