@@ -493,19 +493,21 @@ const GeneratedBill = () => {
                     return (
                       <div
                         key={i}
-                        className={`flex items-center justify-between rounded-2xl px-5 py-4 border transition-all ${paid ? "bg-green-50 border-green-300 opacity-70" : "bg-gray-50 border-gray-200"}`}
+                        className={`grid grid-cols-3 items-center rounded-2xl px-5 py-4 border transition-all ${paid ? "bg-green-50 border-green-300 opacity-70" : "bg-gray-50 border-gray-200"}`}
                       >
-                        <div className="text-center min-w-[80px]">
+                        {/* PAYS — left */}
+                        <div className="text-center">
                           <p className="text-[10px] text-gray-400 uppercase tracking-wider mb-1">
                             Pays
                           </p>
                           <p
-                            className={`text-lg font-extrabold ${paid ? "line-through text-gray-400" : "text-red-500"}`}
+                            className={`text-lg font-extrabold break-words ${paid ? "line-through text-gray-400" : "text-red-500"}`}
                           >
                             {s.from}
                           </p>
                         </div>
-                        <div className="flex flex-col items-center flex-1">
+                        {/* AMOUNT + BUTTON — center */}
+                        <div className="flex flex-col items-center">
                           <p className="text-2xl font-black text-gray-900">
                             Rs.{s.amount}
                           </p>
@@ -531,12 +533,13 @@ const GeneratedBill = () => {
                             </span>
                           )}
                         </div>
-                        <div className="text-center min-w-[80px]">
+                        {/* RECEIVES — right */}
+                        <div className="text-center">
                           <p className="text-[10px] text-gray-400 uppercase tracking-wider mb-1">
                             Receives
                           </p>
                           <p
-                            className={`text-lg font-extrabold ${paid ? "text-gray-400" : "text-green-600"}`}
+                            className={`text-lg font-extrabold break-words ${paid ? "text-gray-400" : "text-green-600"}`}
                           >
                             {s.to}
                           </p>
