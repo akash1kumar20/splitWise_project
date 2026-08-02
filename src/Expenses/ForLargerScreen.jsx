@@ -37,7 +37,7 @@ const ForLargerScreen = ({ comingData, updateHandler, deleteHandler }) => {
                 )}
               </td>
               {/* Personal sheet: always show "Self" */}
-              <td className="tableHeading">
+              <td className="tableHeading whitespace-nowrap">
                 {isPersonal ? "Self" : data.user}
               </td>
               <td className="tableElementSide">

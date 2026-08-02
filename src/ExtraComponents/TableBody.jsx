@@ -23,7 +23,7 @@ const TableBody = ({ comingData }) => {
                   <p className="text-sm font-extrabold">P/M - {data.payBy}</p>
                 )}
               </td>
-              <td className="tableHeading ">{data.user}</td>
+              <td className="tableHeading whitespace-nowrap">{data.user}</td>
             </tr>
           </tbody>
         </table>
