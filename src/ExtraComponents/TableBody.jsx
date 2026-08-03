@@ -15,15 +15,17 @@ const TableBody = ({ comingData }) => {
               <td className="tableHeading">
                 {!data.relatedAmount ? data.amount : data.relatedAmtVal}
                 {data.relatedAmount && (
-                  <p className="text-sm font-extrabold">
+                  <p className="text-sm font-extrabold whitespace-nowrap">
                     F&L - {data.relatedTo}
                   </p>
                 )}
                 {!data.relatedAmount && (
-                  <p className="text-sm font-extrabold">P/M - {data.payBy}</p>
+                  <p className="text-sm font-extrabold whitespace-nowrap">
+                    P/M - {data.payBy}
+                  </p>
                 )}
               </td>
-              <td className="tableHeading whitespace-nowrap">{data.user}</td>
+              <td className="tableHeading">{data.user}</td>
             </tr>
           </tbody>
         </table>

@@ -24,11 +24,9 @@ const ForLargerScreen = ({ comingData, updateHandler, deleteHandler }) => {
               <td className="tableHeading">
                 {!data.relatedAmount ? data.amount : data.relatedAmtVal}
                 {!data.relatedAmount ? (
-                  <p className="text-sm font-extrabold">PM - {data.payBy}</p>
+                  <p className="text-sm font-extrabold whitespace-nowrap">PM - {data.payBy}</p>
                 ) : (
-                  <p className="text-sm font-extrabold">
-                    F&L - {data.relatedTo}
-                  </p>
+                  <p className="text-sm font-extrabold whitespace-nowrap">F&L - {data.relatedTo}</p>
                 )}
                 {data.isEdited && (
                   <p className="text-xs font-bold text-orange-400">
