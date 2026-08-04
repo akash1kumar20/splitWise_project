@@ -11,7 +11,18 @@ class ErrorBoundary extends Component {
   }
 
   componentDidCatch(error, info) {
-    // Log to console for debugging — swap with Sentry later
+    // ✅ Auto-reload on chunk load failures — happens after every new deploy
+    // when the browser has old JS chunk URLs cached from previous version.
+    const isChunkError =
+      error?.message?.includes("Failed to fetch dynamically imported module") ||
+      error?.message?.includes("Importing a module script failed") ||
+      error?.message?.includes("Unable to preload CSS");
+
+    if (isChunkError) {
+      window.location.reload();
+      return;
+    }
+
     console.error("App error caught by ErrorBoundary:", error, info);
   }
 
