@@ -117,7 +117,7 @@ const SheetDetails = () => {
               )}
             </div>
           ))}
-          <div className="flex lg:flex-col flex-row md:gap-x-3 gap-x-[6px] text-end pl-4 md:pl-0">
+          <div className="flex flex-col lg:flex-col md:gap-x-3 gap-y-0.5 text-center md:text-end pl-4 md:pl-0 w-full md:w-auto mt-2 md:mt-0">
             <p className="text-sm md:text-lg">{time.toDateString()}</p>
             <p className="text-sm md:text-lg">{time.toLocaleTimeString()}</p>
             <p className="text-sm md:text-lg leading-snug">{greetings}</p>

@@ -32,7 +32,7 @@ const ForSmallerScreen = ({ comingData, updateHandler, deleteHandler }) => {
         const cfg = getConfig(data.category, isFL);
 
         return (
-          <div key={data.id} className="flex items-center px-4 py-3 border-b border-gray-600 border-opacity-40">
+          <div key={data.id} className="flex items-center pl-4 pr-6 py-3 border-b border-gray-600 border-opacity-40">
             <div className={`w-11 h-11 rounded-full flex items-center justify-center text-sm font-bold text-white flex-shrink-0 mr-3 ${cfg.color}`}>
               {cfg.emoji}
             </div>
