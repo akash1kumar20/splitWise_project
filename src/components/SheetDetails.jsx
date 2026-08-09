@@ -117,10 +117,17 @@ const SheetDetails = () => {
               )}
             </div>
           ))}
-          <div className="flex flex-col lg:flex-col md:gap-x-3 gap-y-0.5 text-center md:text-end pl-4 md:pl-0 w-full md:w-auto mt-2 md:mt-0">
-            <p className="text-sm md:text-lg">{time.toDateString()}</p>
-            <p className="text-sm md:text-lg">{time.toLocaleTimeString()}</p>
-            <p className="text-sm md:text-lg leading-snug">{greetings}</p>
+          <div className="text-center md:text-end w-full md:w-auto mt-2 md:mt-0">
+            {/* Mobile: single line */}
+            <p className="text-sm md:hidden text-gray-300">
+              {time.toDateString()} · {time.toLocaleTimeString()} · {greetings}
+            </p>
+            {/* Desktop: stacked */}
+            <div className="hidden md:flex md:flex-col md:gap-y-0.5">
+              <p className="text-lg">{time.toDateString()}</p>
+              <p className="text-lg">{time.toLocaleTimeString()}</p>
+              <p className="text-lg leading-snug">{greetings}</p>
+            </div>
           </div>
         </div>
       )}
