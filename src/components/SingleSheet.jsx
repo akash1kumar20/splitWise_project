@@ -14,6 +14,7 @@ import axios from "axios";
 import { expenseSheetActions } from "../../store/expenseSheetSlice";
 
 import { FIREBASE_DB_URL as DB } from "../config/firebase";
+import SheetTutorial from "../ExtraComponents/SheetTutorial";
 
 const SingleSheet = () => {
   const navigate  = useNavigate();
@@ -68,6 +69,7 @@ const SingleSheet = () => {
   return (
     <div>
       <ToastContainer autoClose={2000} />
+      <SheetTutorial />
       <Navbar openProfile={() => setOpenProfile((p) => !p)} />
       {openProfile && <Profile />}
       {showCylinder && <OtherOptions />}
@@ -76,10 +78,12 @@ const SingleSheet = () => {
         <CreateExpenseParent onExpenseAdded={onExpenseAdded} />
       </div>
       <DisplayExpense expenseTrigger={expenseTrigger} />
-      <Footer
-        openCylinder={() => setShowCylinder((s) => !s)}
-        isOpen={showCylinder}
-      />
+      <div id="tutorial-other-options">
+        <Footer
+          openCylinder={() => setShowCylinder((s) => !s)}
+          isOpen={showCylinder}
+        />
+      </div>
     </div>
   );
 };

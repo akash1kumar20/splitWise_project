@@ -105,7 +105,7 @@ const SheetDetails = () => {
                         </p>
                       )}
                       {userMail !== sheet.userMail && <p>You: {userMail}</p>}
-                      <p className="text-sm md:text-lg">
+                      <p id="tutorial-invite-code" className="text-sm md:text-lg">
                         Invitation Code:
                         <span className="text-md font-semibold underline ps-2">
                           {sheet.inviationCode}
@@ -117,17 +117,10 @@ const SheetDetails = () => {
               )}
             </div>
           ))}
-          <div className="text-center md:text-end w-full md:w-auto mt-2 md:mt-0">
-            {/* Mobile: single line */}
-            <p className="text-sm md:hidden text-gray-300">
-              {time.toDateString()} · {time.toLocaleTimeString()} · {greetings}
-            </p>
-            {/* Desktop: stacked */}
-            <div className="hidden md:flex md:flex-col md:gap-y-0.5">
-              <p className="text-lg">{time.toDateString()}</p>
-              <p className="text-lg">{time.toLocaleTimeString()}</p>
-              <p className="text-lg leading-snug">{greetings}</p>
-            </div>
+          <div className="flex lg:flex-col flex-row md:gap-x-3 gap-x-[6px] text-end pl-4 md:pl-0">
+            <p className="text-sm md:text-lg">{time.toDateString()}</p>
+            <p className="text-sm md:text-lg">{time.toLocaleTimeString()}</p>
+            <p className="text-sm md:text-lg leading-snug">{greetings}</p>
           </div>
         </div>
       )}

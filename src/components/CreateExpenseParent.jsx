@@ -6,7 +6,6 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 import SheetDetailsCard from "../Card/SheetDetailsCard";
 import { useNavigate } from "react-router-dom";
-import { FIREBASE_DB_URL } from "../config/firebase";
 
 const CreateExpenseParent = ({ onExpenseAdded }) => {
   const inviteCode = useSelector((s) => s.expenseSheet.inviteCode);
@@ -15,8 +14,7 @@ const CreateExpenseParent = ({ onExpenseAdded }) => {
   const isPersonal = sheetType === "personal";
 
   const [comingData, isLoading, , refetch] = useFetchDataHook(
-    `${FIREBASE_DB_URL}/${inviteCode}/usersList.json`,
-    5000, // poll every 5s — other users' additions appear automatically
+    `https://splitwiseapp-82dbf-default-rtdb.firebaseio.com/${inviteCode}/usersList.json`,
   );
 
   const navigate = useNavigate();
@@ -42,11 +40,13 @@ const CreateExpenseParent = ({ onExpenseAdded }) => {
 
           {/* Expense form */}
           {(!addUser || isPersonal) && comingData.length > 0 && (
+            <div id="tutorial-expense-form">
             <CreateExpense
               users={comingData}
               onExpenseAdded={onExpenseAdded}
               isPersonal={isPersonal}
             />
+            </div>
           )}
 
           {comingData.length === 0 && !isPersonal && (
@@ -56,20 +56,18 @@ const CreateExpenseParent = ({ onExpenseAdded }) => {
           )}
 
           {!isPersonal && !addUser && (
-            <div
-              className={`flex flex-nowrap items-center gap-3 ${
-                comingData.length > 0 ? "mx-auto w-full max-w-[80%]" : "w-full"
-              }`}
-            >
+            <div className="flex gap-x-3 md:pl-[72px] pl-10">
               <p
-                className="mt-2 w-fit cursor-pointer whitespace-nowrap rounded-lg border-2 border-blue-600 px-1 text-sm font-bold text-blue-400"
+                className="text-blue-400 font-bold cursor-pointer mt-2 w-fit border-2 border-blue-600 rounded-lg px-1"
+                id="tutorial-add-users"
                 onClick={() => setAddUser(true)}
               >
                 Add users
               </p>
               {comingData.length > 1 && (
                 <p
-                  className="mt-2 w-fit cursor-pointer whitespace-nowrap rounded-lg border-2 border-blue-600 px-1 text-sm font-bold text-blue-400"
+                  className="text-blue-400 font-bold cursor-pointer mt-2 w-fit border-2 border-blue-600 rounded-lg px-1 "
+                  id="tutorial-favours"
                   onClick={() =>
                     navigate(`/home/sheets/${sheetCode}/otherExpense`)
                   }
