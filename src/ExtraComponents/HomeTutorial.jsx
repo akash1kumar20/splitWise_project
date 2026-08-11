@@ -1,4 +1,4 @@
-import Joyride, { STATUS } from "react-joyride";
+import { default as Joyride, STATUS } from "react-joyride";
 import { useState, useEffect } from "react";
 
 const TOUR_KEY = "sp_home_tutorial_done";
@@ -25,8 +25,8 @@ const steps = [
       <div>
         <p className="font-bold mb-1">➕ Create a Sheet</p>
         <p className="text-sm text-gray-600">
-          A sheet is like a group wallet. Create one for your trip, flat, or
-          any group expense. You'll get an invite code to share with others.
+          A sheet is like a group wallet. Create one for your trip, flat, or any
+          group expense. You'll get an invite code to share with others.
         </p>
       </div>
     ),
@@ -39,8 +39,8 @@ const steps = [
       <div>
         <p className="font-bold mb-1">🔍 Join a Sheet</p>
         <p className="text-sm text-gray-600">
-          Got an invite code from someone? Use this to find and join their
-          sheet so you can track expenses together.
+          Got an invite code from someone? Use this to find and join their sheet
+          so you can track expenses together.
         </p>
       </div>
     ),
@@ -54,8 +54,8 @@ const steps = [
         <p className="font-bold mb-1">📋 Your Sheets</p>
         <p className="text-sm text-gray-600">
           All your sheets appear here. Tap any sheet to open it and start
-          tracking expenses. The <strong>Admin</strong> badge means you
-          created it — only admins can generate the final bill.
+          tracking expenses. The <strong>Admin</strong> badge means you created
+          it — only admins can generate the final bill.
         </p>
       </div>
     ),

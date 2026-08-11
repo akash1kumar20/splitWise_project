@@ -1,4 +1,4 @@
-import Joyride, { STATUS } from "react-joyride";
+import { default as Joyride, STATUS } from "react-joyride";
 import { useState, useEffect } from "react";
 
 const TOUR_KEY = "sp_sheet_tutorial_done";
@@ -12,8 +12,8 @@ const steps = [
       <div>
         <p className="font-bold mb-1">🔗 Invite Code</p>
         <p className="text-sm text-gray-600">
-          Share this code with your group members. They can use "Find Sheet"
-          on the home screen to join and track expenses together.
+          Share this code with your group members. They can use "Find Sheet" on
+          the home screen to join and track expenses together.
         </p>
       </div>
     ),
@@ -26,8 +26,8 @@ const steps = [
       <div>
         <p className="font-bold mb-1">👥 Add Users First</p>
         <p className="text-sm text-gray-600">
-          Before adding expenses, add the names of everyone in the group.
-          These names appear in the "Spend By" dropdown when adding expenses.
+          Before adding expenses, add the names of everyone in the group. These
+          names appear in the "Spend By" dropdown when adding expenses.
         </p>
       </div>
     ),
@@ -41,7 +41,8 @@ const steps = [
         <p className="font-bold mb-1">💰 Add Expenses</p>
         <p className="text-sm text-gray-600">
           Fill in the note, category, amount, who spent it, and payment method.
-          Hit <strong>Add</strong> — the expense appears in the list below instantly.
+          Hit <strong>Add</strong> — the expense appears in the list below
+          instantly.
         </p>
       </div>
     ),
@@ -54,8 +55,8 @@ const steps = [
       <div>
         <p className="font-bold mb-1">🤝 Favours & Lending</p>
         <p className="text-sm text-gray-600">
-          Use this for loans or one-sided payments — when one person pays
-          for another directly, not as a shared group expense.
+          Use this for loans or one-sided payments — when one person pays for
+          another directly, not as a shared group expense.
         </p>
       </div>
     ),
@@ -68,8 +69,9 @@ const steps = [
       <div>
         <p className="font-bold mb-1">⚙️ More Options</p>
         <p className="text-sm text-gray-600">
-          Tap this button to access: <strong>Generate Bill</strong> (admin only),
-          filter expenses by category, view previous bills, and manage users.
+          Tap this button to access: <strong>Generate Bill</strong> (admin
+          only), filter expenses by category, view previous bills, and manage
+          users.
         </p>
       </div>
     ),
