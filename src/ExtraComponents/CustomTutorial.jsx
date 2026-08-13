@@ -63,7 +63,15 @@ const CustomTutorial = ({ steps, storageKey, delay = 900 }) => {
         attempts++;
         setTimeout(tryMeasure, 500);
       } else {
-        setRect(null); // element never appeared — show tooltip centered
+        // ✅ Element never mounted (e.g. form hidden behind condition) — auto-skip
+        setIdx((i) => {
+          const nextIdx = i + 1;
+          if (nextIdx < steps.length) return nextIdx;
+          // Was last step — end tour
+          localStorage.setItem(storageKey, "1");
+          setRun(false);
+          return i;
+        });
       }
     };
     tryMeasure();
