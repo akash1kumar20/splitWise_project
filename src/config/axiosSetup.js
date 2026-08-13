@@ -12,23 +12,33 @@ axios.interceptors.request.use((config) => {
   return config;
 });
 
+// ── Helper: clear localStorage but preserve tutorial completion keys ───────
+// ✅ Fix 4: localStorage.clear() was wiping tutorial keys, so tutorial
+// would restart after every logout. Now tutorial keys survive session resets.
+const clearSessionStorage = () => {
+  const PRESERVE = ["sp_home_tutorial_done", "sp_sheet_tutorial_done"];
+  const saved = {};
+  PRESERVE.forEach((k) => {
+    const v = localStorage.getItem(k);
+    if (v) saved[k] = v;
+  });
+  localStorage.clear();
+  Object.entries(saved).forEach(([k, v]) => localStorage.setItem(k, v));
+};
+
 // ── RESPONSE: catch 401 — try token refresh before redirecting ────────────
-// Instead of immediately logging out on 401, we first try to silently
-// refresh the token. If refresh succeeds, retry the failed request.
-// Only redirect to login if the refresh token is also expired/missing.
 axios.interceptors.response.use(
   (response) => response,
   async (error) => {
     if (
       error.response?.status === 401 &&
       error.config?.url?.includes("firebaseio.com") &&
-      !error.config._retried // prevent infinite retry loop
+      !error.config._retried
     ) {
       error.config._retried = true;
       const newToken = await refreshIdToken();
 
       if (newToken) {
-        // Swap the old auth token in the URL and retry
         const retryUrl = error.config.url.replace(
           /auth=[^&]+/,
           `auth=${newToken}`
@@ -36,8 +46,8 @@ axios.interceptors.response.use(
         return axios({ ...error.config, url: retryUrl });
       }
 
-      // Refresh also failed — session truly expired, force re-login
-      localStorage.clear();
+      // Refresh failed — clear session but keep tutorial progress
+      clearSessionStorage();
       window.location.href = "/";
     }
     return Promise.reject(error);

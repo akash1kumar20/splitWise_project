@@ -1,45 +1,42 @@
-// src/ExtraComponents/CustomTutorial.jsx
-// Zero-dependency tutorial engine — works with Vite 8, no library needed.
-// Spotlight effect via box-shadow trick. Mobile-friendly positioning.
-
 import { useState, useEffect, useCallback } from "react";
 
 const PADDING = 6;
 
-const getTooltipStyle = (rect, tooltipW = 300) => {
+const getTooltipStyle = (rect) => {
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const tooltipW = Math.min(280, vw - 28); // ✅ Fix 1: mobile-aware width
+  const tooltipH = 230;
+  const gap = 14;
+
   if (!rect) {
     return {
       position: "fixed",
       top: "50%",
       left: "50%",
       transform: "translate(-50%, -50%)",
+      width: tooltipW,
     };
   }
 
-  const viewW = window.innerWidth;
-  const viewH = window.innerHeight;
-  const tooltipH = 220;
-  const gap = 14;
+  // ✅ Fix 2: if target is in bottom 45% of screen → always go above
+  const goAbove = rect.top > vh * 0.55 || rect.bottom + tooltipH + gap > vh;
+  let top = goAbove
+    ? Math.max(gap, rect.top - tooltipH - gap)
+    : rect.bottom + gap;
 
-  // Prefer below target, fall back to above
-  let top =
-    rect.bottom + gap + tooltipH < viewH
-      ? rect.bottom + gap
-      : rect.top - tooltipH - gap;
-
-  // Center horizontally relative to target
   let left = rect.left + rect.width / 2 - tooltipW / 2;
-  left = Math.max(12, Math.min(left, viewW - tooltipW - 12));
-  top = Math.max(12, top);
+  left = Math.max(12, Math.min(left, vw - tooltipW - 12));
+  top  = Math.max(12, top);
 
   return { position: "fixed", top, left, width: tooltipW };
 };
 
 const CustomTutorial = ({ steps, storageKey, delay = 900 }) => {
-  const [idx, setIdx]         = useState(0);
-  const [run, setRun]         = useState(false);
-  const [rect, setRect]       = useState(null);
-  const [, forceUpdate]       = useState(0);
+  const [idx, setIdx]       = useState(0);
+  const [run, setRun]       = useState(false);
+  const [rect, setRect]     = useState(null);
+  const [, forceUpdate]     = useState(0);
 
   useEffect(() => {
     if (!localStorage.getItem(storageKey)) {
@@ -48,62 +45,61 @@ const CustomTutorial = ({ steps, storageKey, delay = 900 }) => {
     }
   }, [storageKey, delay]);
 
+  // ✅ Fix 3: retry finding element up to 8 times (500ms apart)
   const measureTarget = useCallback(() => {
     const step = steps[idx];
-    if (!step) return;
-    if (!step.target || step.target === "body") {
-      setRect(null);
-      return;
-    }
-    const el = document.querySelector(step.target);
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "center" });
-      // Wait for scroll then measure
-      setTimeout(() => {
-        const r = el.getBoundingClientRect();
-        setRect({ top: r.top, left: r.left, width: r.width, height: r.height });
-      }, 350);
-    } else {
-      setRect(null);
-    }
+    if (!step?.target || step.target === "body") { setRect(null); return; }
+
+    let attempts = 0;
+    const tryMeasure = () => {
+      const el = document.querySelector(step.target);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+        setTimeout(() => {
+          const r = el.getBoundingClientRect();
+          setRect({ top: r.top, left: r.left, width: r.width, height: r.height });
+        }, 350);
+      } else if (attempts < 8) {
+        attempts++;
+        setTimeout(tryMeasure, 500);
+      } else {
+        setRect(null); // element never appeared — show tooltip centered
+      }
+    };
+    tryMeasure();
   }, [idx, steps]);
 
   useEffect(() => {
-    if (run) measureTarget();
+    if (run) { setRect(null); measureTarget(); }
   }, [run, measureTarget]);
 
-  // Re-measure on resize
   useEffect(() => {
     if (!run) return;
-    const handler = () => { measureTarget(); forceUpdate((n) => n + 1); };
-    window.addEventListener("resize", handler);
-    return () => window.removeEventListener("resize", handler);
+    const h = () => { measureTarget(); forceUpdate(n => n + 1); };
+    window.addEventListener("resize", h);
+    return () => window.removeEventListener("resize", h);
   }, [run, measureTarget]);
 
   if (!run) return null;
 
-  const step  = steps[idx];
-  const total = steps.length;
+  const step   = steps[idx];
+  const total  = steps.length;
   const isLast  = idx === total - 1;
   const isFirst = idx === 0;
 
-  const finish = () => {
-    localStorage.setItem(storageKey, "1");
-    setRun(false);
-  };
-
-  const next = () => { setRect(null); setIdx((i) => i + 1); };
-  const back = () => { setRect(null); setIdx((i) => i - 1); };
+  const finish = () => { localStorage.setItem(storageKey, "1"); setRun(false); };
+  const next   = () => { setRect(null); setIdx(i => i + 1); };
+  const back   = () => { setRect(null); setIdx(i => i - 1); };
 
   return (
     <>
-      {/* Dark overlay */}
+      {/* Overlay */}
       <div
         className="fixed inset-0 z-[9000]"
         style={{ background: "rgba(0,0,0,0.55)", pointerEvents: "none" }}
       />
 
-      {/* Spotlight cutout via inverted box-shadow */}
+      {/* Spotlight */}
       {rect && (
         <div
           className="fixed z-[9001] rounded-xl"
@@ -130,48 +126,29 @@ const CustomTutorial = ({ steps, storageKey, delay = 900 }) => {
             <div
               key={i}
               className="h-1.5 rounded-full transition-all"
-              style={{
-                width: i === idx ? 20 : 8,
-                background: i === idx ? "#3b82f6" : "#e5e7eb",
-              }}
+              style={{ width: i === idx ? 20 : 8, background: i === idx ? "#3b82f6" : "#e5e7eb" }}
             />
           ))}
         </div>
 
-        {/* Content */}
-        <div className="text-sm text-gray-700 leading-relaxed">
-          {step.content}
-        </div>
+        <div className="text-sm text-gray-700 leading-relaxed">{step.content}</div>
 
-        {/* Buttons */}
         <div className="flex justify-between items-center mt-4">
-          <button
-            onClick={finish}
-            className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
-          >
+          <button onClick={finish} className="text-xs text-gray-400 hover:text-gray-600">
             Skip tour
           </button>
           <div className="flex gap-2">
             {!isFirst && (
-              <button
-                onClick={back}
-                className="text-xs bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-lg transition-colors"
-              >
+              <button onClick={back} className="text-xs bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-lg">
                 ← Back
               </button>
             )}
             {isLast ? (
-              <button
-                onClick={finish}
-                className="text-xs bg-blue-500 hover:bg-blue-600 text-white px-4 py-1.5 rounded-lg font-semibold transition-colors"
-              >
+              <button onClick={finish} className="text-xs bg-blue-500 hover:bg-blue-600 text-white px-4 py-1.5 rounded-lg font-semibold">
                 Done ✓
               </button>
             ) : (
-              <button
-                onClick={next}
-                className="text-xs bg-blue-500 hover:bg-blue-600 text-white px-4 py-1.5 rounded-lg font-semibold transition-colors"
-              >
+              <button onClick={next} className="text-xs bg-blue-500 hover:bg-blue-600 text-white px-4 py-1.5 rounded-lg font-semibold">
                 Next →
               </button>
             )}
