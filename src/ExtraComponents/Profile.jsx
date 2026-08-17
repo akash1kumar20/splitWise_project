@@ -16,8 +16,15 @@ const Profile = () => {
   const dispatch = useDispatch();
 
   const logoutHandler = () => {
-    // ✅ Fix 1: clear all persisted state so next user starts clean
+    // Preserve tutorial keys so users don't see the tour again after logout
+    const tutorialKeys = ["sp_home_tutorial_done", "sp_sheet_tutorial_done"];
+    const saved = {};
+    tutorialKeys.forEach((k) => {
+      const v = localStorage.getItem(k);
+      if (v) saved[k] = v;
+    });
     localStorage.clear();
+    Object.entries(saved).forEach(([k, v]) => localStorage.setItem(k, v));
     autCtx.logout();
     toast.error("Logged out successfully!", {
       position: "top-right",
