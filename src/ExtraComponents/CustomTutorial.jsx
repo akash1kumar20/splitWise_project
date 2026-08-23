@@ -26,22 +26,26 @@ const CustomTutorial = ({ steps, storageKey, delay = 900 }) => {
   const [idx, setIdx]           = useState(0);
   const [run, setRun]           = useState(false);
   const [rect, setRect]         = useState(null);
-  const [autoSkip, setAutoSkip] = useState(false); // ✅ clean skip flag
+  const [autoSkip, setAutoSkip] = useState(false);
+  const [userKey, setUserKey]   = useState(""); // ✅ user-specific key
   const [, forceUpdate]         = useState(0);
 
-  // ✅ Fix: check BOTH localStorage AND sessionStorage
-  // sessionStorage survives only the current tab session — covers the case
-  // where localStorage is cleared on logout but user stays on the same tab.
   useEffect(() => {
-    const seen = localStorage.getItem(storageKey) || sessionStorage.getItem(storageKey);
+    // ✅ Build a user-specific key so each account on the same device
+    // gets their own tutorial state. Falls back to generic key if no user.
+    const mail = localStorage.getItem("sp_convertedMail") ||
+                 localStorage.getItem("sp_userMail") || "";
+    const key = mail ? `${storageKey}_${mail}` : storageKey;
+    setUserKey(key);
+
+    const seen = localStorage.getItem(key) || sessionStorage.getItem(key);
     if (!seen) {
       const t = setTimeout(() => setRun(true), delay);
       return () => clearTimeout(t);
     }
   }, [storageKey, delay]);
 
-  // ✅ Handle auto-skip cleanly via separate useEffect — avoids calling
-  // setRun inside a setIdx callback which React doesn't guarantee to fire.
+  // Handle auto-skip cleanly via separate useEffect
   useEffect(() => {
     if (!autoSkip) return;
     setAutoSkip(false);
@@ -49,12 +53,11 @@ const CustomTutorial = ({ steps, storageKey, delay = 900 }) => {
     if (idx < steps.length - 1) {
       setIdx((i) => i + 1);
     } else {
-      // Last step — end tour
-      localStorage.setItem(storageKey, "1");
-      sessionStorage.setItem(storageKey, "1");
+      localStorage.setItem(userKey, "1");
+      sessionStorage.setItem(userKey, "1");
       setRun(false);
     }
-  }, [autoSkip, idx, steps.length, storageKey]);
+  }, [autoSkip, idx, steps.length, userKey]);
 
   const measureTarget = useCallback(() => {
     const step = steps[idx];
@@ -73,7 +76,6 @@ const CustomTutorial = ({ steps, storageKey, delay = 900 }) => {
         attempts++;
         setTimeout(tryMeasure, 500);
       } else {
-        // ✅ Element never found — trigger auto-skip via flag
         setAutoSkip(true);
       }
     };
@@ -93,14 +95,14 @@ const CustomTutorial = ({ steps, storageKey, delay = 900 }) => {
 
   if (!run) return null;
 
-  const step   = steps[idx];
-  const total  = steps.length;
+  const step    = steps[idx];
+  const total   = steps.length;
   const isLast  = idx === total - 1;
   const isFirst = idx === 0;
 
   const finish = () => {
-    localStorage.setItem(storageKey, "1");
-    sessionStorage.setItem(storageKey, "1"); // ✅ also save in session
+    localStorage.setItem(userKey, "1");
+    sessionStorage.setItem(userKey, "1");
     setRun(false);
   };
   const next = () => { setRect(null); setIdx((i) => i + 1); };
@@ -124,7 +126,8 @@ const CustomTutorial = ({ steps, storageKey, delay = 900 }) => {
         <div className="flex gap-1 mb-3">
           {steps.map((_, i) => (
             <div key={i} className="h-1.5 rounded-full transition-all"
-              style={{ width: i === idx ? 20 : 8, background: i === idx ? "#3b82f6" : "#e5e7eb" }} />
+              style={{ width: i === idx ? 20 : 8, background: i === idx ? "#3b82f6" : "#e5e7eb" }}
+            />
           ))}
         </div>
         <div className="text-sm text-gray-700 leading-relaxed">{step.content}</div>
