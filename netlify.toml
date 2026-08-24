@@ -9,3 +9,10 @@
 
 [build.environment]
   SECRETS_SCAN_OMIT_KEYS = "VITE_FIREBASE_DB_URL,VITE_FIREBASE_API_KEY,CLAUDE_API_KEY"
+
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+    Pragma = "no-cache"
+    Expires = "0"
