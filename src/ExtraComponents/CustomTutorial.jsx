@@ -27,18 +27,13 @@ const CustomTutorial = ({ steps, storageKey, delay = 900 }) => {
   const [run, setRun]           = useState(false);
   const [rect, setRect]         = useState(null);
   const [autoSkip, setAutoSkip] = useState(false);
-  const [userKey, setUserKey]   = useState(""); // ✅ user-specific key
   const [, forceUpdate]         = useState(0);
 
   useEffect(() => {
-    // ✅ Build a user-specific key so each account on the same device
-    // gets their own tutorial state. Falls back to generic key if no user.
-    const mail = localStorage.getItem("sp_convertedMail") ||
-                 localStorage.getItem("sp_userMail") || "";
-    const key = mail ? `${storageKey}_${mail}` : storageKey;
-    setUserKey(key);
-
-    const seen = localStorage.getItem(key) || sessionStorage.getItem(key);
+    // Simple key — no user suffix. Profile.jsx logout preserves this key.
+    // User-specific keys caused a race condition where sp_convertedMail
+    // wasn't available at mount time, making the key inconsistent.
+    const seen = localStorage.getItem(storageKey) || sessionStorage.getItem(storageKey);
     if (!seen) {
       const t = setTimeout(() => setRun(true), delay);
       return () => clearTimeout(t);
@@ -53,11 +48,11 @@ const CustomTutorial = ({ steps, storageKey, delay = 900 }) => {
     if (idx < steps.length - 1) {
       setIdx((i) => i + 1);
     } else {
-      localStorage.setItem(userKey, "1");
-      sessionStorage.setItem(userKey, "1");
+      localStorage.setItem(storageKey, "1");
+      sessionStorage.setItem(storageKey, "1");
       setRun(false);
     }
-  }, [autoSkip, idx, steps.length, userKey]);
+  }, [autoSkip, idx, steps.length, storageKey]);
 
   const measureTarget = useCallback(() => {
     const step = steps[idx];
@@ -101,8 +96,8 @@ const CustomTutorial = ({ steps, storageKey, delay = 900 }) => {
   const isFirst = idx === 0;
 
   const finish = () => {
-    localStorage.setItem(userKey, "1");
-    sessionStorage.setItem(userKey, "1");
+    localStorage.setItem(storageKey, "1");
+    sessionStorage.setItem(storageKey, "1");
     setRun(false);
   };
   const next = () => { setRect(null); setIdx((i) => i + 1); };
