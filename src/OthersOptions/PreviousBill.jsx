@@ -187,7 +187,7 @@ const PreviousBill = () => {
       )}
 
       {!isLoading &&
-        comingData.map((data, i) => {
+        comingData.slice().reverse().map((data, i) => {
           const generatedOn =
             data.generatedAt || decodeFirebaseDate(data.id) || "-";
           const timeStart = data.startingDate || null;
