@@ -1,0 +1,43 @@
+{
+  "name": "SplitExpense",
+  "short_name": "SplitExpense",
+  "description": "Track, split, and settle expenses with ease",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1e293b",
+  "theme_color": "#1e293b",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-180.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["finance", "utilities"],
+  "shortcuts": [
+    {
+      "name": "Add Sheet",
+      "url": "/home/sheets/addSheet",
+      "description": "Create a new expense sheet"
+    },
+    {
+      "name": "Find Sheet",
+      "url": "/home/sheets/findSheet",
+      "description": "Join an existing sheet"
+    }
+  ]
+}
