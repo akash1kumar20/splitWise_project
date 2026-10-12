@@ -9,7 +9,7 @@ const CardComponent = ({ children }) => {
       {/* Close Button */}
       <button
         onClick={() => navigate(-1)}
-        className="absolute top-4 right-4 text-white text-3xl font-bold hover:text-red-400 transition-colors"
+        className="absolute top-4 right-4 text-white text-3xl font-bold hover:text-red-400 active:text-red-400 transition-colors"
       >
         ×
       </button>

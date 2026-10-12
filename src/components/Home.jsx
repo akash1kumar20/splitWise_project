@@ -6,6 +6,7 @@ import Profile from "../ExtraComponents/Profile";
 import { FaUser } from "react-icons/fa";
 import useSessionPersist from "../customHooks/useSessionPersist";
 import HomeTutorial from "../ExtraComponents/HomeTutorial";
+import Loading from "../ExtraComponents/Loading";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -13,11 +14,15 @@ const Home = () => {
   const token = tokenRedux || localStorage.getItem("sp_token");
   const [openProfile, setOpenProfile] = useState(false);
 
-  useSessionPersist();
+  const { isRestoring } = useSessionPersist();
 
   useEffect(() => {
-    if (!token) navigate("/");
-  }, [token]);
+    if (!isRestoring && !token) navigate("/");
+  }, [isRestoring, navigate, token]);
+
+  if (isRestoring) {
+    return <Loading />;
+  }
 
   return (
     <>

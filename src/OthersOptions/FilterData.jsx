@@ -63,7 +63,7 @@ const FilterData = () => {
       {/* Top bar */}
       <div className="flex items-center justify-between px-4 py-4 border-b bg-white shadow-sm">
         <button
-          className="text-sm bg-gray-800 text-white px-4 py-2 rounded-xl hover:bg-gray-700 whitespace-nowrap"
+          className="text-sm bg-gray-800 text-white px-4 py-2 rounded-xl hover:bg-gray-700 active:bg-gray-700 whitespace-nowrap"
           onClick={() => navigate(-1)}
         >
           ← Back
@@ -95,7 +95,7 @@ const FilterData = () => {
                     ${
                       activeKey === tab.key
                         ? "bg-gray-800 text-white"
-                        : "bg-white text-gray-700 hover:bg-gray-100"
+                        : "bg-white text-gray-700 hover:bg-gray-100 active:bg-gray-100"
                     }`}
                 >
                   {tab.label}

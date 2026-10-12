@@ -12,13 +12,13 @@ const sheetModes = {
   split: {
     label: "Split Sheet",
     action: "Create Split Sheet",
-    accent: "bg-blue-600 hover:bg-blue-700",
+    accent: "bg-blue-600 hover:bg-blue-700 active:bg-blue-700",
     dot: "bg-blue-500",
   },
   personal: {
     label: "Personal Sheet",
     action: "Create Personal Sheet",
-    accent: "bg-purple-600 hover:bg-purple-700",
+    accent: "bg-purple-600 hover:bg-purple-700 active:bg-purple-700",
     dot: "bg-purple-500",
   },
 };
@@ -118,7 +118,7 @@ const CreateSheet = () => {
                   className={`flex-1 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all duration-200 ${
                     sheetType === key
                       ? `${mode.accent} text-white shadow-lg shadow-black/20`
-                      : "text-slate-300 hover:text-white hover:bg-white/5"
+                      : "text-slate-300 hover:text-white active:text-white hover:bg-white/5 active:bg-white/5"
                   }`}
                 >
                   {mode.label}

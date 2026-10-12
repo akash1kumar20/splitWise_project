@@ -160,13 +160,13 @@ const UpdateExpense = () => {
               <button
                 type="button"
                 onClick={() => navigate(-1)}
-                className="flex-1 bg-red-600 hover:bg-slate-500 text-white py-3 rounded-xl font-bold transition-colors"
+                className="flex-1 bg-red-600 hover:bg-slate-500 active:bg-slate-500 text-white py-3 rounded-xl font-bold transition-colors"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="flex-1 bg-blue-600 hover:bg-blue-500 text-white py-3 rounded-xl font-bold transition-colors"
+                className="flex-1 bg-blue-600 hover:bg-blue-500 active:bg-blue-500 text-white py-3 rounded-xl font-bold transition-colors"
               >
                 Save Changes
               </button>

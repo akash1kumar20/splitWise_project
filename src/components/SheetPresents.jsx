@@ -223,7 +223,7 @@ const SheetPresents = () => {
                 key={sheet.id}
               >
                 <FaTrash
-                  className="relative top-[20px] left-6 text-red-500 hover:text-red-700 cursor-pointer hover:scale-150"
+                  className="relative top-[20px] left-6 text-red-500 hover:text-red-700 active:text-red-700 cursor-pointer hover:scale-150 active:scale-150"
                   onClick={() => handleTrashClick(sheet)}
                 />
                 <p

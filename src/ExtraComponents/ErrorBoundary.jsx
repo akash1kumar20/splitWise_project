@@ -42,7 +42,7 @@ class ErrorBoundary extends Component {
             <div className="flex gap-3 justify-center">
               <button
                 onClick={() => window.location.reload()}
-                className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2.5 rounded-xl font-semibold transition-colors"
+                className="bg-blue-600 hover:bg-blue-500 active:bg-blue-500 text-white px-6 py-2.5 rounded-xl font-semibold transition-colors"
               >
                 Reload app
               </button>
@@ -51,7 +51,7 @@ class ErrorBoundary extends Component {
                   this.setState({ hasError: false, error: null });
                   window.location.href = "/";
                 }}
-                className="bg-gray-600 hover:bg-gray-500 text-white px-6 py-2.5 rounded-xl font-semibold transition-colors"
+                className="bg-gray-600 hover:bg-gray-500 active:bg-gray-500 text-white px-6 py-2.5 rounded-xl font-semibold transition-colors"
               >
                 Go home
               </button>

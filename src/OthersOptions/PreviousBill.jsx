@@ -162,7 +162,7 @@ const PreviousBill = () => {
       <div className="bg-white shadow-sm border-b px-4 py-3 sticky top-0">
         <div className="flex items-center justify-between">
           <button
-            className="text-sm bg-gray-800 text-white px-4 py-2 rounded-xl hover:bg-gray-700 whitespace-nowrap"
+            className="text-sm bg-gray-800 text-white px-4 py-2 rounded-xl hover:bg-gray-700 active:bg-gray-700 whitespace-nowrap"
             onClick={() => navigate(-1)}
           >
             ← Back
@@ -204,7 +204,7 @@ const PreviousBill = () => {
                 </span>
                 {isAdmin && (
                   <button
-                    className="bg-gray-800 hover:bg-gray-700 text-white text-xs px-2 py-1.5 rounded-xl whitespace-nowrap"
+                    className="bg-gray-800 hover:bg-gray-700 active:bg-gray-700 text-white text-xs px-2 py-1.5 rounded-xl whitespace-nowrap"
                     onClick={() =>
                       generatePDF(data, sheetAdmin, i, currentSheetMeta)
                     }

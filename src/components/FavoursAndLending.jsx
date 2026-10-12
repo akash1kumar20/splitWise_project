@@ -74,7 +74,7 @@ const FavoursAndLending = () => {
            border border-[rgb(203,213,225)] py-2 px-4 shadow-lg drop-shadow-xl mx-auto rounded-md"
         >
           <button
-            className="text-sm bg-[rgb(30,41,59)] text-white px-4 py-2 rounded-xl hover:bg-[rgb(15,23,42)]"
+            className="text-sm bg-[rgb(30,41,59)] text-white px-4 py-2 rounded-xl hover:bg-[rgb active:bg-[rgb(15,23,42)]"
             onClick={() => navigate(-1)}
           >
             ← Back

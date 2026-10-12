@@ -167,7 +167,7 @@ const DisplayExpense = ({ expenseTrigger }) => {
         {length && !isLoading && (
           <div className="flex justify-end px-4 mb-2">
             <button
-              className="text-xs bg-gray-700 hover:bg-gray-600 text-white px-3 py-1.5 rounded-lg"
+              className="text-xs bg-gray-700 hover:bg-gray-600 active:bg-gray-600 text-white px-3 py-1.5 rounded-lg"
               onClick={() => exportToCSV(comingData)}
             >
               ⬇ Export CSV

@@ -80,7 +80,7 @@ const DeleteUser = () => {
       {/* Top bar */}
       <div className="flex items-center justify-between px-4 py-4 border-b bg-white shadow-sm">
         <button
-          className="text-sm bg-gray-800 text-white px-4 py-2 rounded-xl hover:bg-gray-700 whitespace-nowrap"
+          className="text-sm bg-gray-800 text-white px-4 py-2 rounded-xl hover:bg-gray-700 active:bg-gray-700 whitespace-nowrap"
           onClick={() => navigate(-1)}
         >
           ← Back
@@ -113,7 +113,7 @@ const DeleteUser = () => {
                   {data.userName}
                 </span>
                 <button
-                  className="text-red-500 hover:text-red-700 hover:scale-110 transition-transform"
+                  className="text-red-500 hover:text-red-700 active:text-red-700 hover:scale-110 active:scale-110 transition-transform"
                   onClick={() => setPendingDelete(data.id)}
                 >
                   <TbTrashXFilled className="text-2xl" />

@@ -203,7 +203,7 @@ const ChangePassword = () => {
                     <button
                       type="button"
                       onClick={() => setShowCurrentPassword((prev) => !prev)}
-                      className="shrink-0 rounded-lg p-1 text-slate-600 transition hover:text-slate-900"
+                      className="shrink-0 rounded-lg p-1 text-slate-600 transition hover:text-slate-900 active:text-slate-900"
                       aria-label={
                         showCurrentPassword
                           ? "Hide current password"
@@ -235,7 +235,7 @@ const ChangePassword = () => {
                     <button
                       type="button"
                       onClick={() => setShowPassword((prev) => !prev)}
-                      className="shrink-0 rounded-lg p-1 text-slate-600 transition hover:text-slate-900"
+                      className="shrink-0 rounded-lg p-1 text-slate-600 transition hover:text-slate-900 active:text-slate-900"
                       aria-label={
                         showPassword ? "Hide password" : "Show password"
                       }
@@ -269,7 +269,7 @@ const ChangePassword = () => {
                     <button
                       type="button"
                       onClick={() => setShowConfirmPassword((prev) => !prev)}
-                      className="shrink-0 rounded-lg p-1 text-slate-600 transition hover:text-slate-900"
+                      className="shrink-0 rounded-lg p-1 text-slate-600 transition hover:text-slate-900 active:text-slate-900"
                       aria-label={
                         showConfirmPassword
                           ? "Hide confirm password"
@@ -290,13 +290,13 @@ const ChangePassword = () => {
             <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:justify-center">
               <button
                 type="submit"
-                className="inline-flex w-full items-center justify-center rounded-xl bg-blue-700 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-900/20 transition hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-2 focus:ring-offset-slate-800 sm:w-auto"
+                className="inline-flex w-full items-center justify-center rounded-xl bg-blue-700 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-900/20 transition hover:bg-blue-600 active:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-2 focus:ring-offset-slate-800 sm:w-auto"
               >
                 Submit
               </button>
               <button
                 type="button"
-                className="inline-flex w-full items-center justify-center rounded-xl bg-red-700 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-red-900/20 transition hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300 focus:ring-offset-2 focus:ring-offset-slate-800 sm:w-auto"
+                className="inline-flex w-full items-center justify-center rounded-xl bg-red-700 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-red-900/20 transition hover:bg-red-600 active:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300 focus:ring-offset-2 focus:ring-offset-slate-800 sm:w-auto"
                 onClick={() => navigate(-1)}
               >
                 Cancel

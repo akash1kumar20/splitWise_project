@@ -41,11 +41,11 @@ const ForLargerScreen = ({ comingData, updateHandler, deleteHandler }) => {
               <td className="tableElementSide">
                 <span className="flex gap-x-6 ms-10">
                   <FaPenAlt
-                    className="text-yellow-400 text-lg cursor-pointer hover:scale-x-125"
+                    className="text-yellow-400 text-lg cursor-pointer hover:scale-x-125 active:scale-x-125"
                     onClick={() => updateHandler(data)}
                   />
                   <FaTrash
-                    className="text-red-500  text-lg cursor-pointer hover:scale-x-125"
+                    className="text-red-500  text-lg cursor-pointer hover:scale-x-125 active:scale-x-125"
                     onClick={() => deleteHandler(data.id)}
                   />
                 </span>

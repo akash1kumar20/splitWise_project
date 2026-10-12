@@ -127,15 +127,15 @@ const CustomTutorial = ({ steps, storageKey, delay = 900 }) => {
         </div>
         <div className="text-sm text-gray-700 leading-relaxed">{step.content}</div>
         <div className="flex justify-between items-center mt-4">
-          <button onClick={finish} className="text-xs text-gray-400 hover:text-gray-600">Skip tour</button>
+          <button onClick={finish} className="text-xs text-gray-400 hover:text-gray-600 active:text-gray-600">Skip tour</button>
           <div className="flex gap-2">
             {!isFirst && (
-              <button onClick={back} className="text-xs bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-lg">← Back</button>
+              <button onClick={back} className="text-xs bg-gray-100 hover:bg-gray-200 active:bg-gray-200 px-3 py-1.5 rounded-lg">← Back</button>
             )}
             {isLast ? (
-              <button onClick={finish} className="text-xs bg-blue-500 hover:bg-blue-600 text-white px-4 py-1.5 rounded-lg font-semibold">Done ✓</button>
+              <button onClick={finish} className="text-xs bg-blue-500 hover:bg-blue-600 active:bg-blue-600 text-white px-4 py-1.5 rounded-lg font-semibold">Done ✓</button>
             ) : (
-              <button onClick={next} className="text-xs bg-blue-500 hover:bg-blue-600 text-white px-4 py-1.5 rounded-lg font-semibold">Next →</button>
+              <button onClick={next} className="text-xs bg-blue-500 hover:bg-blue-600 active:bg-blue-600 text-white px-4 py-1.5 rounded-lg font-semibold">Next →</button>
             )}
           </div>
         </div>

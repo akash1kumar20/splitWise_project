@@ -208,7 +208,7 @@ const AddAccount = () => {
               </div>
             )}
             <button
-              className="bg-blue-400 px-6 py-2 rounded-lg my-2 text-slate-900 drop-shadow-2xl shadow-2xl hover:bg-blue-800 hover:text-white"
+              className="bg-blue-400 px-6 py-2 rounded-lg my-2 text-slate-900 drop-shadow-2xl shadow-2xl hover:bg-blue-800 active:bg-blue-800 hover:text-white active:text-white"
               onClick={(event) => formSubmitHandler(event)}
             >
               {isLogIn ? "Log In" : "Sign Up"}

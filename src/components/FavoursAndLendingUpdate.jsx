@@ -177,13 +177,13 @@ const FavoursAndLendingUpdate = () => {
                 <button
                   type="button"
                   onClick={() => navigate(-1)}
-                  className="flex-1 bg-red-600 hover:bg-red-700 transition py-3 rounded-xl font-bold text-lg"
+                  className="flex-1 bg-red-600 hover:bg-red-700 active:bg-red-700 transition py-3 rounded-xl font-bold text-lg"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 bg-blue-600 hover:bg-blue-700 transition py-3 rounded-xl font-bold text-lg"
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 active:bg-blue-700 transition py-3 rounded-xl font-bold text-lg"
                 >
                   Save Changes
                 </button>

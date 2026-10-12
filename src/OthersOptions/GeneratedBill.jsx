@@ -285,7 +285,7 @@ const GeneratedBill = () => {
       {!isLoading && (
         <div className="flex items-center justify-between px-6 py-4 border-b bg-white shadow-sm sticky top-0 z-10">
           <button
-            className="text-sm bg-gray-800 text-white px-4 py-2 rounded-xl hover:bg-gray-700"
+            className="text-sm bg-gray-800 text-white px-4 py-2 rounded-xl hover:bg-gray-700 active:bg-gray-700"
             onClick={() => navigate(-1)}
           >
             Back
@@ -517,8 +517,8 @@ const GeneratedBill = () => {
                               className={`print:hidden text-xs mt-2 px-3 py-1 rounded-full font-semibold border transition-all
                                 ${
                                   paid
-                                    ? "bg-green-600 text-white border-green-600 hover:bg-red-500 hover:border-red-500"
-                                    : "bg-white text-gray-600 border-gray-300 hover:border-green-500 hover:text-green-600"
+                                    ? "bg-green-600 text-white border-green-600 hover:bg-red-500 active:bg-red-500 hover:border-red-500 active:border-red-500"
+                                    : "bg-white text-gray-600 border-gray-300 hover:border-green-500 active:border-green-500 hover:text-green-600 active:text-green-600"
                                 }`}
                               onClick={() => togglePaid(s)}
                             >
@@ -585,7 +585,7 @@ const GeneratedBill = () => {
             {isAdmin ? (
               allSettled ? (
                 <button
-                  className="bg-green-600 hover:bg-green-700 text-white font-bold px-8 py-3 rounded-2xl shadow-lg"
+                  className="bg-green-600 hover:bg-green-700 active:bg-green-700 text-white font-bold px-8 py-3 rounded-2xl shadow-lg"
                   onClick={() => setShowConfirm(true)}
                 >
                   Generate New Bill
@@ -601,7 +601,7 @@ const GeneratedBill = () => {
               </div>
             )}
             <button
-              className="bg-gray-800 hover:bg-gray-700 text-white font-bold px-8 py-3 rounded-2xl shadow-lg"
+              className="bg-gray-800 hover:bg-gray-700 active:bg-gray-700 text-white font-bold px-8 py-3 rounded-2xl shadow-lg"
               onClick={() => navigate(-1)}
             >
               Add More
