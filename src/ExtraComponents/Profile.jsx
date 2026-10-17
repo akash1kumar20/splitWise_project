@@ -5,6 +5,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useDispatch, useSelector } from "react-redux";
 import { themeSliceActions } from "../../store/themeSlice";
+import { expenseSheetActions } from "../../store/expenseSheetSlice";
 import DemoVideo from "./DemoVideo";
 
 const Profile = () => {
@@ -25,6 +26,9 @@ const Profile = () => {
     });
     localStorage.clear();
     Object.entries(saved).forEach(([k, v]) => localStorage.setItem(k, v));
+    // ✅ Clear Redux store token — without this, Home.jsx still sees the
+    // old token in Redux and stays on /home instead of redirecting to login.
+    dispatch(expenseSheetActions.setToken(null));
     autCtx.logout();
     toast.error("Logged out successfully!", {
       position: "top-right",
